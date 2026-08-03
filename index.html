@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sbr System - Dashboard</title>
+    
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Variabel Warna Mode Terang */
+        :root {
+            --bg-color: #f3f4f6;
+            --text-color: #1f2937;
+            --card-bg: #ffffff;
+            --icon-bg: #eff6ff;
+            --border-color: #e5e7eb;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            --card-shadow-hover: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --accent-color: #2563eb;
+            --subtitle-color: #6b7280;
+            --transition: all 0.2s ease;
+        }
+
+        /* Variabel Warna Mode Gelap */
+        [data-theme="dark"] {
+            --bg-color: #111827;
+            --text-color: #f9fafb;
+            --card-bg: #1f2937;
+            --icon-bg: #374151;
+            --border-color: #374151;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --card-shadow-hover: 0 4px 6px -1px rgba(0,0,0,0.5);
+            --accent-color: #60a5fa;
+            --subtitle-color: #9ca3af;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color var(--transition), color var(--transition);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5% 1rem;
+            max-width: 600px; /* Disesuaikan agar proporsional dengan list 1 kolom */
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header-text h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-text p {
+            font-size: 0.7rem;
+            color: var(--subtitle-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        /* Tombol Toggle Tema */
+        .theme-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        /* Main Container - Diubah menjadi list vertikal */
+        main {
+            flex: 1;
+            padding: 0.5rem 5% 2rem;
+            max-width: 600px; /* Membatasi lebar maksimal agar tidak terlalu melar di PC */
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column; /* Mengubah layout menjadi baris ke bawah */
+            gap: 1rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: var(--text-color);
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateX(4px); /* Efek hover digeser sedikit ke kanan, cocok untuk list */
+            box-shadow: var(--card-shadow-hover);
+            border-color: var(--accent-color);
+        }
+
+        /* Wadah Icon Kecil */
+        .icon-wrapper {
+            background-color: var(--icon-bg);
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .card i {
+            font-size: 1.1rem;
+            color: var(--accent-color);
+        }
+
+        /* Teks Card */
+        .card-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-text h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .card-text p {
+            font-size: 0.75rem;
+            color: var(--subtitle-color);
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header System -->
+    <header>
+        <div class="header-text">
+            <h1>Sbr System</h1>
+            <p>Versi Tiga</p>
+        </div>
+        <!-- Tombol Icon Interaktif -->
+        <button class="theme-toggle" id="themeToggle" aria-label="Ubah Tema">
+            <i class="fa-solid fa-moon"></i>
+        </button>
+    </header>
+
+    <!-- Main Dashboard Menu -->
+    <main>
+        <a href="reseller_paymentv4.html" class="card">
+            <div class="icon-wrapper">
+                <i class="fa-solid fa-file-invoice"></i>
+            </div>
+            <div class="card-text">
+                <h3>Pembayaran Reseller</h3>
+                <p>Trial and erro rekapan untuk kontrabon reseller aromanis</p>
+            </div>
+        </a>
+        
+    </main>
+
+    <!-- Script Interaktif untuk Dark/Light Mode -->
+    <script>
+        const toggleBtn = document.getElementById('themeToggle');
+        const toggleIcon = toggleBtn.querySelector('i');
+        const htmlElement = document.documentElement;
+
+        // Cek tema di local storage
+        const savedTheme = localStorage.getItem('sbr-theme');
+        if (savedTheme) {
+            htmlElement.setAttribute('data-theme', savedTheme);
+            updateIcon(savedTheme);
+        }
+
+        // Fungsi klik tombol
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('sbr-theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        // Fungsi ubah icon
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                toggleIcon.className = 'fa-solid fa-sun';
+            } else {
+                toggleIcon.className = 'fa-solid fa-moon';
+            }
+        }
+    </script>
+</body>
+</html>

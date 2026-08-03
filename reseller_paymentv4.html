@@ -1,0 +1,1108 @@
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pembayaran Reseller - SBR Putra Food</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <!-- html2canvas untuk Save as PNG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid #e2e8f0; }
+        input, select { transition: all 0.2s ease-in-out; }
+        input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
+        
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; }
+            body * { visibility: hidden; }
+            #areaPrint, #areaPrint * { visibility: visible; }
+            #areaPrint { 
+                position: absolute; left: 0; top: 0; width: 100%; 
+                margin: 0; padding: 0; box-shadow: none !important; border: none !important;
+            }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12 relative">
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Top Navigation -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-30 print:hidden">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-14">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-600 p-1.5 rounded-lg text-white shadow-sm shadow-blue-200">
+                        <i data-feather="box" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-sm leading-tight text-gray-900">SBR Putra Food</h1>
+                        <p class="text-[10px] text-gray-500 font-medium">Sistem Kalkulasi Reseller</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="relative group">
+                        <button class="flex items-center space-x-1 text-xs font-medium text-gray-600 hover:text-blue-600 focus:outline-none px-2 py-1.5 rounded-lg hover:bg-gray-50 transition cursor-pointer">
+                            <i data-feather="database" class="w-3.5 h-3.5"></i>
+                            <span class="hidden sm:inline">Manajemen Data</span>
+                            <i data-feather="chevron-down" class="w-3 h-3 mt-0.5"></i>
+                        </button>
+                        <div class="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
+                            <div class="py-1">
+                                <a href="#" onclick="openModal('modalAgen'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="users" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Data Agen</a>
+                                <a href="#" onclick="openModal('modalBarang'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="layers" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Master Barang</a>
+                                <a href="#" onclick="openModal('modalHarga'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="tag" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Harga Khusus</a>
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <a href="#" onclick="openModal('modalRiwayat'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="clock" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Riwayat Pembayaran</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-1.5 bg-yellow-50 px-2.5 py-1 rounded-full border border-yellow-100 shadow-sm" id="status-connection">
+                        <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span></span>
+                        <span id="text-connection" class="text-[10px] font-semibold text-yellow-700 tracking-wide hidden sm:inline">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-5 print:hidden">
+        
+        <div class="flex flex-wrap items-center gap-4 mb-6 bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+            <div class="flex items-center gap-2">
+                <label class="text-xs font-bold text-gray-500">Reseller:</label>
+                <select id="resellerSelect" class="w-48 rounded border border-gray-300 py-1 px-2 text-sm text-gray-800 bg-gray-50 hover:bg-white focus:bg-white cursor-pointer font-semibold outline-none">
+                    <option value="">-- Pilih --</option>
+                </select>
+            </div>
+            <div class="w-px h-6 bg-gray-200 hidden md:block"></div>
+            <div class="flex items-center gap-2">
+                <label class="text-xs font-bold text-gray-500">Tanggal:</label>
+                <input type="date" id="tglTransaksi" class="w-36 rounded border border-gray-300 py-1 px-2 text-sm text-gray-800 bg-gray-50 hover:bg-white focus:bg-white font-medium outline-none">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            
+            <!-- KIRI: Kasbon Bahan -->
+            <div class="glass-card rounded-xl p-4 shadow-sm border-t-4 border-t-red-500 flex flex-col h-full">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
+                    <h2 class="text-sm font-bold text-gray-800 flex items-center">
+                        <i data-feather="shopping-bag" class="w-4 h-4 text-red-600 mr-1.5"></i> Pengambilan Bahan
+                    </h2>
+                    <button onclick="addRow('bahanBaku')" class="text-[11px] bg-red-50 hover:bg-red-100 text-red-600 font-bold py-1 px-2.5 rounded flex items-center transition">
+                        <i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah
+                    </button>
+                </div>
+                
+                <div class="flex text-[10px] font-bold text-gray-400 px-1 mb-1.5 uppercase tracking-wider">
+                    <div class="w-2/12 text-center">Qty</div>
+                    <div class="w-4/12 pl-1">Item Bahan</div>
+                    <div class="w-3/12 text-right">Harga</div>
+                    <div class="w-3/12 text-right pr-2">Subtotal</div>
+                </div>
+                
+                <div id="containerBahanBaku" class="space-y-1 custom-scroll"></div>
+
+                <div class="mt-auto pt-3 mt-4 border-t border-gray-100 flex justify-between items-center">
+                    <span class="text-xs font-bold text-gray-500">Subtotal Bahan Baku:</span>
+                    <span id="subtotalBahanBakuLayar" class="text-sm font-bold text-red-500">Rp 0</span>
+                </div>
+            </div>
+
+            <!-- KANAN: Barang Jadi & Ringkasan -->
+            <div class="space-y-6 flex flex-col">
+                
+                <div class="glass-card rounded-xl p-4 shadow-sm border-t-4 border-t-blue-500 flex flex-col">
+                    <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
+                        <h2 class="text-sm font-bold text-gray-800 flex items-center">
+                            <i data-feather="package" class="w-4 h-4 text-blue-600 mr-1.5"></i> Setoran Barang Jadi
+                        </h2>
+                        <button onclick="addRow('barangJadi')" class="text-[11px] bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold py-1 px-2.5 rounded flex items-center transition">
+                            <i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah
+                        </button>
+                    </div>
+
+                    <div class="flex text-[10px] font-bold text-gray-400 px-1 mb-1.5 uppercase tracking-wider">
+                        <div class="w-2/12 text-center">Qty</div>
+                        <div class="w-4/12 pl-1">Barang Jadi</div>
+                        <div class="w-3/12 text-right">Harga</div>
+                        <div class="w-3/12 text-right pr-2">Subtotal</div>
+                    </div>
+                    
+                    <div id="containerBarangJadi" class="space-y-1 custom-scroll"></div>
+
+                    <div class="mt-auto pt-3 mt-4 border-t border-gray-100 flex justify-between items-center">
+                        <span class="text-xs font-bold text-gray-500">Subtotal Barang Jadi:</span>
+                        <span id="subtotalBarangJadiLayar" class="text-sm font-bold text-blue-500">Rp 0</span>
+                    </div>
+                </div>
+
+                <!-- Ringkasan -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+                    <h2 class="text-sm font-bold text-gray-800 mb-3 flex items-center">
+                        <i data-feather="file-text" class="w-4 h-4 mr-1.5 text-blue-500"></i> Ringkasan Akhir
+                    </h2>
+                    
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center bg-gray-50 py-1.5 px-2.5 rounded border border-gray-100">
+                            <span class="text-[11px] text-gray-600 font-medium">Total Setoran</span>
+                            <span id="summarySetoran" class="text-xs font-bold text-blue-600">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-gray-50 py-1.5 px-2.5 rounded border border-gray-100">
+                            <span class="text-[11px] text-gray-600 font-medium">Total Pengambilan Bahan</span>
+                            <span id="summaryKasbon" class="text-xs font-bold text-red-500">- Rp 0</span>
+                        </div>
+                        
+                        <!-- Kasbon Manual Multi Row -->
+                        <div class="bg-gray-50 py-2 px-2.5 rounded border border-gray-100 transition-all">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[11px] text-gray-600 font-bold flex items-center gap-1.5">
+                                    <i data-feather="dollar-sign" class="w-3 h-3 text-red-500"></i> Kasbon Lain/Uang
+                                </span>
+                                <span id="summaryManual" class="text-xs font-bold text-red-500">- Rp 0</span>
+                            </div>
+                            <div id="listKasbonManual" class="mt-2 pt-2 border-t border-gray-200"></div>
+                            <button onclick="addKasbonManual()" class="mt-2 text-[10px] bg-white border border-gray-200 text-gray-600 hover:text-blue-600 hover:border-blue-300 py-1 px-2 rounded flex items-center gap-1 w-full justify-center transition">
+                                <i data-feather="plus" class="w-3 h-3"></i> Tambah Kolom Kasbon
+                            </button>
+                        </div>
+                        
+                        <div class="pt-2 mt-2 border-t border-gray-200 flex justify-between items-end">
+                            <span class="block text-xs text-gray-700 font-bold">Net Pembayaran</span>
+                            <span id="summaryNet" class="block text-lg font-black text-green-500">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 grid grid-cols-2 gap-3">
+                        <button onclick="bukaPratinjau()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm">
+                            <i data-feather="eye" class="w-3.5 h-3.5 mr-1.5"></i> Pratinjau
+                        </button>
+                        <button id="btnSubmit" onclick="simpanTransaksi()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm shadow-blue-200">
+                            <i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PRATINJAU NOTA (LANDSCAPE & RINGKASAN DI KANAN BAWAH) -->
+    <div id="modalPratinjau" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
+        <div onclick="closeModal('modalPratinjau')" class="absolute inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm pointer-events-auto transition-opacity"></div>
+        <div class="bg-gray-100 w-full max-w-4xl rounded-xl shadow-2xl pointer-events-auto transform scale-95 transition-transform duration-200 relative overflow-hidden flex flex-col max-h-[95vh]">
+            <div class="bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center no-print sticky top-0 z-10">
+                <h3 class="text-sm font-bold text-gray-700">Pratinjau Nota (Landscape)</h3>
+                <div class="flex gap-2">
+                    <button onclick="simpanPNG()" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="image" class="w-3 h-3 mr-1"></i> Simpan PNG</button>
+                    <button onclick="window.print()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="printer" class="w-3 h-3 mr-1"></i> Cetak A4</button>
+                    <button onclick="closeModal('modalPratinjau')" class="bg-gray-50 text-gray-500 hover:bg-gray-200 border border-gray-200 p-1.5 rounded transition"><i data-feather="x" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+            
+            <div id="areaPrint" class="bg-white p-6 md:p-8 overflow-y-auto w-full">
+                <!-- Header -->
+                <div class="border-b-2 border-gray-800 pb-3 mb-4 text-center">
+                    <h2 class="text-xl font-black text-gray-900 uppercase tracking-wide">SBR Putra Food</h2>
+                    <p class="text-[10px] font-medium text-gray-500 mt-0.5">Grosir Makanan Ringan (Makroni Naruto, Aromanis, Basreng Kiwari)</p>
+                    <p class="text-xs font-bold text-gray-800 mt-2 bg-gray-100 inline-block px-3 py-1 rounded">NOTA PEMBAYARAN RESELLER</p>
+                </div>
+                
+                <!-- Info Reseller -->
+                <div class="flex justify-between items-end mb-6 text-xs font-medium text-gray-700">
+                    <div>
+                        <p class="text-gray-500 mb-0.5">Agen / Reseller:</p>
+                        <p id="notaNama" class="text-sm font-bold text-gray-900">-</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-gray-500 mb-0.5">Tanggal Transaksi:</p>
+                        <p id="notaTgl" class="font-bold text-gray-900">-</p>
+                    </div>
+                </div>
+
+                <!-- Grid 2 Kolom -->
+                <div class="grid grid-cols-2 gap-8 mb-4 items-start">
+                    <!-- KIRI: Pengambilan Bahan Baku -->
+                    <div>
+                        <h4 class="text-[11px] font-bold text-gray-800 bg-red-50 border border-red-100 px-2 py-1.5 mb-2 rounded flex items-center">
+                            <i data-feather="arrow-up-right" class="w-3 h-3 mr-1 text-red-500"></i> PENGAMBILAN BAHAN BAKU (KASBON)
+                        </h4>
+                        <table class="w-full text-[11px] text-left mb-2">
+                            <thead>
+                                <tr class="border-b border-gray-200 text-gray-500"><th class="pb-1 font-semibold">Item</th><th class="pb-1 font-semibold text-center w-12">Qty</th><th class="pb-1 font-semibold text-right w-20">Harga</th><th class="pb-1 font-semibold text-right w-24">Total</th></tr>
+                            </thead>
+                            <tbody id="notaListBahan" class="text-gray-700"></tbody>
+                        </table>
+                        <div class="flex justify-end text-[11px] font-bold text-red-600 border-t border-gray-200 pt-1">
+                            Subtotal: <span id="notaSubBahan" class="ml-4">- Rp 0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- KANAN: Setoran Barang Jadi & Ringkasan -->
+                    <div class="flex flex-col gap-6">
+                        <div>
+                            <h4 class="text-[11px] font-bold text-gray-800 bg-blue-50 border border-blue-100 px-2 py-1.5 mb-2 rounded flex items-center">
+                                <i data-feather="arrow-down-left" class="w-3 h-3 mr-1 text-blue-500"></i> SETORAN BARANG JADI
+                            </h4>
+                            <table class="w-full text-[11px] text-left mb-2">
+                                <thead>
+                                    <tr class="border-b border-gray-200 text-gray-500"><th class="pb-1 font-semibold">Item</th><th class="pb-1 font-semibold text-center w-12">Qty</th><th class="pb-1 font-semibold text-right w-20">Harga</th><th class="pb-1 font-semibold text-right w-24">Total</th></tr>
+                                </thead>
+                                <tbody id="notaListSetoran" class="text-gray-700"></tbody>
+                            </table>
+                            <div class="flex justify-end text-[11px] font-bold text-blue-700 border-t border-gray-200 pt-1">
+                                Subtotal: <span id="notaSubSetoran" class="ml-4">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Ringkasan Tepat di Bawah Setoran Barang Jadi -->
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mt-auto">
+                            <div class="mb-4">
+                                <h4 class="text-[11px] font-bold text-gray-800 border-b border-gray-300 pb-1 mb-2">PINJAMAN / KASBON UANG LAINNYA</h4>
+                                <table class="w-full text-[11px] text-left mb-2"><tbody id="notaListManual" class="text-gray-700"></tbody></table>
+                                <div class="flex justify-end text-[11px] font-bold text-red-600 border-t border-gray-200 pt-1">Total Kasbon Uang: <span id="notaSubManual" class="ml-4">- Rp 0</span></div>
+                            </div>
+                            
+                            <div class="border-t-2 border-dashed border-gray-300 pt-4 flex justify-between items-center">
+                                <span class="text-sm font-black text-gray-700 uppercase tracking-wide">Total Net Pembayaran</span>
+                                <span id="notaGrandTotal" class="text-xl font-black text-gray-900">Rp 0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 text-center text-[9px] text-gray-400 font-medium">
+                    <p>Terima kasih atas kerjasamanya.</p>
+                    <p>Sistem Manajemen SBR Putra Food &copy; 2026</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL OVERLAY -->
+    <div id="modalOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm hidden z-40 transition-opacity"></div>
+    
+    <!-- MODAL CRUD: DATA AGEN -->
+    <div id="modalAgen" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-transform duration-200 flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="users" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Data Agen</h3>
+                <button onclick="closeModal('modalAgen')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto space-y-4 flex-1">
+                <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100">
+                    <input type="hidden" id="editAgenId">
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1" id="labelFormAgen">Tambah Agen Baru</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="inputNamaAgen" placeholder="Nama Reseller / Agen..." class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none focus:border-blue-500">
+                        <button onclick="simpanAgen()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-sm transition whitespace-nowrap">Simpan</button>
+                        <button id="btnBatalAgen" onclick="resetFormAgen()" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold px-2.5 py-2 rounded-lg transition">Batal</button>
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wide">Daftar Agen</h4>
+                    <ul id="listModalAgen" class="space-y-1 divide-y divide-gray-100 border border-gray-200 rounded-xl overflow-hidden text-xs bg-white max-h-48 overflow-y-auto custom-scroll"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL CRUD: MASTER BARANG (TOMBOL TAMBAH DI HEADER & FORM HIDDEN DEFAULT) -->
+    <div id="modalBarang" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="layers" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Master Barang</h3>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleFormBarang()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Barang</button>
+                    <button onclick="closeModal('modalBarang')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+            <div class="p-4 overflow-hidden flex flex-col gap-4 flex-1">
+                
+                <!-- Form Tambah/Edit Barang (HIDDEN BY DEFAULT) -->
+                <div id="formBarangContainer" class="hidden bg-blue-50/50 p-3 rounded-xl border border-blue-100 space-y-2 shrink-0 transition-all">
+                    <input type="hidden" id="editBarangId">
+                    <label class="block text-[11px] font-bold text-gray-600" id="labelFormBarang">Tambah Barang Baru</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <input type="text" id="inputNamaBarang" placeholder="Nama Barang..." class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none">
+                        <select id="inputTipeBarang" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none">
+                            <option value="jadi">Barang Jadi</option>
+                            <option value="bahan">Bahan Baku</option>
+                        </select>
+                        <input type="number" id="inputHargaDefault" placeholder="Harga Default (Rp)" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none">
+                    </div>
+                    <div class="flex justify-end gap-2 pt-1">
+                        <button id="btnBatalBarang" onclick="resetFormBarang()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg transition hidden">Batal</button>
+                        <button onclick="simpanBarang()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-1.5 rounded-lg shadow-sm transition">Simpan Barang</button>
+                    </div>
+                </div>
+
+                <!-- Input Pencarian -->
+                <div class="relative shrink-0">
+                    <i data-feather="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-400"></i>
+                    <input type="text" id="searchMasterBarang" placeholder="Cari nama barang..." class="w-full text-xs py-2.5 pl-9 pr-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white outline-none focus:border-blue-500 transition">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-hidden">
+                    <div class="border border-gray-200 rounded-xl p-2 bg-white flex flex-col">
+                        <h4 class="font-bold text-xs mb-2 text-gray-700 border-b pb-1">Barang Jadi</h4>
+                        <ul id="listModalBarangJadi" class="space-y-1 max-h-[30vh] overflow-y-auto custom-scroll pr-1 flex-1"></ul>
+                    </div>
+                    <div class="border border-gray-200 rounded-xl p-2 bg-white flex flex-col">
+                        <h4 class="font-bold text-xs mb-2 text-gray-700 border-b pb-1">Bahan Baku</h4>
+                        <ul id="listModalBahanBaku" class="space-y-1 max-h-[30vh] overflow-y-auto custom-scroll pr-1 flex-1"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL CRUD: HARGA KHUSUS (TOMBOL TAMBAH DI HEADER & FORM HIDDEN DEFAULT) -->
+    <div id="modalHarga" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="tag" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Harga Khusus</h3>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleFormHarga()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Harga</button>
+                    <button onclick="closeModal('modalHarga')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+            <div class="p-4 overflow-hidden flex flex-col gap-4 flex-1">
+                
+                <!-- Form Tambah Harga Khusus (HIDDEN BY DEFAULT) -->
+                <div id="formHargaContainer" class="hidden bg-blue-50/50 p-3 rounded-xl border border-blue-100 space-y-2 shrink-0 transition-all">
+                    <label class="block text-[11px] font-bold text-gray-600">Tambah / Setel Harga Khusus Reseller</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <select id="selectHargaReseller" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none"><option value="">Pilih Agen...</option></select>
+                        <select id="selectHargaBarang" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none"><option value="">Pilih Barang...</option></select>
+                        <input type="number" id="inputHargaKhususVal" placeholder="Harga Khusus (Rp)" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none">
+                    </div>
+                    <div class="flex justify-end pt-1">
+                        <button onclick="simpanHargaKhusus()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-1.5 rounded-lg shadow-sm transition">Simpan Harga Khusus</button>
+                    </div>
+                </div>
+
+                <!-- Input Pencarian Harga Khusus -->
+                <div class="relative shrink-0">
+                    <i data-feather="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-400"></i>
+                    <input type="text" id="searchHargaKhusus" placeholder="Cari nama agen atau barang..." class="w-full text-xs py-2.5 pl-9 pr-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white outline-none focus:border-blue-500 transition">
+                </div>
+
+                <div class="flex-1 overflow-hidden flex flex-col">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 shrink-0">Daftar Harga Khusus Aktif</h4>
+                    <div id="containerModalHarga" class="space-y-2 max-h-[40vh] overflow-y-auto custom-scroll pr-1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL RIWAYAT PEMBAYARAN -->
+    <div id="modalRiwayat" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-transform duration-200 flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <div class="flex items-center gap-3">
+                    <button id="btnBackRiwayat" onclick="renderRiwayatDates()" class="hidden text-gray-500 hover:text-blue-600 bg-gray-100 p-1.5 rounded-lg transition"><i data-feather="arrow-left" class="w-4 h-4"></i></button>
+                    <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="clock" class="w-4 h-4 mr-2 text-blue-500"></i> Riwayat Pembayaran</h3>
+                </div>
+                <button onclick="closeModal('modalRiwayat')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto space-y-4 flex-1 custom-scroll" id="containerRiwayat">
+                <div class="flex justify-center py-8"><i data-feather="loader" class="w-6 h-6 animate-spin text-blue-500"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIKA -->
+    <script>
+        feather.replace();
+        const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const colorClass = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-red-600' : 'bg-blue-600');
+            const icon = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-octagon' : 'info');
+            
+            toast.className = `${colorClass} text-white px-4 py-3 rounded-lg shadow-xl shadow-gray-200/50 transform transition-all duration-300 translate-y-10 opacity-0 flex items-center gap-2.5 text-xs font-bold tracking-wide pointer-events-auto`;
+            toast.innerHTML = `<i data-feather="${icon}" class="w-4 h-4"></i> ${message}`;
+            container.appendChild(toast); feather.replace();
+            setTimeout(() => { toast.classList.remove('translate-y-10', 'opacity-0'); }, 10);
+            setTimeout(() => { toast.classList.add('translate-y-10', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3500);
+        }
+
+        const supabaseUrl = 'https://uocvuddqhviorebinpva.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvY3Z1ZGRxaHZpb3JlYmlucHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2OTQ0NDAsImV4cCI6MjEwMTI3MDQ0MH0.mWGTOTfHG4Q62S3P4LQi-5bGviMPWgMzo2p2AECquL8';
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let masterData = { resellers: [], barangJadi: [], bahanBaku: [], hargaDefault: {}, hargaKhusus: {} };
+        let selectedResellerId = '';
+        let riwayatTransactions = []; // Menyimpan data riwayat
+
+        async function loadMasterData() {
+            try {
+                const [resellersData, barangData, hargaKhususData] = await Promise.all([
+                    supabaseClient.from('reseller').select('*'),
+                    supabaseClient.from('barang').select('*'),
+                    supabaseClient.from('harga_khusus').select('*')
+                ]);
+
+                if (resellersData.error) throw resellersData.error;
+                if (barangData.error) throw barangData.error;
+                if (hargaKhususData.error) throw hargaKhususData.error;
+
+                masterData.resellers = resellersData.data.map(r => ({ id: r.id, nama: r.nama_reseller }));
+                masterData.barangJadi = []; masterData.bahanBaku = []; masterData.hargaDefault = {}; masterData.hargaKhusus = {};
+
+                barangData.data.forEach(b => {
+                    masterData.hargaDefault[b.id] = b.harga_default;
+                    if (b.tipe === 'jadi') masterData.barangJadi.push({ id: b.id, nama: b.nama_barang });
+                    else masterData.bahanBaku.push({ id: b.id, nama: b.nama_barang });
+                });
+                hargaKhususData.data.forEach(hk => { masterData.hargaKhusus[`${hk.reseller_id}_${hk.barang_id}`] = hk.harga; });
+
+                const statusConn = document.getElementById('status-connection');
+                statusConn.classList.replace('bg-yellow-50', 'bg-green-50');
+                statusConn.classList.replace('border-yellow-100', 'border-green-100');
+                if(statusConn.querySelector('.animate-ping')) statusConn.querySelector('.animate-ping').classList.replace('bg-yellow-400', 'bg-green-400');
+                if(statusConn.querySelector('.relative.inline-flex')) statusConn.querySelector('.relative.inline-flex').classList.replace('bg-yellow-500', 'bg-green-500');
+                
+                const txt = document.getElementById('text-connection');
+                txt.innerText = 'Connected'; txt.classList.replace('text-yellow-700', 'text-green-700');
+
+                initDefaults();
+                refreshDropdownsUI();
+
+            } catch (error) {
+                const statusConn = document.getElementById('status-connection');
+                statusConn.classList.replace('bg-yellow-50', 'bg-red-50');
+                statusConn.classList.replace('border-yellow-100', 'border-red-100');
+                const txt = document.getElementById('text-connection');
+                txt.innerText = 'Error Connection'; txt.classList.replace('text-yellow-700', 'text-red-700');
+                showNotification("Gagal terhubung ke Database Supabase.", "error");
+            }
+        }
+
+        const getHarga = (itemId) => {
+            if (!itemId) return 0;
+            if (selectedResellerId && masterData.hargaKhusus[`${selectedResellerId}_${itemId}`] !== undefined) return masterData.hargaKhusus[`${selectedResellerId}_${itemId}`];
+            return masterData.hargaDefault[itemId] || 0;
+        };
+
+        const initDefaults = () => {
+            const select = document.getElementById('resellerSelect');
+            const currentSelected = select.value;
+            select.innerHTML = '<option value="">-- Pilih --</option>';
+            masterData.resellers.forEach(r => select.innerHTML += `<option value="${r.id}">${r.nama}</option>`);
+            select.value = currentSelected;
+            select.onchange = (e) => { selectedResellerId = e.target.value; kalkulasiSemua(); };
+            
+            if(!document.getElementById('tglTransaksi').value) {
+                const tzOffset = (new Date()).getTimezoneOffset() * 60000; 
+                document.getElementById('tglTransaksi').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
+            }
+        };
+
+        function refreshDropdownsUI() {
+            document.querySelectorAll('.row-item').forEach(row => {
+                const selectEl = row.querySelector('.item-select');
+                const currentVal = selectEl.value;
+                const isJadi = row.closest('#containerBarangJadi') !== null;
+                const items = isJadi ? masterData.barangJadi : masterData.bahanBaku;
+                
+                let optionsHtml = `<option value="">Pilih...</option>`;
+                items.forEach(item => optionsHtml += `<option value="${item.id}">${item.nama}</option>`);
+                selectEl.innerHTML = optionsHtml;
+                selectEl.value = currentVal;
+            });
+            kalkulasiSemua();
+        }
+
+        const addRow = (tipe) => {
+            const container = document.getElementById(tipe === 'barangJadi' ? 'containerBarangJadi' : 'containerBahanBaku');
+            const items = tipe === 'barangJadi' ? masterData.barangJadi : masterData.bahanBaku;
+            const focusClass = tipe === 'barangJadi' ? 'focus:border-blue-400' : 'focus:border-red-400';
+            const bgClass = tipe === 'barangJadi' ? 'hover:bg-blue-50/40' : 'hover:bg-red-50/40';
+            
+            const div = document.createElement('div');
+            div.className = `flex items-center gap-1 group p-1 rounded-md border border-transparent ${bgClass} transition-colors row-item relative`;
+            
+            let optionsHtml = `<option value="">Pilih...</option>`;
+            items.forEach(item => optionsHtml += `<option value="${item.id}">${item.nama}</option>`);
+
+            div.innerHTML = `
+                <div class="w-2/12"><input type="number" min="0" step="0.1" placeholder="0" class="qty-input w-full rounded border border-gray-200 p-1.5 text-xs text-center bg-white shadow-sm outline-none ${focusClass}"></div>
+                <div class="w-4/12"><select class="item-select w-full rounded border border-gray-200 p-1.5 text-xs bg-white shadow-sm outline-none ${focusClass}">${optionsHtml}</select></div>
+                <div class="w-3/12"><input type="text" class="harga-input w-full p-1 text-xs bg-transparent text-right text-gray-500 font-medium focus:outline-none" readonly value="Rp 0"></div>
+                <div class="w-3/12"><input type="text" class="subtotal-input w-full p-1 text-xs bg-transparent text-right text-gray-800 font-bold focus:outline-none pr-2" readonly value="Rp 0"></div>
+                <button type="button" onclick="this.parentElement.remove(); kalkulasiSemua();" class="absolute -right-2 -top-2 bg-red-50 rounded p-1 text-red-400 hover:text-red-600 hover:bg-red-100 opacity-0 group-hover:opacity-100 transition-opacity z-10 border border-red-200"><i data-feather="x" class="w-3 h-3"></i></button>
+            `;
+            container.appendChild(div); feather.replace();
+            const updateRow = () => {
+                const hrg = getHarga(div.querySelector('.item-select').value); const qty = parseFloat(div.querySelector('.qty-input').value) || 0;
+                div.querySelector('.harga-input').value = formatRupiah(hrg); div.querySelector('.subtotal-input').value = formatRupiah(hrg * qty);
+                div.dataset.subtotal = hrg * qty; kalkulasiSemua();
+            };
+            div.querySelector('.item-select').addEventListener('change', updateRow);
+            div.querySelector('.qty-input').addEventListener('input', updateRow);
+        };
+
+        const addKasbonManual = () => {
+            const container = document.getElementById('listKasbonManual');
+            const div = document.createElement('div');
+            div.className = 'flex gap-1.5 items-center row-kasbon-manual mb-1.5 group';
+            div.innerHTML = `
+                <div class="w-7/12"><input type="text" placeholder="Ket (Misal: Kasbon Rabu)" class="ket-manual w-full text-[10px] p-1.5 rounded border border-gray-300 focus:border-red-400 outline-none"></div>
+                <div class="w-4/12"><input type="number" placeholder="Rp" min="0" oninput="kalkulasiSemua()" class="nom-manual w-full text-[10px] p-1.5 rounded border border-gray-300 focus:border-red-400 outline-none text-right font-medium"></div>
+                <div class="w-1/12 text-right"><button onclick="this.parentElement.parentElement.remove(); kalkulasiSemua();" class="text-gray-400 hover:text-red-500 p-1"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button></div>
+            `;
+            container.appendChild(div); feather.replace();
+        };
+
+        const kalkulasiSemua = () => {
+            document.querySelectorAll('.row-item').forEach(row => {
+                const hrg = getHarga(row.querySelector('.item-select').value); const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+                row.querySelector('.harga-input').value = formatRupiah(hrg); row.querySelector('.subtotal-input').value = formatRupiah(hrg * qty); row.dataset.subtotal = hrg * qty;
+            });
+
+            let setoran = 0; document.querySelectorAll('#containerBarangJadi .row-item').forEach(r => setoran += parseFloat(r.dataset.subtotal)||0);
+            let kasbonBahan = 0; document.querySelectorAll('#containerBahanBaku .row-item').forEach(r => kasbonBahan += parseFloat(r.dataset.subtotal)||0);
+            
+            let kasbonManualTotal = 0;
+            document.querySelectorAll('.row-kasbon-manual').forEach(row => {
+                kasbonManualTotal += parseFloat(row.querySelector('.nom-manual').value) || 0;
+            });
+
+            const net = setoran - kasbonBahan - kasbonManualTotal;
+
+            document.getElementById('subtotalBarangJadiLayar').innerText = formatRupiah(setoran);
+            document.getElementById('subtotalBahanBakuLayar').innerText = formatRupiah(kasbonBahan);
+            document.getElementById('summarySetoran').innerText = formatRupiah(setoran);
+            document.getElementById('summaryKasbon').innerText = "- " + formatRupiah(kasbonBahan);
+            document.getElementById('summaryManual').innerText = "- " + formatRupiah(kasbonManualTotal);
+            
+            const elNet = document.getElementById('summaryNet');
+            elNet.innerText = formatRupiah(net);
+            elNet.className = `block text-lg font-black ${net < 0 ? 'text-red-500' : 'text-green-500'}`;
+        };
+
+        // EVENT LISTENER PENCARIAN (LIVE SEARCH)
+        document.getElementById('searchMasterBarang')?.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('#listModalBarangJadi li, #listModalBahanBaku li').forEach(li => {
+                const text = li.innerText.toLowerCase();
+                li.style.display = text.includes(term) ? '' : 'none';
+            });
+        });
+
+        document.getElementById('searchHargaKhusus')?.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('#containerModalHarga > div').forEach(div => {
+                const text = div.innerText.toLowerCase();
+                div.style.display = text.includes(term) ? '' : 'none';
+            });
+        });
+
+        // ================= CRUD FUNCTIONS & TOGGLES =================
+        function toggleFormBarang(forceShow = false) {
+            const form = document.getElementById('formBarangContainer');
+            if(forceShow) form.classList.remove('hidden');
+            else form.classList.toggle('hidden');
+        }
+
+        function toggleFormHarga(forceShow = false) {
+            const form = document.getElementById('formHargaContainer');
+            if(forceShow) form.classList.remove('hidden');
+            else form.classList.toggle('hidden');
+        }
+
+        async function simpanAgen() {
+            const id = document.getElementById('editAgenId').value;
+            const nama = document.getElementById('inputNamaAgen').value.trim();
+            if(!nama) return showNotification("Nama agen tidak boleh kosong!", "error");
+            try {
+                if(id) {
+                    const { error } = await supabaseClient.from('reseller').update({ nama_reseller: nama }).eq('id', id);
+                    if(error) throw error; showNotification("Data agen berhasil diperbarui!", "success");
+                } else {
+                    const { error } = await supabaseClient.from('reseller').insert([{ nama_reseller: nama }]);
+                    if(error) throw error; showNotification("Agen baru berhasil ditambahkan!", "success");
+                }
+                resetFormAgen(); await loadMasterData(); openModal('modalAgen'); 
+            } catch (err) { showNotification("Gagal menyimpan agen: " + err.message, "error"); }
+        }
+
+        function editAgen(id, nama) {
+            document.getElementById('editAgenId').value = id; document.getElementById('inputNamaAgen').value = nama;
+            document.getElementById('labelFormAgen').innerText = "Edit Data Agen"; document.getElementById('btnBatalAgen').classList.remove('hidden');
+        }
+
+        function resetFormAgen() {
+            document.getElementById('editAgenId').value = ''; document.getElementById('inputNamaAgen').value = '';
+            document.getElementById('labelFormAgen').innerText = "Tambah Agen Baru"; document.getElementById('btnBatalAgen').classList.add('hidden');
+        }
+
+        async function hapusAgen(id) {
+            if(!confirm("Yakin ingin menghapus agen ini?")) return;
+            try {
+                const { error } = await supabaseClient.from('reseller').delete().eq('id', id);
+                if(error) throw error; showNotification("Agen berhasil dihapus!", "success"); await loadMasterData(); openModal('modalAgen');
+            } catch (err) { showNotification("Gagal menghapus: " + err.message, "error"); }
+        }
+
+        async function simpanBarang() {
+            const id = document.getElementById('editBarangId').value;
+            const nama = document.getElementById('inputNamaBarang').value.trim();
+            const tipe = document.getElementById('inputTipeBarang').value;
+            const harga = parseFloat(document.getElementById('inputHargaDefault').value) || 0;
+            if(!nama) return showNotification("Nama barang tidak boleh kosong!", "error");
+            try {
+                if(id) {
+                    const { error } = await supabaseClient.from('barang').update({ nama_barang: nama, tipe: tipe, harga_default: harga }).eq('id', id);
+                    if(error) throw error; showNotification("Barang berhasil diperbarui!", "success");
+                } else {
+                    const { error } = await supabaseClient.from('barang').insert([{ nama_barang: nama, tipe: tipe, harga_default: harga }]);
+                    if(error) throw error; showNotification("Barang baru berhasil ditambahkan!", "success");
+                }
+                resetFormBarang(); await loadMasterData(); openModal('modalBarang');
+            } catch (err) { showNotification("Gagal menyimpan barang: " + err.message, "error"); }
+        }
+
+        function editBarang(id, nama, tipe, harga) {
+            toggleFormBarang(true);
+            document.getElementById('editBarangId').value = id; document.getElementById('inputNamaBarang').value = nama;
+            document.getElementById('inputTipeBarang').value = tipe; document.getElementById('inputHargaDefault').value = harga;
+            document.getElementById('labelFormBarang').innerText = "Edit Master Barang"; document.getElementById('btnBatalBarang').classList.remove('hidden');
+        }
+
+        function resetFormBarang() {
+            document.getElementById('editBarangId').value = ''; document.getElementById('inputNamaBarang').value = '';
+            document.getElementById('inputTipeBarang').value = 'jadi'; document.getElementById('inputHargaDefault').value = '';
+            document.getElementById('labelFormBarang').innerText = "Tambah Barang Baru"; document.getElementById('btnBatalBarang').classList.add('hidden');
+            toggleFormBarang(false); // Sembunyikan otomatis setelah reset/simpan
+        }
+
+        async function hapusBarang(id) {
+            if(!confirm("Yakin ingin menghapus barang ini?")) return;
+            try {
+                const { error } = await supabaseClient.from('barang').delete().eq('id', id);
+                if(error) throw error; showNotification("Barang berhasil dihapus!", "success"); await loadMasterData(); openModal('modalBarang');
+            } catch (err) { showNotification("Gagal menghapus: " + err.message, "error"); }
+        }
+
+        async function simpanHargaKhusus() {
+            const resellerId = document.getElementById('selectHargaReseller').value;
+            const barangId = document.getElementById('selectHargaBarang').value;
+            const harga = parseFloat(document.getElementById('inputHargaKhususVal').value) || 0;
+            if(!resellerId || !barangId) return showNotification("Pilih Reseller dan Barang terlebih dahulu!", "error");
+            try {
+                const { error } = await supabaseClient.from('harga_khusus').upsert([
+                    { reseller_id: resellerId, barang_id: barangId, harga: harga }
+                ], { onConflict: 'reseller_id,barang_id' });
+                if(error) throw error;
+                showNotification("Harga khusus berhasil disimpan!", "success");
+                document.getElementById('inputHargaKhususVal').value = ''; await loadMasterData(); toggleFormHarga(false); openModal('modalHarga');
+            } catch (err) { showNotification("Gagal menyimpan harga khusus: " + err.message, "error"); }
+        }
+
+        async function hapusHargaKhusus(id) {
+            if(!confirm("Hapus aturan harga khusus ini?")) return;
+            try {
+                const { error } = await supabaseClient.from('harga_khusus').delete().eq('id', id);
+                if(error) throw error; showNotification("Harga khusus berhasil dihapus!", "success"); await loadMasterData(); openModal('modalHarga');
+            } catch (err) { showNotification("Gagal menghapus: " + err.message, "error"); }
+        }
+        // ================= END CRUD =================
+
+        // ================= RIWAYAT PEMBAYARAN =================
+        async function fetchRiwayatData() {
+            const container = document.getElementById('containerRiwayat');
+            container.innerHTML = `<div class="flex justify-center py-8"><i data-feather="loader" class="w-6 h-6 animate-spin text-blue-500"></i></div>`;
+            feather.replace();
+            
+            try {
+                const { data, error } = await supabaseClient.from('transaksi').select('*').order('tanggal_transaksi', { ascending: false }).order('created_at', { ascending: false });
+                if (error) throw error;
+                riwayatTransactions = data;
+                renderRiwayatDates();
+            } catch (err) {
+                container.innerHTML = `<div class="text-center text-xs text-red-500 py-4">Gagal memuat riwayat: ${err.message}</div>`;
+            }
+        }
+
+        function renderRiwayatDates() {
+            document.getElementById('btnBackRiwayat').classList.add('hidden');
+            const container = document.getElementById('containerRiwayat');
+            
+            if (riwayatTransactions.length === 0) {
+                container.innerHTML = `<div class="text-center text-xs text-gray-500 py-4">Belum ada riwayat transaksi tersimpan.</div>`;
+                return;
+            }
+
+            const grouped = {};
+            riwayatTransactions.forEach(trx => {
+                if(!grouped[trx.tanggal_transaksi]) grouped[trx.tanggal_transaksi] = 0;
+                grouped[trx.tanggal_transaksi] += trx.net_pembayaran;
+            });
+
+            let html = '<ul class="space-y-2">';
+            Object.keys(grouped).forEach(date => {
+                const formattedDate = new Date(date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                html += `
+                <li onclick="renderRiwayatReseller('${date}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 hover:shadow-sm cursor-pointer transition">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i data-feather="calendar" class="w-4 h-4"></i></div>
+                        <span class="font-bold text-xs text-gray-800">${formattedDate}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-[10px] text-gray-500">Total Hari Ini</span>
+                        <span class="font-black text-xs text-green-600">${formatRupiah(grouped[date])}</span>
+                    </div>
+                </li>`;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+            feather.replace();
+        }
+
+        function renderRiwayatReseller(date) {
+            document.getElementById('btnBackRiwayat').classList.remove('hidden');
+            const container = document.getElementById('containerRiwayat');
+            
+            const trxs = riwayatTransactions.filter(t => t.tanggal_transaksi === date);
+            const formattedDate = new Date(date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            let html = `<div class="mb-3"><span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Transaksi pada:</span><br><span class="text-sm font-black text-gray-800">${formattedDate}</span></div><ul class="space-y-2">`;
+            
+            trxs.forEach(trx => {
+                const reseller = masterData.resellers.find(r => r.id === trx.reseller_id);
+                const resellerName = reseller ? reseller.nama : 'Reseller Dihapus';
+                html += `
+                <li onclick="lihatPratinjauRiwayat('${trx.id}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 hover:shadow-sm cursor-pointer transition">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-gray-100 p-2 rounded-lg text-gray-600"><i data-feather="user" class="w-4 h-4"></i></div>
+                        <span class="font-bold text-xs text-gray-800">${resellerName}</span>
+                    </div>
+                    <div class="text-right flex items-center gap-3">
+                        <span class="font-black text-xs text-blue-600">${formatRupiah(trx.net_pembayaran)}</span>
+                        <i data-feather="chevron-right" class="w-4 h-4 text-gray-400"></i>
+                    </div>
+                </li>`;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+            feather.replace();
+        }
+
+        async function lihatPratinjauRiwayat(trxId) {
+            const trx = riwayatTransactions.find(t => t.id === trxId);
+            if (!trx) return;
+
+            const reseller = masterData.resellers.find(r => r.id === trx.reseller_id);
+            document.getElementById('notaNama').innerText = reseller ? reseller.nama : 'Reseller Dihapus';
+            document.getElementById('notaTgl').innerText = new Date(trx.tanggal_transaksi).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            showNotification("Memuat detail transaksi...", "info");
+            try {
+                const { data: details, error } = await supabaseClient.from('transaksi_detail').select('*').eq('transaksi_id', trxId);
+                if (error) throw error;
+
+                let htmlSetoran = ''; let htmlBahan = '';
+                const allItems = [...masterData.barangJadi, ...masterData.bahanBaku];
+
+                details.forEach(d => {
+                    const item = allItems.find(i => i.id === d.barang_id);
+                    const itemName = item ? item.nama : 'Item Dihapus';
+                    const isBahan = masterData.bahanBaku.some(b => b.id === d.barang_id);
+                    
+                    const rowHtml = `<tr><td class="py-1">${itemName}</td><td class="text-center">${d.qty}</td><td class="text-right text-gray-500">${formatRupiah(d.harga_satuan)}</td><td class="text-right font-medium">${formatRupiah(d.subtotal)}</td></tr>`;
+                    
+                    if(isBahan) htmlBahan += rowHtml;
+                    else htmlSetoran += rowHtml;
+                });
+
+                document.getElementById('notaListSetoran').innerHTML = htmlSetoran || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada setoran</td></tr>';
+                document.getElementById('notaSubSetoran').innerText = formatRupiah(trx.total_setoran);
+
+                document.getElementById('notaListBahan').innerHTML = htmlBahan || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pengambilan bahan</td></tr>';
+                document.getElementById('notaSubBahan').innerText = "- " + formatRupiah(trx.total_kasbon_bahan);
+
+                let htmlManual = '';
+                if(trx.kasbon_manual > 0) {
+                    htmlManual = `<tr><td colspan="3" class="py-1.5">${trx.keterangan_manual || 'Pinjaman/Kasbon Lainnya'}</td><td class="text-right font-medium">${formatRupiah(trx.kasbon_manual)}</td></tr>`;
+                }
+                document.getElementById('notaListManual').innerHTML = htmlManual || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pinjaman uang</td></tr>';
+                document.getElementById('notaSubManual').innerText = "- " + formatRupiah(trx.kasbon_manual);
+
+                document.getElementById('notaGrandTotal').innerText = formatRupiah(trx.net_pembayaran);
+                const netVal = parseFloat(trx.net_pembayaran) || 0;
+                document.getElementById('notaGrandTotal').className = `text-xl font-black ${netVal < 0 ? 'text-red-600' : 'text-gray-900'}`;
+
+                // Buka Pratinjau di atas modal Riwayat
+                document.getElementById('modalPratinjau').classList.remove('hidden');
+                setTimeout(() => { document.getElementById('modalPratinjau').children[1].classList.replace('scale-95','scale-100'); }, 10);
+            } catch (err) { showNotification("Gagal memuat pratinjau: " + err.message, "error"); }
+        }
+        // ================= END RIWAYAT =================
+
+        // PRATINJAU NOTA (TRANSAKSI AKTIF)
+        function bukaPratinjau() {
+            if (!selectedResellerId) return showNotification("Pilih Reseller terlebih dahulu untuk pratinjau!", "error");
+            
+            const reseller = masterData.resellers.find(r => r.id === selectedResellerId);
+            document.getElementById('notaNama').innerText = reseller ? reseller.nama : '-';
+            
+            const rawTgl = document.getElementById('tglTransaksi').value;
+            document.getElementById('notaTgl').innerText = new Date(rawTgl).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            let htmlSetoran = '';
+            document.querySelectorAll('#containerBarangJadi .row-item').forEach(row => {
+                const sel = row.querySelector('.item-select'); const qty = row.querySelector('.qty-input').value;
+                if(sel.value && qty > 0) {
+                    const itemName = sel.options[sel.selectedIndex].text;
+                    const hrg = row.querySelector('.harga-input').value; const sub = row.querySelector('.subtotal-input').value;
+                    htmlSetoran += `<tr><td class="py-1">${itemName}</td><td class="text-center">${qty}</td><td class="text-right text-gray-500">${hrg}</td><td class="text-right font-medium">${sub}</td></tr>`;
+                }
+            });
+            document.getElementById('notaListSetoran').innerHTML = htmlSetoran || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada setoran</td></tr>';
+            document.getElementById('notaSubSetoran').innerText = document.getElementById('subtotalBarangJadiLayar').innerText;
+
+            let htmlBahan = '';
+            document.querySelectorAll('#containerBahanBaku .row-item').forEach(row => {
+                const sel = row.querySelector('.item-select'); const qty = row.querySelector('.qty-input').value;
+                if(sel.value && qty > 0) {
+                    const itemName = sel.options[sel.selectedIndex].text;
+                    const hrg = row.querySelector('.harga-input').value; const sub = row.querySelector('.subtotal-input').value;
+                    htmlBahan += `<tr><td class="py-1">${itemName}</td><td class="text-center">${qty}</td><td class="text-right text-gray-500">${hrg}</td><td class="text-right font-medium">${sub}</td></tr>`;
+                }
+            });
+            document.getElementById('notaListBahan').innerHTML = htmlBahan || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pengambilan bahan</td></tr>';
+            document.getElementById('notaSubBahan').innerText = "- " + document.getElementById('subtotalBahanBakuLayar').innerText;
+
+            let htmlManual = '';
+            document.querySelectorAll('.row-kasbon-manual').forEach(row => {
+                const ket = row.querySelector('.ket-manual').value || 'Tanpa Keterangan';
+                const nom = parseFloat(row.querySelector('.nom-manual').value) || 0;
+                if(nom > 0) {
+                    htmlManual += `<tr><td colspan="3" class="py-1.5">${ket}</td><td class="text-right font-medium">${formatRupiah(nom)}</td></tr>`;
+                }
+            });
+            document.getElementById('notaListManual').innerHTML = htmlManual || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pinjaman uang</td></tr>';
+            document.getElementById('notaSubManual').innerText = document.getElementById('summaryManual').innerText;
+
+            document.getElementById('notaGrandTotal').innerText = document.getElementById('summaryNet').innerText;
+            const netVal = parseFloat(document.getElementById('summaryNet').innerText.replace(/[^0-9,-]+/g,"")) || 0;
+            document.getElementById('notaGrandTotal').className = `text-xl font-black ${netVal < 0 ? 'text-red-600' : 'text-gray-900'}`;
+
+            document.getElementById('modalPratinjau').classList.remove('hidden');
+            setTimeout(() => { document.getElementById('modalPratinjau').children[1].classList.replace('scale-95','scale-100'); }, 10);
+        }
+
+        function simpanPNG() {
+            const area = document.getElementById('areaPrint');
+            showNotification('Sedang memproses gambar...', 'info');
+            html2canvas(area, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Nota_SBR_${document.getElementById('notaNama').innerText}_${document.getElementById('tglTransaksi').value}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showNotification('Nota berhasil disimpan sebagai gambar!', 'success');
+            }).catch(() => { showNotification('Gagal menyimpan gambar.', 'error'); });
+        }
+
+        async function simpanTransaksi() {
+            if (!selectedResellerId) return showNotification("Pilih Reseller terlebih dahulu!", "error");
+            
+            const btn = document.getElementById('btnSubmit'); 
+            btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 mr-1.5 animate-spin"></i> Menyimpan...`; btn.disabled = true;
+
+            const tgl = document.getElementById('tglTransaksi').value;
+            const totalSetoran = parseFloat(document.getElementById('summarySetoran').innerText.replace(/[^0-9,-]+/g,"")) || 0;
+            const totalKasbon = parseFloat(document.getElementById('summaryKasbon').innerText.replace(/[^0-9,-]+/g,"")) || 0;
+            
+            let manualNominalTotal = 0; let manualKetArr = [];
+            document.querySelectorAll('.row-kasbon-manual').forEach(row => {
+                const ket = row.querySelector('.ket-manual').value.trim() || 'Lainnya';
+                const nom = parseFloat(row.querySelector('.nom-manual').value) || 0;
+                if(nom > 0) { manualNominalTotal += nom; manualKetArr.push(`${ket} (${formatRupiah(nom)})`); }
+            });
+            const manualKetGabungan = manualKetArr.join(', ');
+            const net = totalSetoran - totalKasbon - manualNominalTotal;
+
+            try {
+                const { data: trxData, error: trxError } = await supabaseClient.from('transaksi').insert([{
+                    reseller_id: selectedResellerId, tanggal_transaksi: tgl, total_setoran: totalSetoran,
+                    total_kasbon_bahan: totalKasbon, kasbon_manual: manualNominalTotal, keterangan_manual: manualKetGabungan, net_pembayaran: net
+                }]).select();
+                if (trxError) throw trxError;
+                const trxId = trxData[0].id;
+
+                let detailData = [];
+                document.querySelectorAll('.row-item').forEach(row => {
+                    const barangId = row.querySelector('.item-select').value; const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+                    const harga = parseFloat(row.querySelector('.harga-input').value.replace(/[^0-9,-]+/g,"")) || 0; const sub = parseFloat(row.dataset.subtotal) || 0;
+                    if (barangId && qty > 0) detailData.push({ transaksi_id: trxId, barang_id: barangId, qty: qty, harga_satuan: harga, subtotal: sub });
+                });
+                if (detailData.length > 0) {
+                    const { error: detailError } = await supabaseClient.from('transaksi_detail').insert(detailData);
+                    if (detailError) throw detailError;
+                }
+
+                showNotification('Transaksi Berhasil Disimpan!', 'success');
+                document.getElementById('containerBarangJadi').innerHTML = ''; document.getElementById('containerBahanBaku').innerHTML = '';
+                document.getElementById('listKasbonManual').innerHTML = '';
+                
+                kalkulasiSemua(); feather.replace(); addRow('bahanBaku'); addRow('barangJadi'); addKasbonManual();
+
+            } catch (error) {
+                showNotification("Gagal menyimpan: " + error.message, "error");
+            } finally {
+                btn.innerHTML = `<i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan`; btn.disabled = false;
+            }
+        }
+
+        // Modals Logic
+        function closeModal(id) {
+            const modalEl = document.getElementById(id);
+            if(modalEl.children[0]) modalEl.children[0].classList.replace('scale-100','scale-95');
+            setTimeout(() => { 
+                modalEl.classList.add('hidden');
+                // Khusus untuk Pratinjau dari Riwayat, jangan tutup Overlay jika Modal Riwayat masih terbuka
+                if (id === 'modalPratinjau' && !document.getElementById('modalRiwayat').classList.contains('hidden')) {
+                    // Biarkan overlay tetap ada
+                } else {
+                    document.getElementById('modalOverlay').classList.add('hidden'); 
+                }
+            }, 200);
+            document.getElementById('searchMasterBarang') ? document.getElementById('searchMasterBarang').value = '' : null;
+            document.getElementById('searchHargaKhusus') ? document.getElementById('searchHargaKhusus').value = '' : null;
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden'); 
+            document.getElementById('modalOverlay').classList.remove('hidden');
+            setTimeout(() => { document.getElementById(id).children[0].classList.replace('scale-95','scale-100'); }, 10);
+            
+            if(id === 'modalAgen') {
+                resetFormAgen();
+                const ul = document.getElementById('listModalAgen'); ul.innerHTML = '';
+                if(masterData.resellers.length === 0) ul.innerHTML = '<li class="p-3 text-xs text-gray-400 italic text-center">Belum ada data agen</li>';
+                masterData.resellers.forEach(r => {
+                    ul.innerHTML += `
+                    <li class="flex justify-between items-center p-2.5 text-xs text-gray-700 hover:bg-gray-50">
+                        <span class="font-medium">${r.nama}</span>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="editAgen('${r.id}', '${r.nama}')" class="p-1 text-blue-500 hover:bg-blue-50 rounded"><i data-feather="edit-2" class="w-3 h-3"></i></button>
+                            <button onclick="hapusAgen('${r.id}')" class="p-1 text-red-500 hover:bg-red-50 rounded"><i data-feather="trash-2" class="w-3 h-3"></i></button>
+                        </div>
+                    </li>`;
+                });
+            }
+            if(id === 'modalBarang') {
+                resetFormBarang();
+                const uiJadi = document.getElementById('listModalBarangJadi'); 
+                const uiBahan = document.getElementById('listModalBahanBaku');
+                uiJadi.innerHTML = ''; uiBahan.innerHTML = '';
+                
+                if(masterData.barangJadi.length === 0) uiJadi.innerHTML = '<li class="text-[11px] p-2 text-gray-400 italic">Kosong</li>';
+                if(masterData.bahanBaku.length === 0) uiBahan.innerHTML = '<li class="text-[11px] p-2 text-gray-400 italic">Kosong</li>';
+
+                masterData.barangJadi.forEach(b => {
+                    uiJadi.innerHTML += `
+                    <li class="flex justify-between items-center text-[11px] p-2 border-b border-gray-50 hover:bg-gray-50 rounded">
+                        <div><b>${b.nama}</b><br><span class="text-blue-600 font-semibold">${formatRupiah(masterData.hargaDefault[b.id])}</span></div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="editBarang('${b.id}', '${b.nama}', 'jadi', ${masterData.hargaDefault[b.id]})" class="p-1 text-blue-500 hover:bg-blue-50 rounded"><i data-feather="edit-2" class="w-3 h-3"></i></button>
+                            <button onclick="hapusBarang('${b.id}')" class="p-1 text-red-500 hover:bg-red-50 rounded"><i data-feather="trash-2" class="w-3 h-3"></i></button>
+                        </div>
+                    </li>`;
+                });
+
+                masterData.bahanBaku.forEach(b => {
+                    uiBahan.innerHTML += `
+                    <li class="flex justify-between items-center text-[11px] p-2 border-b border-gray-50 hover:bg-gray-50 rounded">
+                        <div><b>${b.nama}</b><br><span class="text-red-600 font-semibold">${formatRupiah(masterData.hargaDefault[b.id])}</span></div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="editBarang('${b.id}', '${b.nama}', 'bahan', ${masterData.hargaDefault[b.id]})" class="p-1 text-blue-500 hover:bg-blue-50 rounded"><i data-feather="edit-2" class="w-3 h-3"></i></button>
+                            <button onclick="hapusBarang('${b.id}')" class="p-1 text-red-500 hover:bg-red-50 rounded"><i data-feather="trash-2" class="w-3 h-3"></i></button>
+                        </div>
+                    </li>`;
+                });
+            }
+            if(id === 'modalHarga') {
+                toggleFormHarga(false); // Sembunyikan saat modal dibuka
+                const selRes = document.getElementById('selectHargaReseller');
+                const selBar = document.getElementById('selectHargaBarang');
+                selRes.innerHTML = '<option value="">Pilih Agen...</option>';
+                masterData.resellers.forEach(r => selRes.innerHTML += `<option value="${r.id}">${r.nama}</option>`);
+                
+                selBar.innerHTML = '<option value="">Pilih Barang...</option>';
+                [...masterData.barangJadi, ...masterData.bahanBaku].forEach(b => selBar.innerHTML += `<option value="${b.id}">${b.nama}</option>`);
+
+                const container = document.getElementById('containerModalHarga'); 
+                container.innerHTML = '';
+                
+                supabaseClient.from('harga_khusus').select('id, reseller_id, barang_id, harga').then(({data, error}) => {
+                    if(error || !data || data.length === 0) {
+                        container.innerHTML = '<p class="text-xs text-center text-gray-400 py-4">Belum ada harga khusus yang disetel.</p>';
+                        return;
+                    }
+
+                    const allItems = [...masterData.barangJadi, ...masterData.bahanBaku];
+                    data.forEach(hk => {
+                        const resObj = masterData.resellers.find(r => r.id === hk.reseller_id);
+                        const itemObj = allItems.find(i => i.id === hk.barang_id);
+                        if(resObj && itemObj) {
+                            container.innerHTML += `
+                            <div class="flex justify-between items-center p-2.5 bg-white border border-gray-200 rounded-xl text-xs shadow-sm">
+                                <div>
+                                    <span class="font-bold text-gray-800">${resObj.nama}</span><br>
+                                    <span class="text-gray-500 text-[11px]">${itemObj.nama} ➔ <b class="text-emerald-600">${formatRupiah(hk.harga)}</b></span>
+                                </div>
+                                <button onclick="hapusHargaKhusus('${hk.id}')" class="text-red-400 hover:text-red-600 p-1 bg-red-50 rounded"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
+                            </div>`;
+                        }
+                    });
+                    feather.replace();
+                });
+            }
+            if(id === 'modalRiwayat') {
+                fetchRiwayatData();
+            }
+            feather.replace();
+        }
+
+        document.getElementById('modalOverlay').addEventListener('click', () => { 
+            // Cek urutan penutupan modal, hindari menutup riwayat jika sedang buka pratinjau
+            if(!document.getElementById('modalPratinjau').classList.contains('hidden')) {
+                closeModal('modalPratinjau');
+                return;
+            }
+            ['modalAgen', 'modalBarang', 'modalHarga', 'modalRiwayat'].forEach(id => { closeModal(id); }); 
+        });
+
+        window.onload = () => {
+            loadMasterData().then(() => { addRow('bahanBaku'); addRow('barangJadi'); addKasbonManual(); });
+        };
+    </script>
+</body>
+</html>
