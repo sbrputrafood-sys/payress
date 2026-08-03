@@ -27,14 +27,33 @@
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
 
+        /* PERBAIKAN CETAK A4 (PRINT PREVIEW) */
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
-            body * { visibility: hidden; }
-            #areaPrint, #areaPrint * { visibility: visible; }
-            #areaPrint { 
-                position: absolute; left: 0; top: 0; width: 100%; 
-                margin: 0; padding: 0; box-shadow: none !important; border: none !important;
+            body, html { background-color: white !important; margin: 0; padding: 0; width: 100%; height: 100%; }
+            
+            /* Sembunyikan semua elemen dasar kecuali area pratinjau */
+            body > *:not(#modalPratinjau) { display: none !important; }
+            nav, #toastContainer, #modalOverlay { display: none !important; }
+            
+            /* Lepaskan modal pratinjau dari gaya fixed & hidden */
+            #modalPratinjau {
+                position: absolute !important; left: 0 !important; top: 0 !important;
+                display: block !important; width: 100% !important; padding: 0 !important;
+                background: white !important;
             }
+            
+            /* Sembunyikan overlay hitam/gelap pada modal */
+            #modalPratinjau > div:first-child { display: none !important; } 
+            
+            /* Sesuaikan box nota agar sesuai lebar kertas */
+            #modalPratinjau > div:last-child {
+                position: relative !important; max-width: 100% !important; width: 100% !important;
+                box-shadow: none !important; border: none !important; transform: none !important;
+                max-height: none !important; background: white !important;
+            }
+            
+            #areaPrint { overflow: visible !important; height: auto !important; padding: 0 !important; }
             .no-print { display: none !important; }
         }
     </style>
@@ -42,7 +61,7 @@
 <body class="min-h-screen pb-12 relative">
 
     <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-[110] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Top Navigation -->
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-30 print:hidden">
@@ -67,7 +86,7 @@
                         </button>
                         <div class="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
                             <div class="py-1">
-                                <a href="#" onclick="openModal('modalAgen'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="users" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Data Agen</a>
+                                <a href="#" onclick="openModal('modalAgen'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="users" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Data Reseller</a>
                                 <a href="#" onclick="openModal('modalBarang'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="layers" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Master Barang</a>
                                 <a href="#" onclick="openModal('modalHarga'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="tag" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Harga Khusus</a>
                                 <div class="border-t border-gray-100 my-1"></div>
@@ -207,14 +226,15 @@
         </div>
     </div>
 
-    <!-- MODAL PRATINJAU NOTA (LANDSCAPE & RINGKASAN DI KANAN BAWAH) -->
-    <div id="modalPratinjau" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
-        <div onclick="closeModal('modalPratinjau')" class="absolute inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm pointer-events-auto transition-opacity"></div>
+    <!-- MODAL PRATINJAU NOTA (Z-INDEX 100 TERTINGGI AGAR MENUTUPI RIWAYAT) -->
+    <div id="modalPratinjau" class="fixed inset-0 z-[100] flex items-center justify-center hidden pointer-events-none p-4">
+        <div onclick="closeModal('modalPratinjau')" class="absolute inset-0 bg-gray-900 bg-opacity-70 backdrop-blur-sm pointer-events-auto transition-opacity"></div>
         <div class="bg-gray-100 w-full max-w-4xl rounded-xl shadow-2xl pointer-events-auto transform scale-95 transition-transform duration-200 relative overflow-hidden flex flex-col max-h-[95vh]">
             <div class="bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center no-print sticky top-0 z-10">
-                <h3 class="text-sm font-bold text-gray-700">Pratinjau Nota (Landscape)</h3>
+                <h3 class="text-sm font-bold text-gray-700">Pratinjau Nota</h3>
                 <div class="flex gap-2">
-                    <button onclick="simpanPNG()" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="image" class="w-3 h-3 mr-1"></i> Simpan PNG</button>
+                    <button id="btnSimpanPratinjau" onclick="simpanTransaksi()" class="bg-emerald-600 text-white hover:bg-emerald-500 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"><i data-feather="check-circle" class="w-3 h-3 mr-1"></i> Simpan Data</button>
+                    <button onclick="simpanPNG()" class="bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="image" class="w-3 h-3 mr-1"></i> Simpan PNG</button>
                     <button onclick="window.print()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="printer" class="w-3 h-3 mr-1"></i> Cetak A4</button>
                     <button onclick="closeModal('modalPratinjau')" class="bg-gray-50 text-gray-500 hover:bg-gray-200 border border-gray-200 p-1.5 rounded transition"><i data-feather="x" class="w-4 h-4"></i></button>
                 </div>
@@ -224,8 +244,8 @@
                 <!-- Header -->
                 <div class="border-b-2 border-gray-800 pb-3 mb-4 text-center">
                     <h2 class="text-xl font-black text-gray-900 uppercase tracking-wide">SBR Putra Food</h2>
-                    <p class="text-[10px] font-medium text-gray-500 mt-0.5">Grosir Makanan Ringan (Makroni Naruto, Aromanis, Basreng Kiwari)</p>
-                    <p class="text-xs font-bold text-gray-800 mt-2 bg-gray-100 inline-block px-3 py-1 rounded">NOTA PEMBAYARAN RESELLER</p>
+                    <p class="text-[10px] font-medium text-gray-500 mt-0.5">Lembang, Bandung Barat 40391</p>
+                    <p class="text-xs font-bold text-gray-800 mt-2 bg-gray-100 inline-block px-3 py-1 rounded border border-gray-200">NOTA PEMBAYARAN RESELLER</p>
                 </div>
                 
                 <!-- Info Reseller -->
@@ -235,7 +255,7 @@
                         <p id="notaNama" class="text-sm font-bold text-gray-900">-</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-gray-500 mb-0.5">Tanggal Transaksi:</p>
+                        <p class="text-gray-500 mb-0.5">Tanggal Di Cetak:</p>
                         <p id="notaTgl" class="font-bold text-gray-900">-</p>
                     </div>
                 </div>
@@ -245,7 +265,7 @@
                     <!-- KIRI: Pengambilan Bahan Baku -->
                     <div>
                         <h4 class="text-[11px] font-bold text-gray-800 bg-red-50 border border-red-100 px-2 py-1.5 mb-2 rounded flex items-center">
-                            <i data-feather="arrow-up-right" class="w-3 h-3 mr-1 text-red-500"></i> PENGAMBILAN BAHAN BAKU (KASBON)
+                            <i data-feather="arrow-up-right" class="w-3 h-3 mr-1 text-red-500"></i> PENGAMBILAN BAHAN BAKU
                         </h4>
                         <table class="w-full text-[11px] text-left mb-2">
                             <thead>
@@ -277,6 +297,18 @@
 
                         <!-- Ringkasan Tepat di Bawah Setoran Barang Jadi -->
                         <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mt-auto">
+                            <!-- Update Rincian Data Sesuai Halaman Utama -->
+                            <div class="mb-4 space-y-2 border-b border-gray-300 pb-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[11px] font-bold text-gray-600">Total Setoran Barang Jadi</span>
+                                    <span id="notaSummarySetoran" class="text-xs font-bold text-blue-600">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[11px] font-bold text-gray-600">Total Pengambilan Bahan Baku</span>
+                                    <span id="notaSummaryKasbon" class="text-xs font-bold text-red-500">- Rp 0</span>
+                                </div>
+                            </div>
+
                             <div class="mb-4">
                                 <h4 class="text-[11px] font-bold text-gray-800 border-b border-gray-300 pb-1 mb-2">PINJAMAN / KASBON UANG LAINNYA</h4>
                                 <table class="w-full text-[11px] text-left mb-2"><tbody id="notaListManual" class="text-gray-700"></tbody></table>
@@ -299,124 +331,78 @@
         </div>
     </div>
 
-    <!-- MODAL OVERLAY -->
+    <!-- MODAL OVERLAY DASAR -->
     <div id="modalOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm hidden z-40 transition-opacity"></div>
     
     <!-- MODAL CRUD: DATA AGEN -->
     <div id="modalAgen" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-transform duration-200 flex flex-col max-h-[85vh]">
             <div class="flex justify-between items-center p-4 border-b border-gray-100">
-                <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="users" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Data Agen</h3>
-                <button onclick="closeModal('modalAgen')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+                <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="users" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Data Reseller</h3>
+                <div class="flex items-center gap-2">
+                    <button onclick="resetFormAgen(); openFormModal('modalFormAgen')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Agen</button>
+                    <button onclick="closeModal('modalAgen')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
+                </div>
             </div>
             <div class="p-4 overflow-y-auto space-y-4 flex-1">
-                <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100">
-                    <input type="hidden" id="editAgenId">
-                    <label class="block text-[11px] font-bold text-gray-600 mb-1" id="labelFormAgen">Tambah Agen Baru</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="inputNamaAgen" placeholder="Nama Reseller / Agen..." class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none focus:border-blue-500">
-                        <button onclick="simpanAgen()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-sm transition whitespace-nowrap">Simpan</button>
-                        <button id="btnBatalAgen" onclick="resetFormAgen()" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold px-2.5 py-2 rounded-lg transition">Batal</button>
-                    </div>
-                </div>
-                <div class="space-y-1.5">
-                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wide">Daftar Agen</h4>
-                    <ul id="listModalAgen" class="space-y-1 divide-y divide-gray-100 border border-gray-200 rounded-xl overflow-hidden text-xs bg-white max-h-48 overflow-y-auto custom-scroll"></ul>
-                </div>
+                <ul id="listModalAgen" class="space-y-1 divide-y divide-gray-100 border border-gray-200 rounded-xl overflow-hidden text-xs bg-white max-h-[50vh] overflow-y-auto custom-scroll"></ul>
             </div>
         </div>
     </div>
     
-    <!-- MODAL CRUD: MASTER BARANG (TOMBOL TAMBAH DI HEADER & FORM HIDDEN DEFAULT) -->
+    <!-- MODAL CRUD: MASTER BARANG -->
     <div id="modalBarang" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center p-4 border-b border-gray-100">
                 <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="layers" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Master Barang</h3>
                 <div class="flex items-center gap-2">
-                    <button onclick="toggleFormBarang()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Barang</button>
+                    <button onclick="resetFormBarang(); openFormModal('modalFormBarang')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Barang</button>
                     <button onclick="closeModal('modalBarang')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
                 </div>
             </div>
             <div class="p-4 overflow-hidden flex flex-col gap-4 flex-1">
-                
-                <!-- Form Tambah/Edit Barang (HIDDEN BY DEFAULT) -->
-                <div id="formBarangContainer" class="hidden bg-blue-50/50 p-3 rounded-xl border border-blue-100 space-y-2 shrink-0 transition-all">
-                    <input type="hidden" id="editBarangId">
-                    <label class="block text-[11px] font-bold text-gray-600" id="labelFormBarang">Tambah Barang Baru</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <input type="text" id="inputNamaBarang" placeholder="Nama Barang..." class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none">
-                        <select id="inputTipeBarang" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none">
-                            <option value="jadi">Barang Jadi</option>
-                            <option value="bahan">Bahan Baku</option>
-                        </select>
-                        <input type="number" id="inputHargaDefault" placeholder="Harga Default (Rp)" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none">
-                    </div>
-                    <div class="flex justify-end gap-2 pt-1">
-                        <button id="btnBatalBarang" onclick="resetFormBarang()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg transition hidden">Batal</button>
-                        <button onclick="simpanBarang()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-1.5 rounded-lg shadow-sm transition">Simpan Barang</button>
-                    </div>
-                </div>
-
-                <!-- Input Pencarian -->
                 <div class="relative shrink-0">
                     <i data-feather="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-400"></i>
                     <input type="text" id="searchMasterBarang" placeholder="Cari nama barang..." class="w-full text-xs py-2.5 pl-9 pr-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white outline-none focus:border-blue-500 transition">
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-hidden">
                     <div class="border border-gray-200 rounded-xl p-2 bg-white flex flex-col">
                         <h4 class="font-bold text-xs mb-2 text-gray-700 border-b pb-1">Barang Jadi</h4>
-                        <ul id="listModalBarangJadi" class="space-y-1 max-h-[30vh] overflow-y-auto custom-scroll pr-1 flex-1"></ul>
+                        <ul id="listModalBarangJadi" class="space-y-1 max-h-[40vh] overflow-y-auto custom-scroll pr-1 flex-1"></ul>
                     </div>
                     <div class="border border-gray-200 rounded-xl p-2 bg-white flex flex-col">
                         <h4 class="font-bold text-xs mb-2 text-gray-700 border-b pb-1">Bahan Baku</h4>
-                        <ul id="listModalBahanBaku" class="space-y-1 max-h-[30vh] overflow-y-auto custom-scroll pr-1 flex-1"></ul>
+                        <ul id="listModalBahanBaku" class="space-y-1 max-h-[40vh] overflow-y-auto custom-scroll pr-1 flex-1"></ul>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- MODAL CRUD: HARGA KHUSUS (TOMBOL TAMBAH DI HEADER & FORM HIDDEN DEFAULT) -->
+    <!-- MODAL CRUD: HARGA KHUSUS (TAMPILAN GRUP) -->
     <div id="modalHarga" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center p-4 border-b border-gray-100">
                 <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="tag" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Harga Khusus</h3>
                 <div class="flex items-center gap-2">
-                    <button onclick="toggleFormHarga()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Harga</button>
+                    <button onclick="resetFormHarga(); openFormModal('modalFormHarga')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Harga</button>
                     <button onclick="closeModal('modalHarga')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
                 </div>
             </div>
             <div class="p-4 overflow-hidden flex flex-col gap-4 flex-1">
-                
-                <!-- Form Tambah Harga Khusus (HIDDEN BY DEFAULT) -->
-                <div id="formHargaContainer" class="hidden bg-blue-50/50 p-3 rounded-xl border border-blue-100 space-y-2 shrink-0 transition-all">
-                    <label class="block text-[11px] font-bold text-gray-600">Tambah / Setel Harga Khusus Reseller</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <select id="selectHargaReseller" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none"><option value="">Pilih Agen...</option></select>
-                        <select id="selectHargaBarang" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none"><option value="">Pilih Barang...</option></select>
-                        <input type="number" id="inputHargaKhususVal" placeholder="Harga Khusus (Rp)" class="w-full text-xs p-2 rounded-lg border border-gray-300 bg-white outline-none">
-                    </div>
-                    <div class="flex justify-end pt-1">
-                        <button onclick="simpanHargaKhusus()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-1.5 rounded-lg shadow-sm transition">Simpan Harga Khusus</button>
-                    </div>
-                </div>
-
-                <!-- Input Pencarian Harga Khusus -->
                 <div class="relative shrink-0">
                     <i data-feather="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-400"></i>
-                    <input type="text" id="searchHargaKhusus" placeholder="Cari nama agen atau barang..." class="w-full text-xs py-2.5 pl-9 pr-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white outline-none focus:border-blue-500 transition">
+                    <input type="text" id="searchHargaKhusus" placeholder="Cari nama agen..." class="w-full text-xs py-2.5 pl-9 pr-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white outline-none focus:border-blue-500 transition">
                 </div>
-
                 <div class="flex-1 overflow-hidden flex flex-col">
-                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 shrink-0">Daftar Harga Khusus Aktif</h4>
-                    <div id="containerModalHarga" class="space-y-2 max-h-[40vh] overflow-y-auto custom-scroll pr-1"></div>
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 shrink-0">Daftar Reseller (Harga Khusus)</h4>
+                    <div id="containerModalHarga" class="max-h-[50vh] overflow-y-auto custom-scroll pr-1"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL RIWAYAT PEMBAYARAN -->
+    <!-- MODAL RIWAYAT PEMBAYARAN (Z-INDEX 50) -->
     <div id="modalRiwayat" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-transform duration-200 flex flex-col max-h-[85vh]">
             <div class="flex justify-between items-center p-4 border-b border-gray-100">
@@ -431,6 +417,107 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL FORM POPUP TERPISAH (Z-INDEX 60) -->
+    
+    <!-- Modal Form Agen -->
+    <div id="modalFormAgen" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalFormAgen')"></div>
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-transform duration-200">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <h3 class="text-sm font-bold text-gray-800" id="labelFormAgen">Tambah Agen Baru</h3>
+                <button onclick="closeFormModal('modalFormAgen')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-4 space-y-4">
+                <input type="hidden" id="editAgenId">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Nama Reseller / Agen</label>
+                    <input type="text" id="inputNamaAgen" placeholder="Masukkan nama..." class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition">
+                </div>
+                <div class="flex gap-2 justify-end pt-2">
+                    <button onclick="closeFormModal('modalFormAgen')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-4 py-2 rounded-lg transition">Batal</button>
+                    <button onclick="simpanAgen()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition">Simpan Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Form Master Barang -->
+    <div id="modalFormBarang" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalFormBarang')"></div>
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-transform duration-200">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <h3 class="text-sm font-bold text-gray-800" id="labelFormBarang">Tambah Barang Baru</h3>
+                <button onclick="closeFormModal('modalFormBarang')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-4 space-y-3">
+                <input type="hidden" id="editBarangId">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Nama Barang</label>
+                    <input type="text" id="inputNamaBarang" placeholder="Masukkan nama..." class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Tipe Barang</label>
+                    <select id="inputTipeBarang" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition">
+                        <option value="jadi">Barang Jadi</option>
+                        <option value="bahan">Bahan Baku</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Harga Default (Rp)</label>
+                    <input type="number" id="inputHargaDefault" placeholder="0" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition">
+                </div>
+                <div class="flex gap-2 justify-end pt-3">
+                    <button onclick="closeFormModal('modalFormBarang')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-4 py-2 rounded-lg transition">Batal</button>
+                    <button onclick="simpanBarang()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition">Simpan Barang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Form Tambah Harga Khusus -->
+    <div id="modalFormHarga" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalFormHarga')"></div>
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-transform duration-200">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <h3 class="text-sm font-bold text-gray-800">Setel Harga Khusus</h3>
+                <button onclick="closeFormModal('modalFormHarga')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-4 space-y-3">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Pilih Reseller / Agen</label>
+                    <select id="selectHargaReseller" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition"><option value="">Pilih Agen...</option></select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Pilih Barang</label>
+                    <select id="selectHargaBarang" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition"><option value="">Pilih Barang...</option></select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Harga Khusus (Rp)</label>
+                    <input type="number" id="inputHargaKhususVal" placeholder="0" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition">
+                </div>
+                <div class="flex gap-2 justify-end pt-3">
+                    <button onclick="closeFormModal('modalFormHarga')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-4 py-2 rounded-lg transition">Batal</button>
+                    <button onclick="simpanHargaKhusus()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition">Simpan Harga</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Popup Detail Harga Khusus Reseller (Z-INDEX 70) -->
+    <div id="modalDetailHargaKhusus" class="fixed inset-0 z-[70] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalDetailHargaKhusus')"></div>
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-transform duration-200 max-h-[85vh]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="tag" class="w-4 h-4 mr-2 text-blue-500"></i> Rincian Harga Khusus <span id="namaResellerDetailHarga" class="ml-1 text-blue-600 font-black"></span></h3>
+                <button onclick="closeFormModal('modalDetailHargaKhusus')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto space-y-2 custom-scroll flex-1 bg-gray-50 rounded-b-2xl" id="listDetailHargaKhusus">
+                <!-- Rincian list harga akan di-load di sini -->
+            </div>
+        </div>
+    </div>
+
 
     <!-- SCRIPT LOGIKA -->
     <script>
@@ -454,9 +541,9 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvY3Z1ZGRxaHZpb3JlYmlucHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2OTQ0NDAsImV4cCI6MjEwMTI3MDQ0MH0.mWGTOTfHG4Q62S3P4LQi-5bGviMPWgMzo2p2AECquL8';
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        let masterData = { resellers: [], barangJadi: [], bahanBaku: [], hargaDefault: {}, hargaKhusus: {} };
+        let masterData = { resellers: [], barangJadi: [], bahanBaku: [], hargaDefault: {}, hargaKhusus: {}, rawHargaKhusus: [] };
         let selectedResellerId = '';
-        let riwayatTransactions = []; // Menyimpan data riwayat
+        let riwayatTransactions = []; 
 
         async function loadMasterData() {
             try {
@@ -472,6 +559,7 @@
 
                 masterData.resellers = resellersData.data.map(r => ({ id: r.id, nama: r.nama_reseller }));
                 masterData.barangJadi = []; masterData.bahanBaku = []; masterData.hargaDefault = {}; masterData.hargaKhusus = {};
+                masterData.rawHargaKhusus = hargaKhususData.data; // Simpan untuk rincian detail pop-up
 
                 barangData.data.forEach(b => {
                     masterData.hargaDefault[b.id] = b.harga_default;
@@ -489,9 +577,7 @@
                 const txt = document.getElementById('text-connection');
                 txt.innerText = 'Connected'; txt.classList.replace('text-yellow-700', 'text-green-700');
 
-                initDefaults();
-                refreshDropdownsUI();
-
+                initDefaults(); refreshDropdownsUI();
             } catch (error) {
                 const statusConn = document.getElementById('status-connection');
                 statusConn.classList.replace('bg-yellow-50', 'bg-red-50');
@@ -616,25 +702,41 @@
 
         document.getElementById('searchHargaKhusus')?.addEventListener('input', function(e) {
             const term = e.target.value.toLowerCase();
-            document.querySelectorAll('#containerModalHarga > div').forEach(div => {
-                const text = div.innerText.toLowerCase();
-                div.style.display = text.includes(term) ? '' : 'none';
+            document.querySelectorAll('#containerModalHarga li').forEach(li => {
+                const text = li.innerText.toLowerCase();
+                li.style.display = text.includes(term) ? '' : 'none';
             });
         });
 
-        // ================= CRUD FUNCTIONS & TOGGLES =================
-        function toggleFormBarang(forceShow = false) {
-            const form = document.getElementById('formBarangContainer');
-            if(forceShow) form.classList.remove('hidden');
-            else form.classList.toggle('hidden');
+
+        // ================= FUNGSI BUKA / TUTUP FORM MODAL TERPISAH =================
+        function openFormModal(id) {
+            const el = document.getElementById(id);
+            el.classList.remove('hidden');
+            setTimeout(() => { el.children[1].classList.replace('scale-95', 'scale-100'); }, 10);
+            feather.replace();
         }
 
-        function toggleFormHarga(forceShow = false) {
-            const form = document.getElementById('formHargaContainer');
-            if(forceShow) form.classList.remove('hidden');
-            else form.classList.toggle('hidden');
+        function closeFormModal(id) {
+            const el = document.getElementById(id);
+            el.children[1].classList.replace('scale-100', 'scale-95');
+            setTimeout(() => { el.classList.add('hidden'); }, 200);
         }
 
+        // ================= CRUD FUNCTIONS =================
+        
+        // --- AGEN ---
+        function resetFormAgen() {
+            document.getElementById('editAgenId').value = ''; 
+            document.getElementById('inputNamaAgen').value = '';
+            document.getElementById('labelFormAgen').innerText = "Tambah Agen Baru";
+        }
+        function editAgen(id, nama) {
+            document.getElementById('editAgenId').value = id; 
+            document.getElementById('inputNamaAgen').value = nama;
+            document.getElementById('labelFormAgen').innerText = "Edit Data Reseller";
+            openFormModal('modalFormAgen');
+        }
         async function simpanAgen() {
             const id = document.getElementById('editAgenId').value;
             const nama = document.getElementById('inputNamaAgen').value.trim();
@@ -642,25 +744,14 @@
             try {
                 if(id) {
                     const { error } = await supabaseClient.from('reseller').update({ nama_reseller: nama }).eq('id', id);
-                    if(error) throw error; showNotification("Data agen berhasil diperbarui!", "success");
+                    if(error) throw error; showNotification("Data Reseller berhasil diperbarui!", "success");
                 } else {
                     const { error } = await supabaseClient.from('reseller').insert([{ nama_reseller: nama }]);
                     if(error) throw error; showNotification("Agen baru berhasil ditambahkan!", "success");
                 }
-                resetFormAgen(); await loadMasterData(); openModal('modalAgen'); 
+                closeFormModal('modalFormAgen'); await loadMasterData(); openModal('modalAgen'); 
             } catch (err) { showNotification("Gagal menyimpan agen: " + err.message, "error"); }
         }
-
-        function editAgen(id, nama) {
-            document.getElementById('editAgenId').value = id; document.getElementById('inputNamaAgen').value = nama;
-            document.getElementById('labelFormAgen').innerText = "Edit Data Agen"; document.getElementById('btnBatalAgen').classList.remove('hidden');
-        }
-
-        function resetFormAgen() {
-            document.getElementById('editAgenId').value = ''; document.getElementById('inputNamaAgen').value = '';
-            document.getElementById('labelFormAgen').innerText = "Tambah Agen Baru"; document.getElementById('btnBatalAgen').classList.add('hidden');
-        }
-
         async function hapusAgen(id) {
             if(!confirm("Yakin ingin menghapus agen ini?")) return;
             try {
@@ -669,6 +760,22 @@
             } catch (err) { showNotification("Gagal menghapus: " + err.message, "error"); }
         }
 
+        // --- BARANG ---
+        function resetFormBarang() {
+            document.getElementById('editBarangId').value = ''; 
+            document.getElementById('inputNamaBarang').value = '';
+            document.getElementById('inputTipeBarang').value = 'jadi'; 
+            document.getElementById('inputHargaDefault').value = '';
+            document.getElementById('labelFormBarang').innerText = "Tambah Barang Baru";
+        }
+        function editBarang(id, nama, tipe, harga) {
+            document.getElementById('editBarangId').value = id; 
+            document.getElementById('inputNamaBarang').value = nama;
+            document.getElementById('inputTipeBarang').value = tipe; 
+            document.getElementById('inputHargaDefault').value = harga;
+            document.getElementById('labelFormBarang').innerText = "Edit Master Barang";
+            openFormModal('modalFormBarang');
+        }
         async function simpanBarang() {
             const id = document.getElementById('editBarangId').value;
             const nama = document.getElementById('inputNamaBarang').value.trim();
@@ -683,24 +790,9 @@
                     const { error } = await supabaseClient.from('barang').insert([{ nama_barang: nama, tipe: tipe, harga_default: harga }]);
                     if(error) throw error; showNotification("Barang baru berhasil ditambahkan!", "success");
                 }
-                resetFormBarang(); await loadMasterData(); openModal('modalBarang');
+                closeFormModal('modalFormBarang'); await loadMasterData(); openModal('modalBarang');
             } catch (err) { showNotification("Gagal menyimpan barang: " + err.message, "error"); }
         }
-
-        function editBarang(id, nama, tipe, harga) {
-            toggleFormBarang(true);
-            document.getElementById('editBarangId').value = id; document.getElementById('inputNamaBarang').value = nama;
-            document.getElementById('inputTipeBarang').value = tipe; document.getElementById('inputHargaDefault').value = harga;
-            document.getElementById('labelFormBarang').innerText = "Edit Master Barang"; document.getElementById('btnBatalBarang').classList.remove('hidden');
-        }
-
-        function resetFormBarang() {
-            document.getElementById('editBarangId').value = ''; document.getElementById('inputNamaBarang').value = '';
-            document.getElementById('inputTipeBarang').value = 'jadi'; document.getElementById('inputHargaDefault').value = '';
-            document.getElementById('labelFormBarang').innerText = "Tambah Barang Baru"; document.getElementById('btnBatalBarang').classList.add('hidden');
-            toggleFormBarang(false); // Sembunyikan otomatis setelah reset/simpan
-        }
-
         async function hapusBarang(id) {
             if(!confirm("Yakin ingin menghapus barang ini?")) return;
             try {
@@ -709,6 +801,12 @@
             } catch (err) { showNotification("Gagal menghapus: " + err.message, "error"); }
         }
 
+        // --- HARGA KHUSUS ---
+        function resetFormHarga() {
+            document.getElementById('inputHargaKhususVal').value = '';
+            document.getElementById('selectHargaReseller').value = '';
+            document.getElementById('selectHargaBarang').value = '';
+        }
         async function simpanHargaKhusus() {
             const resellerId = document.getElementById('selectHargaReseller').value;
             const barangId = document.getElementById('selectHargaBarang').value;
@@ -720,18 +818,49 @@
                 ], { onConflict: 'reseller_id,barang_id' });
                 if(error) throw error;
                 showNotification("Harga khusus berhasil disimpan!", "success");
-                document.getElementById('inputHargaKhususVal').value = ''; await loadMasterData(); toggleFormHarga(false); openModal('modalHarga');
+                closeFormModal('modalFormHarga'); await loadMasterData(); openModal('modalHarga');
             } catch (err) { showNotification("Gagal menyimpan harga khusus: " + err.message, "error"); }
+        }
+
+        function bukaDetailHargaKhusus(rId) {
+            const resObj = masterData.resellers.find(r => r.id === rId);
+            document.getElementById('namaResellerDetailHarga').innerText = resObj ? ` - ${resObj.nama}` : '';
+            
+            const container = document.getElementById('listDetailHargaKhusus');
+            container.innerHTML = '';
+            
+            const items = masterData.rawHargaKhusus.filter(hk => hk.reseller_id === rId);
+            const allItems = [...masterData.barangJadi, ...masterData.bahanBaku];
+            
+            items.forEach(hk => {
+                const itemObj = allItems.find(i => i.id === hk.barang_id);
+                if(itemObj) {
+                    container.innerHTML += `
+                    <div class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl text-xs mb-1.5 shadow-sm">
+                        <div>
+                            <span class="font-bold text-gray-800">${itemObj.nama}</span><br>
+                            <span class="text-emerald-600 font-bold">${formatRupiah(hk.harga)}</span>
+                        </div>
+                        <button onclick="hapusHargaKhusus('${hk.id}')" class="text-red-400 hover:text-red-600 p-2 bg-red-50 hover:bg-red-100 rounded-lg transition"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+                    </div>`;
+                }
+            });
+            openFormModal('modalDetailHargaKhusus');
+            feather.replace();
         }
 
         async function hapusHargaKhusus(id) {
             if(!confirm("Hapus aturan harga khusus ini?")) return;
             try {
                 const { error } = await supabaseClient.from('harga_khusus').delete().eq('id', id);
-                if(error) throw error; showNotification("Harga khusus berhasil dihapus!", "success"); await loadMasterData(); openModal('modalHarga');
+                if(error) throw error; 
+                showNotification("Harga khusus berhasil dihapus!", "success"); 
+                closeFormModal('modalDetailHargaKhusus');
+                await loadMasterData(); 
+                openModal('modalHarga'); // Refresh daftar utama
             } catch (err) { showNotification("Gagal menghapus: " + err.message, "error"); }
         }
-        // ================= END CRUD =================
+
 
         // ================= RIWAYAT PEMBAYARAN =================
         async function fetchRiwayatData() {
@@ -813,26 +942,34 @@
             feather.replace();
         }
 
-        async function lihatPratinjauRiwayat(trxId) {
-            const trx = riwayatTransactions.find(t => t.id === trxId);
-            if (!trx) return;
+async function lihatPratinjauRiwayat(trxId) {
+            // PERBAIKAN: Pastikan tipe data dikonversi ke String agar sama-sama cocok saat dicari
+            const trx = riwayatTransactions.find(t => String(t.id) === String(trxId));
+            
+            if (!trx) {
+                showNotification("Data transaksi tidak ditemukan!", "error");
+                return;
+            }
 
-            const reseller = masterData.resellers.find(r => r.id === trx.reseller_id);
+            const reseller = masterData.resellers.find(r => String(r.id) === String(trx.reseller_id));
             document.getElementById('notaNama').innerText = reseller ? reseller.nama : 'Reseller Dihapus';
             document.getElementById('notaTgl').innerText = new Date(trx.tanggal_transaksi).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
+            // Sembunyikan Tombol Simpan saat dari riwayat
+            document.getElementById('btnSimpanPratinjau').style.display = 'none';
+
             showNotification("Memuat detail transaksi...", "info");
             try {
-                const { data: details, error } = await supabaseClient.from('transaksi_detail').select('*').eq('transaksi_id', trxId);
+                const { data: details, error } = await supabaseClient.from('transaksi_detail').select('*').eq('transaksi_id', trx.id);
                 if (error) throw error;
 
                 let htmlSetoran = ''; let htmlBahan = '';
                 const allItems = [...masterData.barangJadi, ...masterData.bahanBaku];
 
                 details.forEach(d => {
-                    const item = allItems.find(i => i.id === d.barang_id);
+                    const item = allItems.find(i => String(i.id) === String(d.barang_id));
                     const itemName = item ? item.nama : 'Item Dihapus';
-                    const isBahan = masterData.bahanBaku.some(b => b.id === d.barang_id);
+                    const isBahan = masterData.bahanBaku.some(b => String(b.id) === String(d.barang_id));
                     
                     const rowHtml = `<tr><td class="py-1">${itemName}</td><td class="text-center">${d.qty}</td><td class="text-right text-gray-500">${formatRupiah(d.harga_satuan)}</td><td class="text-right font-medium">${formatRupiah(d.subtotal)}</td></tr>`;
                     
@@ -853,18 +990,23 @@
                 document.getElementById('notaListManual').innerHTML = htmlManual || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pinjaman uang</td></tr>';
                 document.getElementById('notaSubManual').innerText = "- " + formatRupiah(trx.kasbon_manual);
 
+                // Update Ringkasan
+                document.getElementById('notaSummarySetoran').innerText = formatRupiah(trx.total_setoran);
+                document.getElementById('notaSummaryKasbon').innerText = "- " + formatRupiah(trx.total_kasbon_bahan);
+
                 document.getElementById('notaGrandTotal').innerText = formatRupiah(trx.net_pembayaran);
                 const netVal = parseFloat(trx.net_pembayaran) || 0;
                 document.getElementById('notaGrandTotal').className = `text-xl font-black ${netVal < 0 ? 'text-red-600' : 'text-gray-900'}`;
 
-                // Buka Pratinjau di atas modal Riwayat
-                document.getElementById('modalPratinjau').classList.remove('hidden');
-                setTimeout(() => { document.getElementById('modalPratinjau').children[1].classList.replace('scale-95','scale-100'); }, 10);
+                // Buka Pratinjau (Menjamin Z-Index Tertinggi)
+                const pratinjauModal = document.getElementById('modalPratinjau');
+                pratinjauModal.classList.remove('hidden');
+                setTimeout(() => { pratinjauModal.children[1].classList.replace('scale-95','scale-100'); }, 10);
             } catch (err) { showNotification("Gagal memuat pratinjau: " + err.message, "error"); }
         }
-        // ================= END RIWAYAT =================
 
-        // PRATINJAU NOTA (TRANSAKSI AKTIF)
+
+        // ================= PRATINJAU NOTA (TRANSAKSI BARU AKTIF) =================
         function bukaPratinjau() {
             if (!selectedResellerId) return showNotification("Pilih Reseller terlebih dahulu untuk pratinjau!", "error");
             
@@ -873,6 +1015,9 @@
             
             const rawTgl = document.getElementById('tglTransaksi').value;
             document.getElementById('notaTgl').innerText = new Date(rawTgl).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            // Tampilkan kembali tombol simpan saat dibuka dari halaman utama
+            document.getElementById('btnSimpanPratinjau').style.display = 'flex';
 
             let htmlSetoran = '';
             document.querySelectorAll('#containerBarangJadi .row-item').forEach(row => {
@@ -909,6 +1054,10 @@
             document.getElementById('notaListManual').innerHTML = htmlManual || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pinjaman uang</td></tr>';
             document.getElementById('notaSubManual').innerText = document.getElementById('summaryManual').innerText;
 
+            // Update Ringkasan Sesuai Halaman Utama
+            document.getElementById('notaSummarySetoran').innerText = document.getElementById('subtotalBarangJadiLayar').innerText;
+            document.getElementById('notaSummaryKasbon').innerText = "- " + document.getElementById('subtotalBahanBakuLayar').innerText;
+
             document.getElementById('notaGrandTotal').innerText = document.getElementById('summaryNet').innerText;
             const netVal = parseFloat(document.getElementById('summaryNet').innerText.replace(/[^0-9,-]+/g,"")) || 0;
             document.getElementById('notaGrandTotal').className = `text-xl font-black ${netVal < 0 ? 'text-red-600' : 'text-gray-900'}`;
@@ -933,7 +1082,10 @@
             if (!selectedResellerId) return showNotification("Pilih Reseller terlebih dahulu!", "error");
             
             const btn = document.getElementById('btnSubmit'); 
-            btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 mr-1.5 animate-spin"></i> Menyimpan...`; btn.disabled = true;
+            const btnPratinjau = document.getElementById('btnSimpanPratinjau');
+            
+            if(btn) { btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 mr-1.5 animate-spin"></i> Menyimpan...`; btn.disabled = true; }
+            if(btnPratinjau) { btnPratinjau.innerHTML = `<i data-feather="loader" class="w-3 h-3 mr-1 animate-spin"></i> Menyimpan...`; btnPratinjau.disabled = true; }
 
             const tgl = document.getElementById('tglTransaksi').value;
             const totalSetoran = parseFloat(document.getElementById('summarySetoran').innerText.replace(/[^0-9,-]+/g,"")) || 0;
@@ -972,29 +1124,37 @@
                 document.getElementById('listKasbonManual').innerHTML = '';
                 
                 kalkulasiSemua(); feather.replace(); addRow('bahanBaku'); addRow('barangJadi'); addKasbonManual();
+                closeModal('modalPratinjau'); // Tutup modal jika disimpan lewat pratinjau
 
             } catch (error) {
                 showNotification("Gagal menyimpan: " + error.message, "error");
             } finally {
-                btn.innerHTML = `<i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan`; btn.disabled = false;
+                if(btn) { btn.innerHTML = `<i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan`; btn.disabled = false; }
+                if(btnPratinjau) { btnPratinjau.innerHTML = `<i data-feather="check-circle" class="w-3 h-3 mr-1"></i> Simpan Data`; btnPratinjau.disabled = false; }
             }
         }
 
-        // Modals Logic
+        // ================= MODAL LOGICS UTAMA =================
         function closeModal(id) {
             const modalEl = document.getElementById(id);
-            if(modalEl.children[0]) modalEl.children[0].classList.replace('scale-100','scale-95');
+            if(modalEl.children[0] && modalEl.children[0].classList.contains('scale-100')) {
+                 modalEl.children[0].classList.replace('scale-100','scale-95'); // Modal Dasar
+            } else if (modalEl.children[1] && modalEl.children[1].classList.contains('scale-100')) {
+                 modalEl.children[1].classList.replace('scale-100','scale-95'); // Pratinjau
+            }
+            
             setTimeout(() => { 
                 modalEl.classList.add('hidden');
-                // Khusus untuk Pratinjau dari Riwayat, jangan tutup Overlay jika Modal Riwayat masih terbuka
+                // Jangan tutup Overlay Utama jika Pratinjau ditutup tapi Riwayat masih terbuka
                 if (id === 'modalPratinjau' && !document.getElementById('modalRiwayat').classList.contains('hidden')) {
                     // Biarkan overlay tetap ada
                 } else {
                     document.getElementById('modalOverlay').classList.add('hidden'); 
                 }
             }, 200);
-            document.getElementById('searchMasterBarang') ? document.getElementById('searchMasterBarang').value = '' : null;
-            document.getElementById('searchHargaKhusus') ? document.getElementById('searchHargaKhusus').value = '' : null;
+            
+            if(document.getElementById('searchMasterBarang')) document.getElementById('searchMasterBarang').value = '';
+            if(document.getElementById('searchHargaKhusus')) document.getElementById('searchHargaKhusus').value = '';
         }
 
         function openModal(id) {
@@ -1003,9 +1163,8 @@
             setTimeout(() => { document.getElementById(id).children[0].classList.replace('scale-95','scale-100'); }, 10);
             
             if(id === 'modalAgen') {
-                resetFormAgen();
                 const ul = document.getElementById('listModalAgen'); ul.innerHTML = '';
-                if(masterData.resellers.length === 0) ul.innerHTML = '<li class="p-3 text-xs text-gray-400 italic text-center">Belum ada data agen</li>';
+                if(masterData.resellers.length === 0) ul.innerHTML = '<li class="p-3 text-xs text-gray-400 italic text-center">Belum ada data Reseller</li>';
                 masterData.resellers.forEach(r => {
                     ul.innerHTML += `
                     <li class="flex justify-between items-center p-2.5 text-xs text-gray-700 hover:bg-gray-50">
@@ -1018,7 +1177,6 @@
                 });
             }
             if(id === 'modalBarang') {
-                resetFormBarang();
                 const uiJadi = document.getElementById('listModalBarangJadi'); 
                 const uiBahan = document.getElementById('listModalBahanBaku');
                 uiJadi.innerHTML = ''; uiBahan.innerHTML = '';
@@ -1049,7 +1207,6 @@
                 });
             }
             if(id === 'modalHarga') {
-                toggleFormHarga(false); // Sembunyikan saat modal dibuka
                 const selRes = document.getElementById('selectHargaReseller');
                 const selBar = document.getElementById('selectHargaBarang');
                 selRes.innerHTML = '<option value="">Pilih Agen...</option>';
@@ -1061,29 +1218,39 @@
                 const container = document.getElementById('containerModalHarga'); 
                 container.innerHTML = '';
                 
-                supabaseClient.from('harga_khusus').select('id, reseller_id, barang_id, harga').then(({data, error}) => {
-                    if(error || !data || data.length === 0) {
-                        container.innerHTML = '<p class="text-xs text-center text-gray-400 py-4">Belum ada harga khusus yang disetel.</p>';
-                        return;
-                    }
-
-                    const allItems = [...masterData.barangJadi, ...masterData.bahanBaku];
-                    data.forEach(hk => {
-                        const resObj = masterData.resellers.find(r => r.id === hk.reseller_id);
-                        const itemObj = allItems.find(i => i.id === hk.barang_id);
-                        if(resObj && itemObj) {
-                            container.innerHTML += `
-                            <div class="flex justify-between items-center p-2.5 bg-white border border-gray-200 rounded-xl text-xs shadow-sm">
-                                <div>
-                                    <span class="font-bold text-gray-800">${resObj.nama}</span><br>
-                                    <span class="text-gray-500 text-[11px]">${itemObj.nama} ➔ <b class="text-emerald-600">${formatRupiah(hk.harga)}</b></span>
-                                </div>
-                                <button onclick="hapusHargaKhusus('${hk.id}')" class="text-red-400 hover:text-red-600 p-1 bg-red-50 rounded"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
-                            </div>`;
-                        }
-                    });
-                    feather.replace();
+                // Grouping Harga Khusus berdasarkan Reseller
+                const grouped = {};
+                masterData.rawHargaKhusus.forEach(hk => {
+                    if(!grouped[hk.reseller_id]) grouped[hk.reseller_id] = [];
+                    grouped[hk.reseller_id].push(hk);
                 });
+
+                if(Object.keys(grouped).length === 0) {
+                    container.innerHTML = '<p class="text-xs text-center text-gray-400 py-4">Belum ada harga khusus yang disetel.</p>';
+                    return;
+                }
+
+                let html = '<ul class="space-y-2">';
+                Object.keys(grouped).forEach(rId => {
+                    const resObj = masterData.resellers.find(r => r.id === rId);
+                    const resName = resObj ? resObj.nama : 'Reseller Terhapus';
+                    const count = grouped[rId].length;
+                    
+                    html += `
+                    <li onclick="bukaDetailHargaKhusus('${rId}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 hover:shadow-sm cursor-pointer transition">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i data-feather="user" class="w-4 h-4"></i></div>
+                            <div>
+                                <span class="font-bold text-xs text-gray-800">${resName}</span><br>
+                                <span class="text-[10px] font-bold text-emerald-600">${count} Barang Khusus</span>
+                            </div>
+                        </div>
+                        <i data-feather="chevron-right" class="w-4 h-4 text-gray-400"></i>
+                    </li>`;
+                });
+                html += '</ul>';
+                container.innerHTML = html;
+                feather.replace();
             }
             if(id === 'modalRiwayat') {
                 fetchRiwayatData();
@@ -1092,7 +1259,15 @@
         }
 
         document.getElementById('modalOverlay').addEventListener('click', () => { 
-            // Cek urutan penutupan modal, hindari menutup riwayat jika sedang buka pratinjau
+            // Cek jika sedang buka form popup (di atas overlay ini), abaikan klik (diurus overlay popup sendiri)
+            if(!document.getElementById('modalFormAgen').classList.contains('hidden') ||
+               !document.getElementById('modalFormBarang').classList.contains('hidden') ||
+               !document.getElementById('modalFormHarga').classList.contains('hidden') ||
+               !document.getElementById('modalDetailHargaKhusus').classList.contains('hidden')) {
+                return;
+            }
+
+            // Jika pratinjau sedang terbuka, tutup saja pratinjaunya
             if(!document.getElementById('modalPratinjau').classList.contains('hidden')) {
                 closeModal('modalPratinjau');
                 return;
