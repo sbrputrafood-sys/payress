@@ -6,6 +6,11 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Supabase JS -->
@@ -16,87 +21,85 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid #e2e8f0; }
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Tema Terang */
+        body:not(.dark) { background-color: #f8fafc; color: #1e293b; }
+        body:not(.dark) .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid #e2e8f0; }
+        
+        /* Tema Gelap Calm */
+        body.dark { background-color: #0f172a; color: #cbd5e1; }
+        body.dark .glass-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); border: 1px solid #334155; }
+        
         input, select { transition: all 0.2s ease-in-out; }
-        input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
+        input:focus, select:focus { outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
         
         input[type="number"]::-webkit-inner-spin-button, 
         input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+        body.dark .custom-scroll::-webkit-scrollbar-thumb { background-color: #475569; }
 
-        /* PERBAIKAN CETAK A4 (PRINT PREVIEW) */
+        /* PERBAIKAN CETAK A4 (PRINT PREVIEW) - SELALU TERANG */
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body, html { background-color: white !important; margin: 0; padding: 0; width: 100%; height: 100%; }
-            
-            /* Sembunyikan semua elemen dasar kecuali area pratinjau */
             body > *:not(#modalPratinjau) { display: none !important; }
             nav, #toastContainer, #modalOverlay { display: none !important; }
-            
-            /* Lepaskan modal pratinjau dari gaya fixed & hidden */
-            #modalPratinjau {
-                position: absolute !important; left: 0 !important; top: 0 !important;
-                display: block !important; width: 100% !important; padding: 0 !important;
-                background: white !important;
-            }
-            
-            /* Sembunyikan overlay hitam/gelap pada modal */
+            #modalPratinjau { position: absolute !important; left: 0 !important; top: 0 !important; display: block !important; width: 100% !important; padding: 0 !important; background: white !important; }
             #modalPratinjau > div:first-child { display: none !important; } 
-            
-            /* Sesuaikan box nota agar sesuai lebar kertas */
-            #modalPratinjau > div:last-child {
-                position: relative !important; max-width: 100% !important; width: 100% !important;
-                box-shadow: none !important; border: none !important; transform: none !important;
-                max-height: none !important; background: white !important;
-            }
-            
+            #modalPratinjau > div:last-child { position: relative !important; max-width: 100% !important; width: 100% !important; box-shadow: none !important; border: none !important; transform: none !important; max-height: none !important; background: white !important; }
             #areaPrint { overflow: visible !important; height: auto !important; padding: 0 !important; }
             .no-print { display: none !important; }
         }
     </style>
 </head>
-<body class="min-h-screen pb-12 relative">
+<body class="min-h-screen pb-12 relative transition-colors duration-300">
 
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="fixed bottom-4 right-4 z-[110] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Top Navigation -->
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-30 print:hidden">
+    <nav class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 sticky top-0 z-30 print:hidden transition-colors">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-14">
                 <div class="flex items-center space-x-3">
-                    <div class="bg-blue-600 p-1.5 rounded-lg text-white shadow-sm shadow-blue-200">
+                    <div class="bg-blue-600 p-1.5 rounded-lg text-white shadow-sm shadow-blue-200 dark:shadow-none">
                         <i data-feather="box" class="w-4 h-4"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-sm leading-tight text-gray-900">SBR Putra Food</h1>
-                        <p class="text-[10px] text-gray-500 font-medium">Sistem Kalkulasi Reseller</p>
+                        <h1 class="font-bold text-sm leading-tight text-gray-900 dark:text-slate-100">SBR Putra Food</h1>
+                        <p class="text-[10px] text-gray-500 dark:text-slate-400 font-medium">Sistem Kalkulasi Reseller</p>
                     </div>
                 </div>
                 
                 <div class="flex items-center space-x-4">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" class="text-gray-400 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 p-1.5 rounded-lg transition" title="Toggle Tema">
+                        <i data-feather="moon" id="iconMoon" class="w-4 h-4"></i>
+                        <i data-feather="sun" id="iconSun" class="w-4 h-4 hidden"></i>
+                    </button>
+
                     <div class="relative group">
-                        <button class="flex items-center space-x-1 text-xs font-medium text-gray-600 hover:text-blue-600 focus:outline-none px-2 py-1.5 rounded-lg hover:bg-gray-50 transition cursor-pointer">
+                        <button class="flex items-center space-x-1 text-xs font-medium text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition cursor-pointer">
                             <i data-feather="database" class="w-3.5 h-3.5"></i>
                             <span class="hidden sm:inline">Manajemen Data</span>
                             <i data-feather="chevron-down" class="w-3 h-3 mt-0.5"></i>
                         </button>
-                        <div class="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
+                        <div class="absolute right-0 mt-1 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
                             <div class="py-1">
-                                <a href="#" onclick="openModal('modalAgen'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="users" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Data Reseller</a>
-                                <a href="#" onclick="openModal('modalBarang'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="layers" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Master Barang</a>
-                                <a href="#" onclick="openModal('modalHarga'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="tag" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Harga Khusus</a>
-                                <div class="border-t border-gray-100 my-1"></div>
-                                <a href="#" onclick="openModal('modalRiwayat'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="clock" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Riwayat Pembayaran</a>
+                                <a href="#" onclick="openModal('modalAgen'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 transition"><i data-feather="users" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Data Reseller</a>
+                                <a href="#" onclick="openModal('modalBarang'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 transition"><i data-feather="layers" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Master Barang</a>
+                                <a href="#" onclick="openModal('modalHarga'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 transition"><i data-feather="tag" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Harga Khusus</a>
+                                <div class="border-t border-gray-100 dark:border-slate-700 my-1"></div>
+                                <a href="#" onclick="openModal('modalRiwayat'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 transition"><i data-feather="clock" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Riwayat Pembayaran</a>
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-1.5 bg-yellow-50 px-2.5 py-1 rounded-full border border-yellow-100 shadow-sm" id="status-connection">
+                    <div class="flex items-center space-x-1.5 bg-yellow-50 dark:bg-yellow-900/30 px-2.5 py-1 rounded-full border border-yellow-100 dark:border-yellow-800/50 shadow-sm" id="status-connection">
                         <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span></span>
-                        <span id="text-connection" class="text-[10px] font-semibold text-yellow-700 tracking-wide hidden sm:inline">Loading...</span>
+                        <span id="text-connection" class="text-[10px] font-semibold text-yellow-700 dark:text-yellow-500 tracking-wide hidden sm:inline">Loading...</span>
                     </div>
                 </div>
             </div>
@@ -106,35 +109,46 @@
     <!-- MAIN DASHBOARD CONTENT -->
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-5 print:hidden">
         
-        <div class="flex flex-wrap items-center gap-4 mb-6 bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+        <div class="flex flex-wrap items-center gap-4 mb-6 bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm transition-colors">
             <div class="flex items-center gap-2">
-                <label class="text-xs font-bold text-gray-500">Reseller:</label>
-                <select id="resellerSelect" class="w-48 rounded border border-gray-300 py-1 px-2 text-sm text-gray-800 bg-gray-50 hover:bg-white focus:bg-white cursor-pointer font-semibold outline-none">
+                <label class="text-xs font-bold text-gray-500 dark:text-slate-400">Reseller:</label>
+                <select id="resellerSelect" class="w-48 rounded border border-gray-300 dark:border-slate-600 py-1 px-2 text-sm text-gray-800 dark:text-slate-100 bg-gray-50 dark:bg-slate-900 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 cursor-pointer font-semibold outline-none focus:border-blue-500 transition-colors">
                     <option value="">-- Pilih --</option>
                 </select>
             </div>
-            <div class="w-px h-6 bg-gray-200 hidden md:block"></div>
-            <div class="flex items-center gap-2">
-                <label class="text-xs font-bold text-gray-500">Tanggal:</label>
-                <input type="date" id="tglTransaksi" class="w-36 rounded border border-gray-300 py-1 px-2 text-sm text-gray-800 bg-gray-50 hover:bg-white focus:bg-white font-medium outline-none">
+            <div class="w-px h-6 bg-gray-200 dark:bg-slate-700 hidden md:block"></div>
+            
+            <!-- OVERLAY DATE PICKER CUSTOM (MENAMPILKAN FORMAT INDONESIA) -->
+            <div class="flex items-center gap-2 relative">
+                <label class="text-xs font-bold text-gray-500 dark:text-slate-400">Tanggal:</label>
+                <div class="relative w-36">
+                    <!-- Input native disembunyikan opacity 0, tapi bisa diklik -->
+                    <input type="date" id="tglTransaksi" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="updateTglDisplay()">
+                    <!-- Tampilan Visual Pengganti (Overlay) -->
+                    <div class="w-full rounded border border-gray-300 dark:border-slate-600 py-1 px-2.5 text-sm text-gray-800 dark:text-slate-100 bg-gray-50 dark:bg-slate-900 font-medium flex justify-between items-center transition-colors">
+                        <span id="tglDisplay">DD/MMM/YY</span>
+                        <i data-feather="calendar" class="w-3.5 h-3.5 text-gray-400"></i>
+                    </div>
+                </div>
             </div>
+
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             
             <!-- KIRI: Kasbon Bahan -->
             <div class="glass-card rounded-xl p-4 shadow-sm border-t-4 border-t-red-500 flex flex-col h-full">
-                <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
-                    <h2 class="text-sm font-bold text-gray-800 flex items-center">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-100 dark:border-slate-700 transition-colors">
+                    <h2 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center">
                         <i data-feather="shopping-bag" class="w-4 h-4 text-red-600 mr-1.5"></i> Pengambilan Bahan
                     </h2>
-                    <button onclick="addRow('bahanBaku')" class="text-[11px] bg-red-50 hover:bg-red-100 text-red-600 font-bold py-1 px-2.5 rounded flex items-center transition">
+                    <button onclick="addRow('bahanBaku')" class="text-[11px] bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-800/40 text-red-600 dark:text-red-400 font-bold py-1 px-2.5 rounded flex items-center transition">
                         <i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah
                     </button>
                 </div>
                 
-                <div class="flex text-[10px] font-bold text-gray-400 px-1 mb-1.5 uppercase tracking-wider">
-                    <div class="w-2/12 text-center">Qty</div>
+                <div class="flex text-[10px] font-bold text-gray-400 dark:text-slate-500 px-1 mb-1.5 uppercase tracking-wider">
+                    <div class="w-2/12 text-center" title="Bisa klik icon grid untuk pop-up kotretan">Qty</div>
                     <div class="w-4/12 pl-1">Item Bahan</div>
                     <div class="w-3/12 text-right">Harga</div>
                     <div class="w-3/12 text-right pr-2">Subtotal</div>
@@ -142,8 +156,8 @@
                 
                 <div id="containerBahanBaku" class="space-y-1 custom-scroll"></div>
 
-                <div class="mt-auto pt-3 mt-4 border-t border-gray-100 flex justify-between items-center">
-                    <span class="text-xs font-bold text-gray-500">Subtotal Bahan Baku:</span>
+                <div class="mt-auto pt-3 mt-4 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center transition-colors">
+                    <span class="text-xs font-bold text-gray-500 dark:text-slate-400">Subtotal Bahan Baku:</span>
                     <span id="subtotalBahanBakuLayar" class="text-sm font-bold text-red-500">Rp 0</span>
                 </div>
             </div>
@@ -152,17 +166,17 @@
             <div class="space-y-6 flex flex-col">
                 
                 <div class="glass-card rounded-xl p-4 shadow-sm border-t-4 border-t-blue-500 flex flex-col">
-                    <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
-                        <h2 class="text-sm font-bold text-gray-800 flex items-center">
-                            <i data-feather="package" class="w-4 h-4 text-blue-600 mr-1.5"></i> Setoran Barang Jadi
+                    <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-100 dark:border-slate-700 transition-colors">
+                        <h2 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center">
+                            <i data-feather="package" class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-1.5"></i> Setoran Barang Jadi
                         </h2>
-                        <button onclick="addRow('barangJadi')" class="text-[11px] bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold py-1 px-2.5 rounded flex items-center transition">
+                        <button onclick="addRow('barangJadi')" class="text-[11px] bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-800/40 text-blue-600 dark:text-blue-400 font-bold py-1 px-2.5 rounded flex items-center transition">
                             <i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah
                         </button>
                     </div>
 
-                    <div class="flex text-[10px] font-bold text-gray-400 px-1 mb-1.5 uppercase tracking-wider">
-                        <div class="w-2/12 text-center">Qty</div>
+                    <div class="flex text-[10px] font-bold text-gray-400 dark:text-slate-500 px-1 mb-1.5 uppercase tracking-wider">
+                        <div class="w-2/12 text-center" title="Bisa klik icon grid untuk pop-up kotretan">Qty</div>
                         <div class="w-4/12 pl-1">Barang Jadi</div>
                         <div class="w-3/12 text-right">Harga</div>
                         <div class="w-3/12 text-right pr-2">Subtotal</div>
@@ -170,53 +184,53 @@
                     
                     <div id="containerBarangJadi" class="space-y-1 custom-scroll"></div>
 
-                    <div class="mt-auto pt-3 mt-4 border-t border-gray-100 flex justify-between items-center">
-                        <span class="text-xs font-bold text-gray-500">Subtotal Barang Jadi:</span>
-                        <span id="subtotalBarangJadiLayar" class="text-sm font-bold text-blue-500">Rp 0</span>
+                    <div class="mt-auto pt-3 mt-4 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center transition-colors">
+                        <span class="text-xs font-bold text-gray-500 dark:text-slate-400">Subtotal Barang Jadi:</span>
+                        <span id="subtotalBarangJadiLayar" class="text-sm font-bold text-blue-500 dark:text-blue-400">Rp 0</span>
                     </div>
                 </div>
 
                 <!-- Ringkasan -->
-                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-                    <h2 class="text-sm font-bold text-gray-800 mb-3 flex items-center">
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 transition-colors">
+                    <h2 class="text-sm font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center">
                         <i data-feather="file-text" class="w-4 h-4 mr-1.5 text-blue-500"></i> Ringkasan Akhir
                     </h2>
                     
                     <div class="space-y-1.5">
-                        <div class="flex justify-between items-center bg-gray-50 py-1.5 px-2.5 rounded border border-gray-100">
-                            <span class="text-[11px] text-gray-600 font-medium">Total Setoran</span>
-                            <span id="summarySetoran" class="text-xs font-bold text-blue-600">Rp 0</span>
+                        <div class="flex justify-between items-center bg-gray-50 dark:bg-slate-900/50 py-1.5 px-2.5 rounded border border-gray-100 dark:border-slate-700 transition-colors">
+                            <span class="text-[11px] text-gray-600 dark:text-slate-300 font-medium">Total Setoran</span>
+                            <span id="summarySetoran" class="text-xs font-bold text-blue-600 dark:text-blue-400">Rp 0</span>
                         </div>
-                        <div class="flex justify-between items-center bg-gray-50 py-1.5 px-2.5 rounded border border-gray-100">
-                            <span class="text-[11px] text-gray-600 font-medium">Total Pengambilan Bahan</span>
-                            <span id="summaryKasbon" class="text-xs font-bold text-red-500">- Rp 0</span>
+                        <div class="flex justify-between items-center bg-gray-50 dark:bg-slate-900/50 py-1.5 px-2.5 rounded border border-gray-100 dark:border-slate-700 transition-colors">
+                            <span class="text-[11px] text-gray-600 dark:text-slate-300 font-medium">Total Pengambilan Bahan</span>
+                            <span id="summaryKasbon" class="text-xs font-bold text-red-500"> - Rp 0</span>
                         </div>
                         
                         <!-- Kasbon Manual Multi Row -->
-                        <div class="bg-gray-50 py-2 px-2.5 rounded border border-gray-100 transition-all">
+                        <div class="bg-gray-50 dark:bg-slate-900/50 py-2 px-2.5 rounded border border-gray-100 dark:border-slate-700 transition-colors">
                             <div class="flex justify-between items-center">
-                                <span class="text-[11px] text-gray-600 font-bold flex items-center gap-1.5">
+                                <span class="text-[11px] text-gray-600 dark:text-slate-300 font-bold flex items-center gap-1.5">
                                     <i data-feather="dollar-sign" class="w-3 h-3 text-red-500"></i> Kasbon Lain/Uang
                                 </span>
-                                <span id="summaryManual" class="text-xs font-bold text-red-500">- Rp 0</span>
+                                <span id="summaryManual" class="text-xs font-bold text-red-500"> - Rp 0</span>
                             </div>
-                            <div id="listKasbonManual" class="mt-2 pt-2 border-t border-gray-200"></div>
-                            <button onclick="addKasbonManual()" class="mt-2 text-[10px] bg-white border border-gray-200 text-gray-600 hover:text-blue-600 hover:border-blue-300 py-1 px-2 rounded flex items-center gap-1 w-full justify-center transition">
+                            <div id="listKasbonManual" class="mt-2 pt-2 border-t border-gray-200 dark:border-slate-700"></div>
+                            <button onclick="addKasbonManual()" class="mt-2 text-[10px] bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-500 py-1 px-2 rounded flex items-center gap-1 w-full justify-center transition">
                                 <i data-feather="plus" class="w-3 h-3"></i> Tambah Kolom Kasbon
                             </button>
                         </div>
                         
-                        <div class="pt-2 mt-2 border-t border-gray-200 flex justify-between items-end">
-                            <span class="block text-xs text-gray-700 font-bold">Net Pembayaran</span>
+                        <div class="pt-2 mt-2 border-t border-gray-200 dark:border-slate-700 flex justify-between items-end transition-colors">
+                            <span class="block text-xs text-gray-700 dark:text-slate-200 font-bold">Net Pembayaran</span>
                             <span id="summaryNet" class="block text-lg font-black text-green-500">Rp 0</span>
                         </div>
                     </div>
 
                     <div class="mt-5 grid grid-cols-2 gap-3">
-                        <button onclick="bukaPratinjau()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm">
+                        <button onclick="bukaPratinjau()" class="w-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm">
                             <i data-feather="eye" class="w-3.5 h-3.5 mr-1.5"></i> Pratinjau
                         </button>
-                        <button id="btnSubmit" onclick="simpanTransaksi()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm shadow-blue-200">
+                        <button id="btnSubmit" onclick="simpanTransaksi()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm shadow-blue-200 dark:shadow-none">
                             <i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan
                         </button>
                     </div>
@@ -226,21 +240,22 @@
         </div>
     </div>
 
-    <!-- MODAL PRATINJAU NOTA (Z-INDEX 100 TERTINGGI AGAR MENUTUPI RIWAYAT) -->
+    <!-- MODAL PRATINJAU NOTA -->
     <div id="modalPratinjau" class="fixed inset-0 z-[100] flex items-center justify-center hidden pointer-events-none p-4">
-        <div onclick="closeModal('modalPratinjau')" class="absolute inset-0 bg-gray-900 bg-opacity-70 backdrop-blur-sm pointer-events-auto transition-opacity"></div>
-        <div class="bg-gray-100 w-full max-w-4xl rounded-xl shadow-2xl pointer-events-auto transform scale-95 transition-transform duration-200 relative overflow-hidden flex flex-col max-h-[95vh]">
-            <div class="bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center no-print sticky top-0 z-10">
-                <h3 class="text-sm font-bold text-gray-700">Pratinjau Nota</h3>
+        <div onclick="closeModal('modalPratinjau')" class="absolute inset-0 bg-gray-900 bg-opacity-70 dark:bg-opacity-90 backdrop-blur-sm pointer-events-auto transition-opacity"></div>
+        <div class="bg-gray-100 dark:bg-slate-800 w-full max-w-4xl rounded-xl shadow-2xl pointer-events-auto transform scale-95 transition-transform duration-200 relative overflow-hidden flex flex-col max-h-[95vh]">
+            <div class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 py-3 flex justify-between items-center no-print sticky top-0 z-10 transition-colors">
+                <h3 class="text-sm font-bold text-gray-700 dark:text-slate-200">Pratinjau Nota</h3>
                 <div class="flex gap-2">
                     <button id="btnSimpanPratinjau" onclick="simpanTransaksi()" class="bg-emerald-600 text-white hover:bg-emerald-500 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"><i data-feather="check-circle" class="w-3 h-3 mr-1"></i> Simpan Data</button>
-                    <button onclick="simpanPNG()" class="bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="image" class="w-3 h-3 mr-1"></i> Simpan PNG</button>
-                    <button onclick="window.print()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="printer" class="w-3 h-3 mr-1"></i> Cetak A4</button>
-                    <button onclick="closeModal('modalPratinjau')" class="bg-gray-50 text-gray-500 hover:bg-gray-200 border border-gray-200 p-1.5 rounded transition"><i data-feather="x" class="w-4 h-4"></i></button>
+                    <button onclick="simpanPNG()" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="image" class="w-3 h-3 mr-1"></i> Simpan PNG</button>
+                    <button onclick="window.print()" class="bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/60 border border-blue-200 dark:border-blue-800/60 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="printer" class="w-3 h-3 mr-1"></i> Cetak A4</button>
+                    <button onclick="closeModal('modalPratinjau')" class="bg-gray-50 dark:bg-slate-700 text-gray-500 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-600 border border-gray-200 dark:border-slate-600 p-1.5 rounded transition"><i data-feather="x" class="w-4 h-4"></i></button>
                 </div>
             </div>
             
-            <div id="areaPrint" class="bg-white p-6 md:p-8 overflow-y-auto w-full">
+            <!-- areaPrint dipaksa terang agar mirip kertas putih -->
+            <div id="areaPrint" class="bg-white text-gray-900 p-6 md:p-8 overflow-y-auto w-full">
                 <!-- Header -->
                 <div class="border-b-2 border-gray-800 pb-3 mb-4 text-center">
                     <h2 class="text-xl font-black text-gray-900 uppercase tracking-wide">SBR Putra Food</h2>
@@ -269,7 +284,12 @@
                         </h4>
                         <table class="w-full text-[11px] text-left mb-2">
                             <thead>
-                                <tr class="border-b border-gray-200 text-gray-500"><th class="pb-1 font-semibold">Item</th><th class="pb-1 font-semibold text-center w-12">Qty</th><th class="pb-1 font-semibold text-right w-20">Harga</th><th class="pb-1 font-semibold text-right w-24">Total</th></tr>
+                                <tr class="border-b border-gray-200 text-gray-500">
+                                    <th class="pb-1 font-semibold text-center w-12">Qty</th>
+                                    <th class="pb-1 font-semibold pl-2">Item</th>
+                                    <th class="pb-1 font-semibold text-right w-20">Harga</th>
+                                    <th class="pb-1 font-semibold text-right w-24">Total</th>
+                                </tr>
                             </thead>
                             <tbody id="notaListBahan" class="text-gray-700"></tbody>
                         </table>
@@ -286,7 +306,12 @@
                             </h4>
                             <table class="w-full text-[11px] text-left mb-2">
                                 <thead>
-                                    <tr class="border-b border-gray-200 text-gray-500"><th class="pb-1 font-semibold">Item</th><th class="pb-1 font-semibold text-center w-12">Qty</th><th class="pb-1 font-semibold text-right w-20">Harga</th><th class="pb-1 font-semibold text-right w-24">Total</th></tr>
+                                    <tr class="border-b border-gray-200 text-gray-500">
+                                        <th class="pb-1 font-semibold text-center w-12">Qty</th>
+                                        <th class="pb-1 font-semibold pl-2">Item</th>
+                                        <th class="pb-1 font-semibold text-right w-20">Harga</th>
+                                        <th class="pb-1 font-semibold text-right w-24">Total</th>
+                                    </tr>
                                 </thead>
                                 <tbody id="notaListSetoran" class="text-gray-700"></tbody>
                             </table>
@@ -297,7 +322,6 @@
 
                         <!-- Ringkasan Tepat di Bawah Setoran Barang Jadi -->
                         <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mt-auto">
-                            <!-- Update Rincian Data Sesuai Halaman Utama -->
                             <div class="mb-4 space-y-2 border-b border-gray-300 pb-3">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[11px] font-bold text-gray-600">Total Setoran Barang Jadi</span>
@@ -332,46 +356,46 @@
     </div>
 
     <!-- MODAL OVERLAY DASAR -->
-    <div id="modalOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm hidden z-40 transition-opacity"></div>
+    <div id="modalOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-opacity-80 backdrop-blur-sm hidden z-40 transition-opacity"></div>
     
     <!-- MODAL CRUD: DATA AGEN -->
     <div id="modalAgen" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-transform duration-200 flex flex-col max-h-[85vh]">
-            <div class="flex justify-between items-center p-4 border-b border-gray-100">
-                <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="users" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Data Reseller</h3>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-all duration-200 flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="users" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Data Reseller</h3>
                 <div class="flex items-center gap-2">
-                    <button onclick="resetFormAgen(); openFormModal('modalFormAgen')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Agen</button>
-                    <button onclick="closeModal('modalAgen')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
+                    <button onclick="resetFormAgen(); openFormModal('modalFormAgen')" class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/50 border border-blue-100 dark:border-blue-800/50 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Agen</button>
+                    <button onclick="closeModal('modalAgen')" class="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 p-1.5 bg-gray-50 dark:bg-slate-700/50 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
                 </div>
             </div>
             <div class="p-4 overflow-y-auto space-y-4 flex-1">
-                <ul id="listModalAgen" class="space-y-1 divide-y divide-gray-100 border border-gray-200 rounded-xl overflow-hidden text-xs bg-white max-h-[50vh] overflow-y-auto custom-scroll"></ul>
+                <ul id="listModalAgen" class="space-y-1 divide-y divide-gray-100 dark:divide-slate-700/50 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden text-xs bg-white dark:bg-slate-800/50 max-h-[50vh] overflow-y-auto custom-scroll"></ul>
             </div>
         </div>
     </div>
     
     <!-- MODAL CRUD: MASTER BARANG -->
     <div id="modalBarang" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]">
-            <div class="flex justify-between items-center p-4 border-b border-gray-100">
-                <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="layers" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Master Barang</h3>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-all duration-200 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="layers" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Master Barang</h3>
                 <div class="flex items-center gap-2">
-                    <button onclick="resetFormBarang(); openFormModal('modalFormBarang')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Barang</button>
-                    <button onclick="closeModal('modalBarang')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
+                    <button onclick="resetFormBarang(); openFormModal('modalFormBarang')" class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/50 border border-blue-100 dark:border-blue-800/50 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Barang</button>
+                    <button onclick="closeModal('modalBarang')" class="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 p-1.5 bg-gray-50 dark:bg-slate-700/50 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
                 </div>
             </div>
             <div class="p-4 overflow-hidden flex flex-col gap-4 flex-1">
                 <div class="relative shrink-0">
-                    <i data-feather="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-400"></i>
-                    <input type="text" id="searchMasterBarang" placeholder="Cari nama barang..." class="w-full text-xs py-2.5 pl-9 pr-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white outline-none focus:border-blue-500 transition">
+                    <i data-feather="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-400 dark:text-slate-500"></i>
+                    <input type="text" id="searchMasterBarang" placeholder="Cari nama barang..." class="w-full text-xs py-2.5 pl-9 pr-3 rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900/50 text-gray-800 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 outline-none focus:border-blue-500 transition">
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-hidden">
-                    <div class="border border-gray-200 rounded-xl p-2 bg-white flex flex-col">
-                        <h4 class="font-bold text-xs mb-2 text-gray-700 border-b pb-1">Barang Jadi</h4>
+                    <div class="border border-gray-200 dark:border-slate-700 rounded-xl p-2 bg-white dark:bg-slate-800/50 flex flex-col">
+                        <h4 class="font-bold text-xs mb-2 text-gray-700 dark:text-slate-300 border-b dark:border-slate-700 pb-1">Barang Jadi</h4>
                         <ul id="listModalBarangJadi" class="space-y-1 max-h-[40vh] overflow-y-auto custom-scroll pr-1 flex-1"></ul>
                     </div>
-                    <div class="border border-gray-200 rounded-xl p-2 bg-white flex flex-col">
-                        <h4 class="font-bold text-xs mb-2 text-gray-700 border-b pb-1">Bahan Baku</h4>
+                    <div class="border border-gray-200 dark:border-slate-700 rounded-xl p-2 bg-white dark:bg-slate-800/50 flex flex-col">
+                        <h4 class="font-bold text-xs mb-2 text-gray-700 dark:text-slate-300 border-b dark:border-slate-700 pb-1">Bahan Baku</h4>
                         <ul id="listModalBahanBaku" class="space-y-1 max-h-[40vh] overflow-y-auto custom-scroll pr-1 flex-1"></ul>
                     </div>
                 </div>
@@ -379,38 +403,38 @@
         </div>
     </div>
     
-    <!-- MODAL CRUD: HARGA KHUSUS (TAMPILAN GRUP) -->
+    <!-- MODAL CRUD: HARGA KHUSUS -->
     <div id="modalHarga" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]">
-            <div class="flex justify-between items-center p-4 border-b border-gray-100">
-                <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="tag" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Harga Khusus</h3>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-all duration-200 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="tag" class="w-4 h-4 mr-2 text-blue-500"></i> Manajemen Harga Khusus</h3>
                 <div class="flex items-center gap-2">
-                    <button onclick="resetFormHarga(); openFormModal('modalFormHarga')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Harga</button>
-                    <button onclick="closeModal('modalHarga')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
+                    <button onclick="resetFormHarga(); openFormModal('modalFormHarga')" class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/50 border border-blue-100 dark:border-blue-800/50 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center"><i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah Harga</button>
+                    <button onclick="closeModal('modalHarga')" class="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 p-1.5 bg-gray-50 dark:bg-slate-700/50 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
                 </div>
             </div>
             <div class="p-4 overflow-hidden flex flex-col gap-4 flex-1">
                 <div class="relative shrink-0">
-                    <i data-feather="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-400"></i>
-                    <input type="text" id="searchHargaKhusus" placeholder="Cari nama agen..." class="w-full text-xs py-2.5 pl-9 pr-3 rounded-lg border border-gray-300 bg-gray-50 focus:bg-white outline-none focus:border-blue-500 transition">
+                    <i data-feather="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-400 dark:text-slate-500"></i>
+                    <input type="text" id="searchHargaKhusus" placeholder="Cari nama agen..." class="w-full text-xs py-2.5 pl-9 pr-3 rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900/50 text-gray-800 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 outline-none focus:border-blue-500 transition">
                 </div>
                 <div class="flex-1 overflow-hidden flex flex-col">
-                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 shrink-0">Daftar Reseller (Harga Khusus)</h4>
+                    <h4 class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wide mb-2 shrink-0">Daftar Reseller (Harga Khusus)</h4>
                     <div id="containerModalHarga" class="max-h-[50vh] overflow-y-auto custom-scroll pr-1"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL RIWAYAT PEMBAYARAN (Z-INDEX 50) -->
+    <!-- MODAL RIWAYAT PEMBAYARAN -->
     <div id="modalRiwayat" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-transform duration-200 flex flex-col max-h-[85vh]">
-            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-all duration-200 flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
                 <div class="flex items-center gap-3">
-                    <button id="btnBackRiwayat" onclick="renderRiwayatDates()" class="hidden text-gray-500 hover:text-blue-600 bg-gray-100 p-1.5 rounded-lg transition"><i data-feather="arrow-left" class="w-4 h-4"></i></button>
-                    <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="clock" class="w-4 h-4 mr-2 text-blue-500"></i> Riwayat Pembayaran</h3>
+                    <button id="btnBackRiwayat" onclick="renderRiwayatDates()" class="hidden text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 bg-gray-100 dark:bg-slate-700 p-1.5 rounded-lg transition"><i data-feather="arrow-left" class="w-4 h-4"></i></button>
+                    <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="clock" class="w-4 h-4 mr-2 text-blue-500"></i> Riwayat Pembayaran</h3>
                 </div>
-                <button onclick="closeModal('modalRiwayat')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+                <button onclick="closeModal('modalRiwayat')" class="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 p-1.5 bg-gray-50 dark:bg-slate-700/50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
             <div class="p-4 overflow-y-auto space-y-4 flex-1 custom-scroll" id="containerRiwayat">
                 <div class="flex justify-center py-8"><i data-feather="loader" class="w-6 h-6 animate-spin text-blue-500"></i></div>
@@ -422,20 +446,20 @@
     
     <!-- Modal Form Agen -->
     <div id="modalFormAgen" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalFormAgen')"></div>
-        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-transform duration-200">
-            <div class="flex justify-between items-center p-4 border-b border-gray-100">
-                <h3 class="text-sm font-bold text-gray-800" id="labelFormAgen">Tambah Agen Baru</h3>
-                <button onclick="closeFormModal('modalFormAgen')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+        <div class="absolute inset-0 bg-gray-900/60 dark:bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalFormAgen')"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-all duration-200">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100" id="labelFormAgen">Tambah Agen Baru</h3>
+                <button onclick="closeFormModal('modalFormAgen')" class="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 p-1 bg-gray-50 dark:bg-slate-700/50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
             <div class="p-4 space-y-4">
                 <input type="hidden" id="editAgenId">
                 <div>
-                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Nama Reseller / Agen</label>
-                    <input type="text" id="inputNamaAgen" placeholder="Masukkan nama..." class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition">
+                    <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Nama Reseller / Agen</label>
+                    <input type="text" id="inputNamaAgen" placeholder="Masukkan nama..." class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 transition">
                 </div>
                 <div class="flex gap-2 justify-end pt-2">
-                    <button onclick="closeFormModal('modalFormAgen')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-4 py-2 rounded-lg transition">Batal</button>
+                    <button onclick="closeFormModal('modalFormAgen')" class="bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-300 text-xs font-bold px-4 py-2 rounded-lg transition">Batal</button>
                     <button onclick="simpanAgen()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition">Simpan Data</button>
                 </div>
             </div>
@@ -444,31 +468,31 @@
 
     <!-- Modal Form Master Barang -->
     <div id="modalFormBarang" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalFormBarang')"></div>
-        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-transform duration-200">
-            <div class="flex justify-between items-center p-4 border-b border-gray-100">
-                <h3 class="text-sm font-bold text-gray-800" id="labelFormBarang">Tambah Barang Baru</h3>
-                <button onclick="closeFormModal('modalFormBarang')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+        <div class="absolute inset-0 bg-gray-900/60 dark:bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalFormBarang')"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-all duration-200">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100" id="labelFormBarang">Tambah Barang Baru</h3>
+                <button onclick="closeFormModal('modalFormBarang')" class="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 p-1 bg-gray-50 dark:bg-slate-700/50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
             <div class="p-4 space-y-3">
                 <input type="hidden" id="editBarangId">
                 <div>
-                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Nama Barang</label>
-                    <input type="text" id="inputNamaBarang" placeholder="Masukkan nama..." class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition">
+                    <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Nama Barang</label>
+                    <input type="text" id="inputNamaBarang" placeholder="Masukkan nama..." class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 transition">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Tipe Barang</label>
-                    <select id="inputTipeBarang" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition">
+                    <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Tipe Barang</label>
+                    <select id="inputTipeBarang" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 transition">
                         <option value="jadi">Barang Jadi</option>
                         <option value="bahan">Bahan Baku</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Harga Default (Rp)</label>
-                    <input type="number" id="inputHargaDefault" placeholder="0" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition">
+                    <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Harga Default (Rp)</label>
+                    <input type="text" id="inputHargaDefault" placeholder="0" oninput="formatInputRibuan(this)" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 transition">
                 </div>
                 <div class="flex gap-2 justify-end pt-3">
-                    <button onclick="closeFormModal('modalFormBarang')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-4 py-2 rounded-lg transition">Batal</button>
+                    <button onclick="closeFormModal('modalFormBarang')" class="bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-300 text-xs font-bold px-4 py-2 rounded-lg transition">Batal</button>
                     <button onclick="simpanBarang()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition">Simpan Barang</button>
                 </div>
             </div>
@@ -477,27 +501,27 @@
 
     <!-- Modal Form Tambah Harga Khusus -->
     <div id="modalFormHarga" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalFormHarga')"></div>
-        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-transform duration-200">
-            <div class="flex justify-between items-center p-4 border-b border-gray-100">
-                <h3 class="text-sm font-bold text-gray-800">Setel Harga Khusus</h3>
-                <button onclick="closeFormModal('modalFormHarga')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+        <div class="absolute inset-0 bg-gray-900/60 dark:bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalFormHarga')"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-all duration-200">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100">Setel Harga Khusus</h3>
+                <button onclick="closeFormModal('modalFormHarga')" class="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 p-1 bg-gray-50 dark:bg-slate-700/50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
             <div class="p-4 space-y-3">
                 <div>
-                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Pilih Reseller / Agen</label>
-                    <select id="selectHargaReseller" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition"><option value="">Pilih Agen...</option></select>
+                    <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Pilih Reseller / Agen</label>
+                    <select id="selectHargaReseller" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 transition"><option value="">Pilih Agen...</option></select>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Pilih Barang</label>
-                    <select id="selectHargaBarang" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition"><option value="">Pilih Barang...</option></select>
+                    <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Pilih Barang</label>
+                    <select id="selectHargaBarang" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 transition"><option value="">Pilih Barang...</option></select>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Harga Khusus (Rp)</label>
-                    <input type="number" id="inputHargaKhususVal" placeholder="0" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 transition">
+                    <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Harga Khusus (Rp)</label>
+                    <input type="text" id="inputHargaKhususVal" placeholder="0" oninput="formatInputRibuan(this)" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 transition">
                 </div>
                 <div class="flex gap-2 justify-end pt-3">
-                    <button onclick="closeFormModal('modalFormHarga')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-4 py-2 rounded-lg transition">Batal</button>
+                    <button onclick="closeFormModal('modalFormHarga')" class="bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-300 text-xs font-bold px-4 py-2 rounded-lg transition">Batal</button>
                     <button onclick="simpanHargaKhusus()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition">Simpan Harga</button>
                 </div>
             </div>
@@ -506,14 +530,39 @@
 
     <!-- Modal Popup Detail Harga Khusus Reseller (Z-INDEX 70) -->
     <div id="modalDetailHargaKhusus" class="fixed inset-0 z-[70] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalDetailHargaKhusus')"></div>
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-transform duration-200 max-h-[85vh]">
-            <div class="flex justify-between items-center p-4 border-b border-gray-100">
-                <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="tag" class="w-4 h-4 mr-2 text-blue-500"></i> Rincian Harga Khusus <span id="namaResellerDetailHarga" class="ml-1 text-blue-600 font-black"></span></h3>
-                <button onclick="closeFormModal('modalDetailHargaKhusus')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+        <div class="absolute inset-0 bg-gray-900/60 dark:bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalDetailHargaKhusus')"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-all duration-200 max-h-[85vh]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="tag" class="w-4 h-4 mr-2 text-blue-500"></i> Rincian Harga Khusus <span id="namaResellerDetailHarga" class="ml-1 text-blue-600 dark:text-blue-400 font-black"></span></h3>
+                <button onclick="closeFormModal('modalDetailHargaKhusus')" class="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 p-1 bg-gray-50 dark:bg-slate-700/50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
-            <div class="p-4 overflow-y-auto space-y-2 custom-scroll flex-1 bg-gray-50 rounded-b-2xl" id="listDetailHargaKhusus">
+            <div class="p-4 overflow-y-auto space-y-2 custom-scroll flex-1 bg-gray-50 dark:bg-slate-900/50 rounded-b-2xl" id="listDetailHargaKhusus">
                 <!-- Rincian list harga akan di-load di sini -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP KOTRETAN QTY (Z-INDEX 80) -->
+    <div id="modalKotretan" class="fixed inset-0 z-[80] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-gray-900/60 dark:bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalKotretan')"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-all duration-200">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="grid" class="w-4 h-4 mr-2 text-blue-500"></i> Rincian Qty (Kotretan)</h3>
+                <button onclick="closeFormModal('modalKotretan')" class="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 p-1 bg-gray-50 dark:bg-slate-700/50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-4">
+                <p class="text-[10px] text-gray-500 dark:text-slate-400 mb-3 leading-tight">Ketik rincian qty di kotak kecil ini. Data ini akan tersimpan dan otomatis dijumlahkan.</p>
+                <div class="grid grid-cols-5 gap-2 mb-4" id="gridKotretan">
+                    <!-- 15 Kotak di-generate via JS -->
+                </div>
+                <div class="flex justify-between items-center border-t border-gray-200 dark:border-slate-700 pt-3 mb-4">
+                    <span class="text-xs font-bold text-gray-600 dark:text-slate-300">Total Akumulasi:</span>
+                    <span class="text-xl font-black text-blue-600 dark:text-blue-400" id="totalKotretan">0</span>
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <button onclick="closeFormModal('modalKotretan')" class="bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-300 text-xs font-bold px-4 py-2 rounded-lg transition">Batal</button>
+                    <button onclick="simpanKotretan()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition">Terapkan Total</button>
+                </div>
             </div>
         </div>
     </div>
@@ -524,13 +573,54 @@
         feather.replace();
         const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
 
+        // FITUR DARK MODE TOGGLE
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            if (isDark) {
+                document.getElementById('iconMoon').classList.add('hidden');
+                document.getElementById('iconSun').classList.remove('hidden');
+            } else {
+                document.getElementById('iconMoon').classList.remove('hidden');
+                document.getElementById('iconSun').classList.add('hidden');
+            }
+        }
+
+        // FORMAT TANGGAL DD/MMM/YY
+        function formatTanggalID(dateStr) {
+            if(!dateStr) return '-';
+            const d = new Date(dateStr);
+            const day = String(d.getDate()).padStart(2, '0');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+            const month = months[d.getMonth()];
+            const year = String(d.getFullYear()).slice(-2);
+            return `${day}/${month}/${year}`;
+        }
+        
+        // UPDATE DISPLAY TANGGAL OVERLAY
+        function updateTglDisplay() {
+            const raw = document.getElementById('tglTransaksi').value;
+            document.getElementById('tglDisplay').innerText = formatTanggalID(raw);
+        }
+
+        // FORMAT INPUT RIBUAN SAAT DIKETIK
+        function formatInputRibuan(inputEl) {
+            let val = inputEl.value.replace(/[^0-9]/g, '');
+            if (val === '') {
+                inputEl.value = '';
+                return;
+            }
+            inputEl.value = new Intl.NumberFormat('id-ID').format(val);
+        }
+
         function showNotification(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             const colorClass = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-red-600' : 'bg-blue-600');
             const icon = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-octagon' : 'info');
             
-            toast.className = `${colorClass} text-white px-4 py-3 rounded-lg shadow-xl shadow-gray-200/50 transform transition-all duration-300 translate-y-10 opacity-0 flex items-center gap-2.5 text-xs font-bold tracking-wide pointer-events-auto`;
+            toast.className = `${colorClass} text-white px-4 py-3 rounded-lg shadow-xl shadow-gray-200/50 dark:shadow-none transform transition-all duration-300 translate-y-10 opacity-0 flex items-center gap-2.5 text-xs font-bold tracking-wide pointer-events-auto`;
             toast.innerHTML = `<i data-feather="${icon}" class="w-4 h-4"></i> ${message}`;
             container.appendChild(toast); feather.replace();
             setTimeout(() => { toast.classList.remove('translate-y-10', 'opacity-0'); }, 10);
@@ -559,7 +649,7 @@
 
                 masterData.resellers = resellersData.data.map(r => ({ id: r.id, nama: r.nama_reseller }));
                 masterData.barangJadi = []; masterData.bahanBaku = []; masterData.hargaDefault = {}; masterData.hargaKhusus = {};
-                masterData.rawHargaKhusus = hargaKhususData.data; // Simpan untuk rincian detail pop-up
+                masterData.rawHargaKhusus = hargaKhususData.data; 
 
                 barangData.data.forEach(b => {
                     masterData.hargaDefault[b.id] = b.harga_default;
@@ -571,11 +661,16 @@
                 const statusConn = document.getElementById('status-connection');
                 statusConn.classList.replace('bg-yellow-50', 'bg-green-50');
                 statusConn.classList.replace('border-yellow-100', 'border-green-100');
+                statusConn.classList.replace('dark:bg-yellow-900/30', 'dark:bg-green-900/30');
+                statusConn.classList.replace('dark:border-yellow-800/50', 'dark:border-green-800/50');
+                
                 if(statusConn.querySelector('.animate-ping')) statusConn.querySelector('.animate-ping').classList.replace('bg-yellow-400', 'bg-green-400');
                 if(statusConn.querySelector('.relative.inline-flex')) statusConn.querySelector('.relative.inline-flex').classList.replace('bg-yellow-500', 'bg-green-500');
                 
                 const txt = document.getElementById('text-connection');
-                txt.innerText = 'Connected'; txt.classList.replace('text-yellow-700', 'text-green-700');
+                txt.innerText = 'Connected'; 
+                txt.classList.replace('text-yellow-700', 'text-green-700');
+                txt.classList.replace('dark:text-yellow-500', 'dark:text-green-400');
 
                 initDefaults(); refreshDropdownsUI();
             } catch (error) {
@@ -606,6 +701,8 @@
                 const tzOffset = (new Date()).getTimezoneOffset() * 60000; 
                 document.getElementById('tglTransaksi').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
             }
+            // Trigger update tampilan overlay tanggal
+            updateTglDisplay();
         };
 
         function refreshDropdownsUI() {
@@ -627,7 +724,7 @@
             const container = document.getElementById(tipe === 'barangJadi' ? 'containerBarangJadi' : 'containerBahanBaku');
             const items = tipe === 'barangJadi' ? masterData.barangJadi : masterData.bahanBaku;
             const focusClass = tipe === 'barangJadi' ? 'focus:border-blue-400' : 'focus:border-red-400';
-            const bgClass = tipe === 'barangJadi' ? 'hover:bg-blue-50/40' : 'hover:bg-red-50/40';
+            const bgClass = tipe === 'barangJadi' ? 'hover:bg-blue-50/40 dark:hover:bg-blue-900/20' : 'hover:bg-red-50/40 dark:hover:bg-red-900/20';
             
             const div = document.createElement('div');
             div.className = `flex items-center gap-1 group p-1 rounded-md border border-transparent ${bgClass} transition-colors row-item relative`;
@@ -635,39 +732,115 @@
             let optionsHtml = `<option value="">Pilih...</option>`;
             items.forEach(item => optionsHtml += `<option value="${item.id}">${item.nama}</option>`);
 
+            // MENGUBAH TAMPILAN INPUT QTY MENJADI ADA TOMBOL POP-UP
             div.innerHTML = `
-                <div class="w-2/12"><input type="number" min="0" step="0.1" placeholder="0" class="qty-input w-full rounded border border-gray-200 p-1.5 text-xs text-center bg-white shadow-sm outline-none ${focusClass}"></div>
-                <div class="w-4/12"><select class="item-select w-full rounded border border-gray-200 p-1.5 text-xs bg-white shadow-sm outline-none ${focusClass}">${optionsHtml}</select></div>
-                <div class="w-3/12"><input type="text" class="harga-input w-full p-1 text-xs bg-transparent text-right text-gray-500 font-medium focus:outline-none" readonly value="Rp 0"></div>
-                <div class="w-3/12"><input type="text" class="subtotal-input w-full p-1 text-xs bg-transparent text-right text-gray-800 font-bold focus:outline-none pr-2" readonly value="Rp 0"></div>
-                <button type="button" onclick="this.parentElement.remove(); kalkulasiSemua();" class="absolute -right-2 -top-2 bg-red-50 rounded p-1 text-red-400 hover:text-red-600 hover:bg-red-100 opacity-0 group-hover:opacity-100 transition-opacity z-10 border border-red-200"><i data-feather="x" class="w-3 h-3"></i></button>
+                <div class="w-2/12 relative flex items-center">
+                    <input type="number" min="0" placeholder="0" class="qty-input w-full rounded border border-gray-200 dark:border-slate-600 py-1.5 pl-1.5 pr-6 text-xs text-center bg-white dark:bg-slate-700 dark:text-white shadow-sm outline-none ${focusClass}" oninput="this.dataset.rincian=''; kalkulasiSemua()">
+                    <button type="button" onclick="bukaKotretan(this)" class="absolute right-0.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-600 p-1 rounded transition opacity-50 hover:opacity-100" title="Buka Rincian Kotretan">
+                        <i data-feather="grid" class="w-3 h-3"></i>
+                    </button>
+                </div>
+                <div class="w-4/12"><select class="item-select w-full rounded border border-gray-200 dark:border-slate-600 p-1.5 text-xs bg-white dark:bg-slate-700 dark:text-white shadow-sm outline-none ${focusClass}">${optionsHtml}</select></div>
+                <div class="w-3/12"><input type="text" class="harga-input w-full p-1 text-xs bg-transparent text-right text-gray-500 dark:text-slate-400 font-medium focus:outline-none" readonly value="Rp 0"></div>
+                <div class="w-3/12"><input type="text" class="subtotal-input w-full p-1 text-xs bg-transparent text-right text-gray-800 dark:text-slate-200 font-bold focus:outline-none pr-2" readonly value="Rp 0"></div>
+                <button type="button" onclick="this.parentElement.remove(); kalkulasiSemua();" class="absolute -right-2 -top-2 bg-red-50 dark:bg-slate-700 rounded p-1 text-red-400 hover:text-red-600 hover:bg-red-100 dark:hover:bg-slate-600 opacity-0 group-hover:opacity-100 transition-opacity z-10 border border-red-200 dark:border-slate-600"><i data-feather="x" class="w-3 h-3"></i></button>
             `;
             container.appendChild(div); feather.replace();
+            
             const updateRow = () => {
-                const hrg = getHarga(div.querySelector('.item-select').value); const qty = parseFloat(div.querySelector('.qty-input').value) || 0;
-                div.querySelector('.harga-input').value = formatRupiah(hrg); div.querySelector('.subtotal-input').value = formatRupiah(hrg * qty);
-                div.dataset.subtotal = hrg * qty; kalkulasiSemua();
+                const hrg = getHarga(div.querySelector('.item-select').value); 
+                const qty = parseFloat(div.querySelector('.qty-input').value) || 0;
+                
+                div.querySelector('.harga-input').value = formatRupiah(hrg); 
+                div.querySelector('.subtotal-input').value = formatRupiah(hrg * qty);
+                div.dataset.subtotal = hrg * qty; 
+                div.dataset.qty = qty; 
+                kalkulasiSemua();
             };
             div.querySelector('.item-select').addEventListener('change', updateRow);
             div.querySelector('.qty-input').addEventListener('input', updateRow);
         };
+
+        // ================= LOGIKA MODAL KOTRETAN QTY =================
+        let activeQtyInput = null;
+
+        function bukaKotretan(btnElement) {
+            // Ambil referensi ke input qty yang ada persis di sebelah icon ini
+            activeQtyInput = btnElement.previousElementSibling; 
+            
+            let rincian = activeQtyInput.dataset.rincian;
+            let arr = [];
+            if (rincian) {
+                try { arr = JSON.parse(rincian); } catch(e) { arr = []; }
+            }
+            
+            let gridHtml = '';
+            for(let i=0; i<15; i++) {
+                let val = (arr[i] !== undefined && arr[i] !== '') ? arr[i] : '';
+                gridHtml += `<input type="number" min="0" class="kotretan-item w-full p-2 text-center text-sm border border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 dark:text-white focus:border-blue-500 outline-none" placeholder="-" value="${val}" oninput="hitungTotalKotretan()">`;
+            }
+            document.getElementById('gridKotretan').innerHTML = gridHtml;
+            document.getElementById('totalKotretan').innerText = activeQtyInput.value || '0';
+            
+            openFormModal('modalKotretan');
+            
+            // Auto fokus ke input pertama yang masih kosong
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('.kotretan-item');
+                for(let input of inputs) {
+                    if(!input.value) { input.focus(); break; }
+                }
+            }, 100);
+        }
+
+        function hitungTotalKotretan() {
+            let total = 0;
+            document.querySelectorAll('.kotretan-item').forEach(el => {
+                total += parseFloat(el.value) || 0;
+            });
+            document.getElementById('totalKotretan').innerText = total;
+        }
+
+        function simpanKotretan() {
+            let arr = [];
+            let total = 0;
+            document.querySelectorAll('.kotretan-item').forEach(el => {
+                let val = el.value;
+                arr.push(val); // Simpan state kotaknya walau kosong
+                total += parseFloat(val) || 0;
+            });
+            
+            activeQtyInput.value = total;
+            activeQtyInput.dataset.rincian = JSON.stringify(arr); // Simpan JSON array di belakang layar
+            
+            closeFormModal('modalKotretan');
+            
+            // Pancing trigger input agar baris menghitung subtotalnya ulang
+            activeQtyInput.dispatchEvent(new Event('input'));
+        }
+        // ============================================================
+
 
         const addKasbonManual = () => {
             const container = document.getElementById('listKasbonManual');
             const div = document.createElement('div');
             div.className = 'flex gap-1.5 items-center row-kasbon-manual mb-1.5 group';
             div.innerHTML = `
-                <div class="w-7/12"><input type="text" placeholder="Ket (Misal: Kasbon Rabu)" class="ket-manual w-full text-[10px] p-1.5 rounded border border-gray-300 focus:border-red-400 outline-none"></div>
-                <div class="w-4/12"><input type="number" placeholder="Rp" min="0" oninput="kalkulasiSemua()" class="nom-manual w-full text-[10px] p-1.5 rounded border border-gray-300 focus:border-red-400 outline-none text-right font-medium"></div>
-                <div class="w-1/12 text-right"><button onclick="this.parentElement.parentElement.remove(); kalkulasiSemua();" class="text-gray-400 hover:text-red-500 p-1"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button></div>
+                <div class="w-7/12"><input type="text" placeholder="Ket (Misal: Kasbon Rabu)" class="ket-manual w-full text-[10px] p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:border-red-400 outline-none"></div>
+                <div class="w-4/12"><input type="text" placeholder="Rp" oninput="formatInputRibuan(this); kalkulasiSemua()" class="nom-manual w-full text-[10px] p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:border-red-400 outline-none text-right font-medium"></div>
+                <div class="w-1/12 text-right"><button onclick="this.parentElement.parentElement.remove(); kalkulasiSemua();" class="text-gray-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 p-1"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button></div>
             `;
             container.appendChild(div); feather.replace();
         };
 
         const kalkulasiSemua = () => {
             document.querySelectorAll('.row-item').forEach(row => {
-                const hrg = getHarga(row.querySelector('.item-select').value); const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
-                row.querySelector('.harga-input').value = formatRupiah(hrg); row.querySelector('.subtotal-input').value = formatRupiah(hrg * qty); row.dataset.subtotal = hrg * qty;
+                const hrg = getHarga(row.querySelector('.item-select').value); 
+                const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+                row.querySelector('.harga-input').value = formatRupiah(hrg); 
+                row.querySelector('.subtotal-input').value = formatRupiah(hrg * qty); 
+                row.dataset.subtotal = hrg * qty;
+                row.dataset.qty = qty;
             });
 
             let setoran = 0; document.querySelectorAll('#containerBarangJadi .row-item').forEach(r => setoran += parseFloat(r.dataset.subtotal)||0);
@@ -675,7 +848,8 @@
             
             let kasbonManualTotal = 0;
             document.querySelectorAll('.row-kasbon-manual').forEach(row => {
-                kasbonManualTotal += parseFloat(row.querySelector('.nom-manual').value) || 0;
+                let val = row.querySelector('.nom-manual').value.replace(/[^0-9]/g, '');
+                kasbonManualTotal += parseFloat(val) || 0;
             });
 
             const net = setoran - kasbonBahan - kasbonManualTotal;
@@ -691,7 +865,6 @@
             elNet.className = `block text-lg font-black ${net < 0 ? 'text-red-500' : 'text-green-500'}`;
         };
 
-        // EVENT LISTENER PENCARIAN (LIVE SEARCH)
         document.getElementById('searchMasterBarang')?.addEventListener('input', function(e) {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('#listModalBarangJadi li, #listModalBahanBaku li').forEach(li => {
@@ -708,8 +881,6 @@
             });
         });
 
-
-        // ================= FUNGSI BUKA / TUTUP FORM MODAL TERPISAH =================
         function openFormModal(id) {
             const el = document.getElementById(id);
             el.classList.remove('hidden');
@@ -723,8 +894,6 @@
             setTimeout(() => { el.classList.add('hidden'); }, 200);
         }
 
-        // ================= CRUD FUNCTIONS =================
-        
         // --- AGEN ---
         function resetFormAgen() {
             document.getElementById('editAgenId').value = ''; 
@@ -772,7 +941,7 @@
             document.getElementById('editBarangId').value = id; 
             document.getElementById('inputNamaBarang').value = nama;
             document.getElementById('inputTipeBarang').value = tipe; 
-            document.getElementById('inputHargaDefault').value = harga;
+            document.getElementById('inputHargaDefault').value = new Intl.NumberFormat('id-ID').format(harga);
             document.getElementById('labelFormBarang').innerText = "Edit Master Barang";
             openFormModal('modalFormBarang');
         }
@@ -780,7 +949,7 @@
             const id = document.getElementById('editBarangId').value;
             const nama = document.getElementById('inputNamaBarang').value.trim();
             const tipe = document.getElementById('inputTipeBarang').value;
-            const harga = parseFloat(document.getElementById('inputHargaDefault').value) || 0;
+            const harga = parseFloat(document.getElementById('inputHargaDefault').value.replace(/[^0-9]/g, '')) || 0;
             if(!nama) return showNotification("Nama barang tidak boleh kosong!", "error");
             try {
                 if(id) {
@@ -810,7 +979,7 @@
         async function simpanHargaKhusus() {
             const resellerId = document.getElementById('selectHargaReseller').value;
             const barangId = document.getElementById('selectHargaBarang').value;
-            const harga = parseFloat(document.getElementById('inputHargaKhususVal').value) || 0;
+            const harga = parseFloat(document.getElementById('inputHargaKhususVal').value.replace(/[^0-9]/g, '')) || 0;
             if(!resellerId || !barangId) return showNotification("Pilih Reseller dan Barang terlebih dahulu!", "error");
             try {
                 const { error } = await supabaseClient.from('harga_khusus').upsert([
@@ -836,12 +1005,12 @@
                 const itemObj = allItems.find(i => i.id === hk.barang_id);
                 if(itemObj) {
                     container.innerHTML += `
-                    <div class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl text-xs mb-1.5 shadow-sm">
+                    <div class="flex justify-between items-center p-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-xs mb-1.5 shadow-sm">
                         <div>
-                            <span class="font-bold text-gray-800">${itemObj.nama}</span><br>
+                            <span class="font-bold text-gray-800 dark:text-slate-200">${itemObj.nama}</span><br>
                             <span class="text-emerald-600 font-bold">${formatRupiah(hk.harga)}</span>
                         </div>
-                        <button onclick="hapusHargaKhusus('${hk.id}')" class="text-red-400 hover:text-red-600 p-2 bg-red-50 hover:bg-red-100 rounded-lg transition"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+                        <button onclick="hapusHargaKhusus('${hk.id}')" class="text-red-400 hover:text-red-600 p-2 bg-red-50 dark:bg-slate-700 hover:bg-red-100 dark:hover:bg-slate-600 rounded-lg transition"><i data-feather="trash-2" class="w-4 h-4"></i></button>
                     </div>`;
                 }
             });
@@ -857,10 +1026,9 @@
                 showNotification("Harga khusus berhasil dihapus!", "success"); 
                 closeFormModal('modalDetailHargaKhusus');
                 await loadMasterData(); 
-                openModal('modalHarga'); // Refresh daftar utama
+                openModal('modalHarga'); 
             } catch (err) { showNotification("Gagal menghapus: " + err.message, "error"); }
         }
-
 
         // ================= RIWAYAT PEMBAYARAN =================
         async function fetchRiwayatData() {
@@ -883,7 +1051,7 @@
             const container = document.getElementById('containerRiwayat');
             
             if (riwayatTransactions.length === 0) {
-                container.innerHTML = `<div class="text-center text-xs text-gray-500 py-4">Belum ada riwayat transaksi tersimpan.</div>`;
+                container.innerHTML = `<div class="text-center text-xs text-gray-500 dark:text-slate-400 py-4">Belum ada riwayat transaksi tersimpan.</div>`;
                 return;
             }
 
@@ -895,15 +1063,15 @@
 
             let html = '<ul class="space-y-2">';
             Object.keys(grouped).forEach(date => {
-                const formattedDate = new Date(date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const formattedDate = formatTanggalID(date); // Pakai DD/MMM/YY
                 html += `
-                <li onclick="renderRiwayatReseller('${date}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 hover:shadow-sm cursor-pointer transition">
+                <li onclick="renderRiwayatReseller('${date}')" class="flex justify-between items-center p-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-sm cursor-pointer transition">
                     <div class="flex items-center gap-3">
-                        <div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i data-feather="calendar" class="w-4 h-4"></i></div>
-                        <span class="font-bold text-xs text-gray-800">${formattedDate}</span>
+                        <div class="bg-blue-50 dark:bg-slate-700 p-2 rounded-lg text-blue-600 dark:text-blue-400"><i data-feather="calendar" class="w-4 h-4"></i></div>
+                        <span class="font-bold text-xs text-gray-800 dark:text-slate-200">${formattedDate}</span>
                     </div>
                     <div class="text-right">
-                        <span class="block text-[10px] text-gray-500">Total Hari Ini</span>
+                        <span class="block text-[10px] text-gray-500 dark:text-slate-400">Total Hari Ini</span>
                         <span class="font-black text-xs text-green-600">${formatRupiah(grouped[date])}</span>
                     </div>
                 </li>`;
@@ -918,21 +1086,21 @@
             const container = document.getElementById('containerRiwayat');
             
             const trxs = riwayatTransactions.filter(t => t.tanggal_transaksi === date);
-            const formattedDate = new Date(date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const formattedDate = formatTanggalID(date); // Pakai DD/MMM/YY
             
-            let html = `<div class="mb-3"><span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Transaksi pada:</span><br><span class="text-sm font-black text-gray-800">${formattedDate}</span></div><ul class="space-y-2">`;
+            let html = `<div class="mb-3"><span class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Transaksi pada:</span><br><span class="text-sm font-black text-gray-800 dark:text-slate-100">${formattedDate}</span></div><ul class="space-y-2">`;
             
             trxs.forEach(trx => {
                 const reseller = masterData.resellers.find(r => r.id === trx.reseller_id);
                 const resellerName = reseller ? reseller.nama : 'Reseller Dihapus';
                 html += `
-                <li onclick="lihatPratinjauRiwayat('${trx.id}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 hover:shadow-sm cursor-pointer transition">
+                <li onclick="lihatPratinjauRiwayat('${trx.id}')" class="flex justify-between items-center p-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-blue-400 hover:shadow-sm cursor-pointer transition">
                     <div class="flex items-center gap-3">
-                        <div class="bg-gray-100 p-2 rounded-lg text-gray-600"><i data-feather="user" class="w-4 h-4"></i></div>
-                        <span class="font-bold text-xs text-gray-800">${resellerName}</span>
+                        <div class="bg-gray-100 dark:bg-slate-700 p-2 rounded-lg text-gray-600 dark:text-slate-300"><i data-feather="user" class="w-4 h-4"></i></div>
+                        <span class="font-bold text-xs text-gray-800 dark:text-slate-200">${resellerName}</span>
                     </div>
                     <div class="text-right flex items-center gap-3">
-                        <span class="font-black text-xs text-blue-600">${formatRupiah(trx.net_pembayaran)}</span>
+                        <span class="font-black text-xs text-blue-600 dark:text-blue-400">${formatRupiah(trx.net_pembayaran)}</span>
                         <i data-feather="chevron-right" class="w-4 h-4 text-gray-400"></i>
                     </div>
                 </li>`;
@@ -942,8 +1110,7 @@
             feather.replace();
         }
 
-async function lihatPratinjauRiwayat(trxId) {
-            // PERBAIKAN: Pastikan tipe data dikonversi ke String agar sama-sama cocok saat dicari
+        async function lihatPratinjauRiwayat(trxId) {
             const trx = riwayatTransactions.find(t => String(t.id) === String(trxId));
             
             if (!trx) {
@@ -953,9 +1120,8 @@ async function lihatPratinjauRiwayat(trxId) {
 
             const reseller = masterData.resellers.find(r => String(r.id) === String(trx.reseller_id));
             document.getElementById('notaNama').innerText = reseller ? reseller.nama : 'Reseller Dihapus';
-            document.getElementById('notaTgl').innerText = new Date(trx.tanggal_transaksi).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('notaTgl').innerText = formatTanggalID(trx.tanggal_transaksi);
 
-            // Sembunyikan Tombol Simpan saat dari riwayat
             document.getElementById('btnSimpanPratinjau').style.display = 'none';
 
             showNotification("Memuat detail transaksi...", "info");
@@ -971,7 +1137,7 @@ async function lihatPratinjauRiwayat(trxId) {
                     const itemName = item ? item.nama : 'Item Dihapus';
                     const isBahan = masterData.bahanBaku.some(b => String(b.id) === String(d.barang_id));
                     
-                    const rowHtml = `<tr><td class="py-1">${itemName}</td><td class="text-center">${d.qty}</td><td class="text-right text-gray-500">${formatRupiah(d.harga_satuan)}</td><td class="text-right font-medium">${formatRupiah(d.subtotal)}</td></tr>`;
+                    const rowHtml = `<tr><td class="text-center font-bold">${d.qty}</td><td class="py-1 pl-2">${itemName}</td><td class="text-right text-gray-500">${formatRupiah(d.harga_satuan)}</td><td class="text-right font-medium">${formatRupiah(d.subtotal)}</td></tr>`;
                     
                     if(isBahan) htmlBahan += rowHtml;
                     else htmlSetoran += rowHtml;
@@ -990,7 +1156,6 @@ async function lihatPratinjauRiwayat(trxId) {
                 document.getElementById('notaListManual').innerHTML = htmlManual || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pinjaman uang</td></tr>';
                 document.getElementById('notaSubManual').innerText = "- " + formatRupiah(trx.kasbon_manual);
 
-                // Update Ringkasan
                 document.getElementById('notaSummarySetoran').innerText = formatRupiah(trx.total_setoran);
                 document.getElementById('notaSummaryKasbon').innerText = "- " + formatRupiah(trx.total_kasbon_bahan);
 
@@ -998,7 +1163,6 @@ async function lihatPratinjauRiwayat(trxId) {
                 const netVal = parseFloat(trx.net_pembayaran) || 0;
                 document.getElementById('notaGrandTotal').className = `text-xl font-black ${netVal < 0 ? 'text-red-600' : 'text-gray-900'}`;
 
-                // Buka Pratinjau (Menjamin Z-Index Tertinggi)
                 const pratinjauModal = document.getElementById('modalPratinjau');
                 pratinjauModal.classList.remove('hidden');
                 setTimeout(() => { pratinjauModal.children[1].classList.replace('scale-95','scale-100'); }, 10);
@@ -1006,7 +1170,7 @@ async function lihatPratinjauRiwayat(trxId) {
         }
 
 
-        // ================= PRATINJAU NOTA (TRANSAKSI BARU AKTIF) =================
+        // ================= PRATINJAU NOTA =================
         function bukaPratinjau() {
             if (!selectedResellerId) return showNotification("Pilih Reseller terlebih dahulu untuk pratinjau!", "error");
             
@@ -1014,18 +1178,18 @@ async function lihatPratinjauRiwayat(trxId) {
             document.getElementById('notaNama').innerText = reseller ? reseller.nama : '-';
             
             const rawTgl = document.getElementById('tglTransaksi').value;
-            document.getElementById('notaTgl').innerText = new Date(rawTgl).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('notaTgl').innerText = formatTanggalID(rawTgl);
 
-            // Tampilkan kembali tombol simpan saat dibuka dari halaman utama
             document.getElementById('btnSimpanPratinjau').style.display = 'flex';
 
             let htmlSetoran = '';
             document.querySelectorAll('#containerBarangJadi .row-item').forEach(row => {
-                const sel = row.querySelector('.item-select'); const qty = row.querySelector('.qty-input').value;
+                const sel = row.querySelector('.item-select'); 
+                const qty = parseFloat(row.dataset.qty) || 0;
                 if(sel.value && qty > 0) {
                     const itemName = sel.options[sel.selectedIndex].text;
                     const hrg = row.querySelector('.harga-input').value; const sub = row.querySelector('.subtotal-input').value;
-                    htmlSetoran += `<tr><td class="py-1">${itemName}</td><td class="text-center">${qty}</td><td class="text-right text-gray-500">${hrg}</td><td class="text-right font-medium">${sub}</td></tr>`;
+                    htmlSetoran += `<tr><td class="text-center font-bold">${qty}</td><td class="py-1 pl-2">${itemName}</td><td class="text-right text-gray-500">${hrg}</td><td class="text-right font-medium">${sub}</td></tr>`;
                 }
             });
             document.getElementById('notaListSetoran').innerHTML = htmlSetoran || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada setoran</td></tr>';
@@ -1033,11 +1197,12 @@ async function lihatPratinjauRiwayat(trxId) {
 
             let htmlBahan = '';
             document.querySelectorAll('#containerBahanBaku .row-item').forEach(row => {
-                const sel = row.querySelector('.item-select'); const qty = row.querySelector('.qty-input').value;
+                const sel = row.querySelector('.item-select'); 
+                const qty = parseFloat(row.dataset.qty) || 0;
                 if(sel.value && qty > 0) {
                     const itemName = sel.options[sel.selectedIndex].text;
                     const hrg = row.querySelector('.harga-input').value; const sub = row.querySelector('.subtotal-input').value;
-                    htmlBahan += `<tr><td class="py-1">${itemName}</td><td class="text-center">${qty}</td><td class="text-right text-gray-500">${hrg}</td><td class="text-right font-medium">${sub}</td></tr>`;
+                    htmlBahan += `<tr><td class="text-center font-bold">${qty}</td><td class="py-1 pl-2">${itemName}</td><td class="text-right text-gray-500">${hrg}</td><td class="text-right font-medium">${sub}</td></tr>`;
                 }
             });
             document.getElementById('notaListBahan').innerHTML = htmlBahan || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pengambilan bahan</td></tr>';
@@ -1046,7 +1211,8 @@ async function lihatPratinjauRiwayat(trxId) {
             let htmlManual = '';
             document.querySelectorAll('.row-kasbon-manual').forEach(row => {
                 const ket = row.querySelector('.ket-manual').value || 'Tanpa Keterangan';
-                const nom = parseFloat(row.querySelector('.nom-manual').value) || 0;
+                let valStr = row.querySelector('.nom-manual').value.replace(/[^0-9]/g, '');
+                const nom = parseFloat(valStr) || 0;
                 if(nom > 0) {
                     htmlManual += `<tr><td colspan="3" class="py-1.5">${ket}</td><td class="text-right font-medium">${formatRupiah(nom)}</td></tr>`;
                 }
@@ -1054,7 +1220,6 @@ async function lihatPratinjauRiwayat(trxId) {
             document.getElementById('notaListManual').innerHTML = htmlManual || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pinjaman uang</td></tr>';
             document.getElementById('notaSubManual').innerText = document.getElementById('summaryManual').innerText;
 
-            // Update Ringkasan Sesuai Halaman Utama
             document.getElementById('notaSummarySetoran').innerText = document.getElementById('subtotalBarangJadiLayar').innerText;
             document.getElementById('notaSummaryKasbon').innerText = "- " + document.getElementById('subtotalBahanBakuLayar').innerText;
 
@@ -1094,7 +1259,8 @@ async function lihatPratinjauRiwayat(trxId) {
             let manualNominalTotal = 0; let manualKetArr = [];
             document.querySelectorAll('.row-kasbon-manual').forEach(row => {
                 const ket = row.querySelector('.ket-manual').value.trim() || 'Lainnya';
-                const nom = parseFloat(row.querySelector('.nom-manual').value) || 0;
+                let valStr = row.querySelector('.nom-manual').value.replace(/[^0-9]/g, '');
+                const nom = parseFloat(valStr) || 0;
                 if(nom > 0) { manualNominalTotal += nom; manualKetArr.push(`${ket} (${formatRupiah(nom)})`); }
             });
             const manualKetGabungan = manualKetArr.join(', ');
@@ -1110,8 +1276,10 @@ async function lihatPratinjauRiwayat(trxId) {
 
                 let detailData = [];
                 document.querySelectorAll('.row-item').forEach(row => {
-                    const barangId = row.querySelector('.item-select').value; const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
-                    const harga = parseFloat(row.querySelector('.harga-input').value.replace(/[^0-9,-]+/g,"")) || 0; const sub = parseFloat(row.dataset.subtotal) || 0;
+                    const barangId = row.querySelector('.item-select').value; 
+                    const qty = parseFloat(row.dataset.qty) || 0;
+                    const harga = parseFloat(row.querySelector('.harga-input').value.replace(/[^0-9,-]+/g,"")) || 0; 
+                    const sub = parseFloat(row.dataset.subtotal) || 0;
                     if (barangId && qty > 0) detailData.push({ transaksi_id: trxId, barang_id: barangId, qty: qty, harga_satuan: harga, subtotal: sub });
                 });
                 if (detailData.length > 0) {
@@ -1124,7 +1292,7 @@ async function lihatPratinjauRiwayat(trxId) {
                 document.getElementById('listKasbonManual').innerHTML = '';
                 
                 kalkulasiSemua(); feather.replace(); addRow('bahanBaku'); addRow('barangJadi'); addKasbonManual();
-                closeModal('modalPratinjau'); // Tutup modal jika disimpan lewat pratinjau
+                closeModal('modalPratinjau'); 
 
             } catch (error) {
                 showNotification("Gagal menyimpan: " + error.message, "error");
@@ -1138,14 +1306,13 @@ async function lihatPratinjauRiwayat(trxId) {
         function closeModal(id) {
             const modalEl = document.getElementById(id);
             if(modalEl.children[0] && modalEl.children[0].classList.contains('scale-100')) {
-                 modalEl.children[0].classList.replace('scale-100','scale-95'); // Modal Dasar
+                 modalEl.children[0].classList.replace('scale-100','scale-95');
             } else if (modalEl.children[1] && modalEl.children[1].classList.contains('scale-100')) {
-                 modalEl.children[1].classList.replace('scale-100','scale-95'); // Pratinjau
+                 modalEl.children[1].classList.replace('scale-100','scale-95'); 
             }
             
             setTimeout(() => { 
                 modalEl.classList.add('hidden');
-                // Jangan tutup Overlay Utama jika Pratinjau ditutup tapi Riwayat masih terbuka
                 if (id === 'modalPratinjau' && !document.getElementById('modalRiwayat').classList.contains('hidden')) {
                     // Biarkan overlay tetap ada
                 } else {
@@ -1167,11 +1334,11 @@ async function lihatPratinjauRiwayat(trxId) {
                 if(masterData.resellers.length === 0) ul.innerHTML = '<li class="p-3 text-xs text-gray-400 italic text-center">Belum ada data Reseller</li>';
                 masterData.resellers.forEach(r => {
                     ul.innerHTML += `
-                    <li class="flex justify-between items-center p-2.5 text-xs text-gray-700 hover:bg-gray-50">
+                    <li class="flex justify-between items-center p-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition">
                         <span class="font-medium">${r.nama}</span>
                         <div class="flex items-center gap-1.5">
-                            <button onclick="editAgen('${r.id}', '${r.nama}')" class="p-1 text-blue-500 hover:bg-blue-50 rounded"><i data-feather="edit-2" class="w-3 h-3"></i></button>
-                            <button onclick="hapusAgen('${r.id}')" class="p-1 text-red-500 hover:bg-red-50 rounded"><i data-feather="trash-2" class="w-3 h-3"></i></button>
+                            <button onclick="editAgen('${r.id}', '${r.nama}')" class="p-1 text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-600 rounded"><i data-feather="edit-2" class="w-3 h-3"></i></button>
+                            <button onclick="hapusAgen('${r.id}')" class="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-slate-600 rounded"><i data-feather="trash-2" class="w-3 h-3"></i></button>
                         </div>
                     </li>`;
                 });
@@ -1186,22 +1353,22 @@ async function lihatPratinjauRiwayat(trxId) {
 
                 masterData.barangJadi.forEach(b => {
                     uiJadi.innerHTML += `
-                    <li class="flex justify-between items-center text-[11px] p-2 border-b border-gray-50 hover:bg-gray-50 rounded">
-                        <div><b>${b.nama}</b><br><span class="text-blue-600 font-semibold">${formatRupiah(masterData.hargaDefault[b.id])}</span></div>
+                    <li class="flex justify-between items-center text-[11px] p-2 border-b border-gray-50 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 rounded text-gray-800 dark:text-slate-200 transition">
+                        <div><b>${b.nama}</b><br><span class="text-blue-600 dark:text-blue-400 font-semibold">${formatRupiah(masterData.hargaDefault[b.id])}</span></div>
                         <div class="flex items-center gap-1">
-                            <button onclick="editBarang('${b.id}', '${b.nama}', 'jadi', ${masterData.hargaDefault[b.id]})" class="p-1 text-blue-500 hover:bg-blue-50 rounded"><i data-feather="edit-2" class="w-3 h-3"></i></button>
-                            <button onclick="hapusBarang('${b.id}')" class="p-1 text-red-500 hover:bg-red-50 rounded"><i data-feather="trash-2" class="w-3 h-3"></i></button>
+                            <button onclick="editBarang('${b.id}', '${b.nama}', 'jadi', ${masterData.hargaDefault[b.id]})" class="p-1 text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-600 rounded"><i data-feather="edit-2" class="w-3 h-3"></i></button>
+                            <button onclick="hapusBarang('${b.id}')" class="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-slate-600 rounded"><i data-feather="trash-2" class="w-3 h-3"></i></button>
                         </div>
                     </li>`;
                 });
 
                 masterData.bahanBaku.forEach(b => {
                     uiBahan.innerHTML += `
-                    <li class="flex justify-between items-center text-[11px] p-2 border-b border-gray-50 hover:bg-gray-50 rounded">
-                        <div><b>${b.nama}</b><br><span class="text-red-600 font-semibold">${formatRupiah(masterData.hargaDefault[b.id])}</span></div>
+                    <li class="flex justify-between items-center text-[11px] p-2 border-b border-gray-50 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 rounded text-gray-800 dark:text-slate-200 transition">
+                        <div><b>${b.nama}</b><br><span class="text-red-600 dark:text-red-400 font-semibold">${formatRupiah(masterData.hargaDefault[b.id])}</span></div>
                         <div class="flex items-center gap-1">
-                            <button onclick="editBarang('${b.id}', '${b.nama}', 'bahan', ${masterData.hargaDefault[b.id]})" class="p-1 text-blue-500 hover:bg-blue-50 rounded"><i data-feather="edit-2" class="w-3 h-3"></i></button>
-                            <button onclick="hapusBarang('${b.id}')" class="p-1 text-red-500 hover:bg-red-50 rounded"><i data-feather="trash-2" class="w-3 h-3"></i></button>
+                            <button onclick="editBarang('${b.id}', '${b.nama}', 'bahan', ${masterData.hargaDefault[b.id]})" class="p-1 text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-600 rounded"><i data-feather="edit-2" class="w-3 h-3"></i></button>
+                            <button onclick="hapusBarang('${b.id}')" class="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-slate-600 rounded"><i data-feather="trash-2" class="w-3 h-3"></i></button>
                         </div>
                     </li>`;
                 });
@@ -1218,7 +1385,6 @@ async function lihatPratinjauRiwayat(trxId) {
                 const container = document.getElementById('containerModalHarga'); 
                 container.innerHTML = '';
                 
-                // Grouping Harga Khusus berdasarkan Reseller
                 const grouped = {};
                 masterData.rawHargaKhusus.forEach(hk => {
                     if(!grouped[hk.reseller_id]) grouped[hk.reseller_id] = [];
@@ -1237,12 +1403,12 @@ async function lihatPratinjauRiwayat(trxId) {
                     const count = grouped[rId].length;
                     
                     html += `
-                    <li onclick="bukaDetailHargaKhusus('${rId}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 hover:shadow-sm cursor-pointer transition">
+                    <li onclick="bukaDetailHargaKhusus('${rId}')" class="flex justify-between items-center p-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-sm cursor-pointer transition">
                         <div class="flex items-center gap-3">
-                            <div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i data-feather="user" class="w-4 h-4"></i></div>
+                            <div class="bg-blue-50 dark:bg-slate-700 p-2 rounded-lg text-blue-600 dark:text-blue-400"><i data-feather="user" class="w-4 h-4"></i></div>
                             <div>
-                                <span class="font-bold text-xs text-gray-800">${resName}</span><br>
-                                <span class="text-[10px] font-bold text-emerald-600">${count} Barang Khusus</span>
+                                <span class="font-bold text-xs text-gray-800 dark:text-slate-200">${resName}</span><br>
+                                <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">${count} Barang Khusus</span>
                             </div>
                         </div>
                         <i data-feather="chevron-right" class="w-4 h-4 text-gray-400"></i>
@@ -1259,15 +1425,13 @@ async function lihatPratinjauRiwayat(trxId) {
         }
 
         document.getElementById('modalOverlay').addEventListener('click', () => { 
-            // Cek jika sedang buka form popup (di atas overlay ini), abaikan klik (diurus overlay popup sendiri)
             if(!document.getElementById('modalFormAgen').classList.contains('hidden') ||
                !document.getElementById('modalFormBarang').classList.contains('hidden') ||
                !document.getElementById('modalFormHarga').classList.contains('hidden') ||
-               !document.getElementById('modalDetailHargaKhusus').classList.contains('hidden')) {
+               !document.getElementById('modalDetailHargaKhusus').classList.contains('hidden') ||
+               !document.getElementById('modalKotretan').classList.contains('hidden')) {
                 return;
             }
-
-            // Jika pratinjau sedang terbuka, tutup saja pratinjaunya
             if(!document.getElementById('modalPratinjau').classList.contains('hidden')) {
                 closeModal('modalPratinjau');
                 return;
