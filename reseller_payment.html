@@ -41,7 +41,6 @@
         .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
         body.dark .custom-scroll::-webkit-scrollbar-thumb { background-color: #475569; }
 
-        /* PERBAIKAN CETAK A4 (PRINT PREVIEW) - SELALU TERANG */
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body, html { background-color: white !important; margin: 0; padding: 0; width: 100%; height: 100%; }
@@ -65,8 +64,8 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-14">
                 <div class="flex items-center space-x-3">
-                    <div class="bg-blue-600 p-1.5 rounded-lg text-white shadow-sm shadow-blue-200 dark:shadow-none">
-                        <i data-feather="box" class="w-4 h-4"></i>
+                    <div class="flex-shrink-0">
+                        <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/677036e078cc7fa6c94788da8482dc53d883e2df/sbr_logo.png" alt="SBR Logo" class="w-8 h-8 object-contain rounded-md shadow-sm border border-gray-100 dark:border-slate-700 bg-white">
                     </div>
                     <div>
                         <h1 class="font-bold text-sm leading-tight text-gray-900 dark:text-slate-100">SBR Putra Food</h1>
@@ -75,7 +74,6 @@
                 </div>
                 
                 <div class="flex items-center space-x-4">
-                    <!-- Theme Toggle -->
                     <button onclick="toggleTheme()" class="text-gray-400 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 p-1.5 rounded-lg transition" title="Toggle Tema">
                         <i data-feather="moon" id="iconMoon" class="w-4 h-4"></i>
                         <i data-feather="sun" id="iconSun" class="w-4 h-4 hidden"></i>
@@ -118,20 +116,16 @@
             </div>
             <div class="w-px h-6 bg-gray-200 dark:bg-slate-700 hidden md:block"></div>
             
-            <!-- OVERLAY DATE PICKER CUSTOM (MENAMPILKAN FORMAT INDONESIA) -->
             <div class="flex items-center gap-2 relative">
                 <label class="text-xs font-bold text-gray-500 dark:text-slate-400">Tanggal:</label>
                 <div class="relative w-36">
-                    <!-- Input native disembunyikan opacity 0, tapi bisa diklik -->
                     <input type="date" id="tglTransaksi" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="updateTglDisplay()">
-                    <!-- Tampilan Visual Pengganti (Overlay) -->
                     <div class="w-full rounded border border-gray-300 dark:border-slate-600 py-1 px-2.5 text-sm text-gray-800 dark:text-slate-100 bg-gray-50 dark:bg-slate-900 font-medium flex justify-between items-center transition-colors">
                         <span id="tglDisplay">DD/MMM/YY</span>
                         <i data-feather="calendar" class="w-3.5 h-3.5 text-gray-400"></i>
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
@@ -206,7 +200,6 @@
                             <span id="summaryKasbon" class="text-xs font-bold text-red-500"> - Rp 0</span>
                         </div>
                         
-                        <!-- Kasbon Manual Multi Row -->
                         <div class="bg-gray-50 dark:bg-slate-900/50 py-2 px-2.5 rounded border border-gray-100 dark:border-slate-700 transition-colors">
                             <div class="flex justify-between items-center">
                                 <span class="text-[11px] text-gray-600 dark:text-slate-300 font-bold flex items-center gap-1.5">
@@ -226,13 +219,16 @@
                         </div>
                     </div>
 
-                    <div class="mt-5 grid grid-cols-2 gap-3">
+                    <div class="mt-5 grid grid-cols-2 gap-3" id="btnGroupNormal">
                         <button onclick="bukaPratinjau()" class="w-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm">
                             <i data-feather="eye" class="w-3.5 h-3.5 mr-1.5"></i> Pratinjau
                         </button>
                         <button id="btnSubmit" onclick="simpanTransaksi()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm shadow-blue-200 dark:shadow-none">
                             <i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan
                         </button>
+                    </div>
+                    <div id="btnGroupEdit" class="mt-3 hidden text-center">
+                        <button onclick="batalEdit()" class="text-[11px] font-medium text-red-500 hover:text-red-700 dark:hover:text-red-400 underline decoration-red-300">Batalkan Mode Edit (Kembali ke Transaksi Baru)</button>
                     </div>
                 </div>
 
@@ -248,13 +244,14 @@
                 <h3 class="text-sm font-bold text-gray-700 dark:text-slate-200">Pratinjau Nota</h3>
                 <div class="flex gap-2">
                     <button id="btnSimpanPratinjau" onclick="simpanTransaksi()" class="bg-emerald-600 text-white hover:bg-emerald-500 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"><i data-feather="check-circle" class="w-3 h-3 mr-1"></i> Simpan Data</button>
+                    <button id="btnEditRiwayat" onclick="" class="hidden bg-amber-500 text-white hover:bg-amber-400 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"><i data-feather="edit" class="w-3 h-3 mr-1"></i> Edit Data</button>
                     <button onclick="simpanPNG()" class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="image" class="w-3 h-3 mr-1"></i> Simpan PNG</button>
                     <button onclick="window.print()" class="bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/60 border border-blue-200 dark:border-blue-800/60 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="printer" class="w-3 h-3 mr-1"></i> Cetak A4</button>
                     <button onclick="closeModal('modalPratinjau')" class="bg-gray-50 dark:bg-slate-700 text-gray-500 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-600 border border-gray-200 dark:border-slate-600 p-1.5 rounded transition"><i data-feather="x" class="w-4 h-4"></i></button>
                 </div>
             </div>
             
-            <!-- areaPrint dipaksa terang agar mirip kertas putih -->
+            <!-- areaPrint -->
             <div id="areaPrint" class="bg-white text-gray-900 p-6 md:p-8 overflow-y-auto w-full">
                 <!-- Header -->
                 <div class="border-b-2 border-gray-800 pb-3 mb-4 text-center">
@@ -384,18 +381,27 @@
                     <button onclick="closeModal('modalBarang')" class="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 p-1.5 bg-gray-50 dark:bg-slate-700/50 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
                 </div>
             </div>
-            <div class="p-4 overflow-hidden flex flex-col gap-4 flex-1">
-                <div class="relative shrink-0">
+            <div class="p-4 overflow-hidden flex flex-col gap-3 flex-1">
+                
+                <div class="relative shrink-0 mb-1">
                     <i data-feather="search" class="w-4 h-4 absolute left-3 top-2.5 text-gray-400 dark:text-slate-500"></i>
                     <input type="text" id="searchMasterBarang" placeholder="Cari nama barang..." class="w-full text-xs py-2.5 pl-9 pr-3 rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900/50 text-gray-800 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 outline-none focus:border-blue-500 transition">
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-hidden">
-                    <div class="border border-gray-200 dark:border-slate-700 rounded-xl p-2 bg-white dark:bg-slate-800/50 flex flex-col">
-                        <h4 class="font-bold text-xs mb-2 text-gray-700 dark:text-slate-300 border-b dark:border-slate-700 pb-1">Barang Jadi</h4>
+
+                <!-- Tabs Filter Master Barang -->
+                <div class="flex gap-2 bg-gray-100 dark:bg-slate-700/50 p-1 rounded-lg shrink-0">
+                    <button onclick="filterBarang('semua')" id="btnFilterBarang_semua" class="flex-1 text-[11px] font-bold py-1.5 rounded-md bg-white dark:bg-slate-600 shadow-sm text-blue-600 dark:text-blue-400 transition">Tampilkan Semua</button>
+                    <button onclick="filterBarang('jadi')" id="btnFilterBarang_jadi" class="flex-1 text-[11px] font-bold py-1.5 rounded-md text-gray-500 hover:text-gray-700 dark:text-slate-400 transition hover:bg-gray-200 dark:hover:bg-slate-700">Barang Jadi</button>
+                    <button onclick="filterBarang('bahan')" id="btnFilterBarang_bahan" class="flex-1 text-[11px] font-bold py-1.5 rounded-md text-gray-500 hover:text-gray-700 dark:text-slate-400 transition hover:bg-gray-200 dark:hover:bg-slate-700">Bahan Baku</button>
+                </div>
+
+                <div id="gridMasterBarang" class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-hidden mt-1">
+                    <div id="colBarangJadi" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2 bg-white dark:bg-slate-800/50 flex flex-col">
+                        <h4 class="font-bold text-[11px] mb-2 text-gray-700 dark:text-slate-300 border-b border-gray-100 dark:border-slate-700 pb-1.5">Barang Jadi</h4>
                         <ul id="listModalBarangJadi" class="space-y-1 max-h-[40vh] overflow-y-auto custom-scroll pr-1 flex-1"></ul>
                     </div>
-                    <div class="border border-gray-200 dark:border-slate-700 rounded-xl p-2 bg-white dark:bg-slate-800/50 flex flex-col">
-                        <h4 class="font-bold text-xs mb-2 text-gray-700 dark:text-slate-300 border-b dark:border-slate-700 pb-1">Bahan Baku</h4>
+                    <div id="colBahanBaku" class="border border-gray-200 dark:border-slate-700 rounded-xl p-2 bg-white dark:bg-slate-800/50 flex flex-col">
+                        <h4 class="font-bold text-[11px] mb-2 text-gray-700 dark:text-slate-300 border-b border-gray-100 dark:border-slate-700 pb-1.5">Bahan Baku</h4>
                         <ul id="listModalBahanBaku" class="space-y-1 max-h-[40vh] overflow-y-auto custom-scroll pr-1 flex-1"></ul>
                     </div>
                 </div>
@@ -442,8 +448,6 @@
         </div>
     </div>
 
-    <!-- MODAL FORM POPUP TERPISAH (Z-INDEX 60) -->
-    
     <!-- Modal Form Agen -->
     <div id="modalFormAgen" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
         <div class="absolute inset-0 bg-gray-900/60 dark:bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalFormAgen')"></div>
@@ -483,6 +487,7 @@
                 <div>
                     <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Tipe Barang</label>
                     <select id="inputTipeBarang" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 transition">
+                        <option value="" disabled selected>-- Pilih Tipe Barang --</option>
                         <option value="jadi">Barang Jadi</option>
                         <option value="bahan">Bahan Baku</option>
                     </select>
@@ -528,7 +533,7 @@
         </div>
     </div>
 
-    <!-- Modal Popup Detail Harga Khusus Reseller (Z-INDEX 70) -->
+    <!-- Modal Popup Detail Harga Khusus Reseller -->
     <div id="modalDetailHargaKhusus" class="fixed inset-0 z-[70] flex items-center justify-center hidden p-4">
         <div class="absolute inset-0 bg-gray-900/60 dark:bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalDetailHargaKhusus')"></div>
         <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-all duration-200 max-h-[85vh]">
@@ -537,7 +542,6 @@
                 <button onclick="closeFormModal('modalDetailHargaKhusus')" class="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 p-1 bg-gray-50 dark:bg-slate-700/50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
             <div class="p-4 overflow-y-auto space-y-2 custom-scroll flex-1 bg-gray-50 dark:bg-slate-900/50 rounded-b-2xl" id="listDetailHargaKhusus">
-                <!-- Rincian list harga akan di-load di sini -->
             </div>
         </div>
     </div>
@@ -553,7 +557,7 @@
             <div class="p-4">
                 <p class="text-[10px] text-gray-500 dark:text-slate-400 mb-3 leading-tight">Ketik rincian qty di kotak kecil ini. Data ini akan tersimpan dan otomatis dijumlahkan.</p>
                 <div class="grid grid-cols-5 gap-2 mb-4" id="gridKotretan">
-                    <!-- 15 Kotak di-generate via JS -->
+                    <!-- 20 Kotak di-generate via JS -->
                 </div>
                 <div class="flex justify-between items-center border-t border-gray-200 dark:border-slate-700 pt-3 mb-4">
                     <span class="text-xs font-bold text-gray-600 dark:text-slate-300">Total Akumulasi:</span>
@@ -567,13 +571,11 @@
         </div>
     </div>
 
-
     <!-- SCRIPT LOGIKA -->
     <script>
         feather.replace();
         const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
 
-        // FITUR DARK MODE TOGGLE
         function toggleTheme() {
             document.documentElement.classList.toggle('dark');
             document.body.classList.toggle('dark');
@@ -587,7 +589,6 @@
             }
         }
 
-        // FORMAT TANGGAL DD/MMM/YY
         function formatTanggalID(dateStr) {
             if(!dateStr) return '-';
             const d = new Date(dateStr);
@@ -598,13 +599,11 @@
             return `${day}/${month}/${year}`;
         }
         
-        // UPDATE DISPLAY TANGGAL OVERLAY
         function updateTglDisplay() {
             const raw = document.getElementById('tglTransaksi').value;
             document.getElementById('tglDisplay').innerText = formatTanggalID(raw);
         }
 
-        // FORMAT INPUT RIBUAN SAAT DIKETIK
         function formatInputRibuan(inputEl) {
             let val = inputEl.value.replace(/[^0-9]/g, '');
             if (val === '') {
@@ -617,7 +616,7 @@
         function showNotification(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            const colorClass = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-red-600' : 'bg-blue-600');
+            const colorClass = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-red-600' : (type === 'info' ? 'bg-blue-600' : 'bg-gray-800'));
             const icon = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-octagon' : 'info');
             
             toast.className = `${colorClass} text-white px-4 py-3 rounded-lg shadow-xl shadow-gray-200/50 dark:shadow-none transform transition-all duration-300 translate-y-10 opacity-0 flex items-center gap-2.5 text-xs font-bold tracking-wide pointer-events-auto`;
@@ -634,6 +633,7 @@
         let masterData = { resellers: [], barangJadi: [], bahanBaku: [], hargaDefault: {}, hargaKhusus: {}, rawHargaKhusus: [] };
         let selectedResellerId = '';
         let riwayatTransactions = []; 
+        let modeEditTrxId = null; // Menyimpan ID Transaksi jika sedang dalam mode Edit
 
         async function loadMasterData() {
             try {
@@ -701,7 +701,6 @@
                 const tzOffset = (new Date()).getTimezoneOffset() * 60000; 
                 document.getElementById('tglTransaksi').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
             }
-            // Trigger update tampilan overlay tanggal
             updateTglDisplay();
         };
 
@@ -720,7 +719,8 @@
             kalkulasiSemua();
         }
 
-        const addRow = (tipe) => {
+        // Modifikasi addRow untuk bisa menerima nilai default saat menarik data edit
+        const addRow = (tipe, defaultItemId = '', defaultQty = '') => {
             const container = document.getElementById(tipe === 'barangJadi' ? 'containerBarangJadi' : 'containerBahanBaku');
             const items = tipe === 'barangJadi' ? masterData.barangJadi : masterData.bahanBaku;
             const focusClass = tipe === 'barangJadi' ? 'focus:border-blue-400' : 'focus:border-red-400';
@@ -732,10 +732,9 @@
             let optionsHtml = `<option value="">Pilih...</option>`;
             items.forEach(item => optionsHtml += `<option value="${item.id}">${item.nama}</option>`);
 
-            // MENGUBAH TAMPILAN INPUT QTY MENJADI ADA TOMBOL POP-UP
             div.innerHTML = `
                 <div class="w-2/12 relative flex items-center">
-                    <input type="number" min="0" placeholder="0" class="qty-input w-full rounded border border-gray-200 dark:border-slate-600 py-1.5 pl-1.5 pr-6 text-xs text-center bg-white dark:bg-slate-700 dark:text-white shadow-sm outline-none ${focusClass}" oninput="this.dataset.rincian=''; kalkulasiSemua()">
+                    <input type="number" min="0" placeholder="0" value="${defaultQty}" class="qty-input w-full rounded border border-gray-200 dark:border-slate-600 py-1.5 pl-1.5 pr-6 text-xs text-center bg-white dark:bg-slate-700 dark:text-white shadow-sm outline-none ${focusClass}" oninput="kalkulasiSemua()">
                     <button type="button" onclick="bukaKotretan(this)" class="absolute right-0.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-600 p-1 rounded transition opacity-50 hover:opacity-100" title="Buka Rincian Kotretan">
                         <i data-feather="grid" class="w-3 h-3"></i>
                     </button>
@@ -746,6 +745,10 @@
                 <button type="button" onclick="this.parentElement.remove(); kalkulasiSemua();" class="absolute -right-2 -top-2 bg-red-50 dark:bg-slate-700 rounded p-1 text-red-400 hover:text-red-600 hover:bg-red-100 dark:hover:bg-slate-600 opacity-0 group-hover:opacity-100 transition-opacity z-10 border border-red-200 dark:border-slate-600"><i data-feather="x" class="w-3 h-3"></i></button>
             `;
             container.appendChild(div); feather.replace();
+            
+            if(defaultItemId) {
+                div.querySelector('.item-select').value = defaultItemId;
+            }
             
             const updateRow = () => {
                 const hrg = getHarga(div.querySelector('.item-select').value); 
@@ -759,13 +762,13 @@
             };
             div.querySelector('.item-select').addEventListener('change', updateRow);
             div.querySelector('.qty-input').addEventListener('input', updateRow);
+            
+            if(defaultItemId || defaultQty) updateRow();
         };
 
-        // ================= LOGIKA MODAL KOTRETAN QTY =================
         let activeQtyInput = null;
 
         function bukaKotretan(btnElement) {
-            // Ambil referensi ke input qty yang ada persis di sebelah icon ini
             activeQtyInput = btnElement.previousElementSibling; 
             
             let rincian = activeQtyInput.dataset.rincian;
@@ -775,7 +778,7 @@
             }
             
             let gridHtml = '';
-            for(let i=0; i<15; i++) {
+            for(let i=0; i<20; i++) {
                 let val = (arr[i] !== undefined && arr[i] !== '') ? arr[i] : '';
                 gridHtml += `<input type="number" min="0" class="kotretan-item w-full p-2 text-center text-sm border border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 dark:text-white focus:border-blue-500 outline-none" placeholder="-" value="${val}" oninput="hitungTotalKotretan()">`;
             }
@@ -784,7 +787,6 @@
             
             openFormModal('modalKotretan');
             
-            // Auto fokus ke input pertama yang masih kosong
             setTimeout(() => {
                 const inputs = document.querySelectorAll('.kotretan-item');
                 for(let input of inputs) {
@@ -806,28 +808,27 @@
             let total = 0;
             document.querySelectorAll('.kotretan-item').forEach(el => {
                 let val = el.value;
-                arr.push(val); // Simpan state kotaknya walau kosong
+                arr.push(val); 
                 total += parseFloat(val) || 0;
             });
             
             activeQtyInput.value = total;
-            activeQtyInput.dataset.rincian = JSON.stringify(arr); // Simpan JSON array di belakang layar
+            activeQtyInput.dataset.rincian = JSON.stringify(arr); 
             
             closeFormModal('modalKotretan');
             
-            // Pancing trigger input agar baris menghitung subtotalnya ulang
             activeQtyInput.dispatchEvent(new Event('input'));
         }
-        // ============================================================
 
-
-        const addKasbonManual = () => {
+        // Modifikasi addKasbonManual untuk bisa menerima nilai default
+        const addKasbonManual = (defaultKet = '', defaultNom = '') => {
             const container = document.getElementById('listKasbonManual');
             const div = document.createElement('div');
+            const strNom = defaultNom ? new Intl.NumberFormat('id-ID').format(defaultNom) : '';
             div.className = 'flex gap-1.5 items-center row-kasbon-manual mb-1.5 group';
             div.innerHTML = `
-                <div class="w-7/12"><input type="text" placeholder="Ket (Misal: Kasbon Rabu)" class="ket-manual w-full text-[10px] p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:border-red-400 outline-none"></div>
-                <div class="w-4/12"><input type="text" placeholder="Rp" oninput="formatInputRibuan(this); kalkulasiSemua()" class="nom-manual w-full text-[10px] p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:border-red-400 outline-none text-right font-medium"></div>
+                <div class="w-7/12"><input type="text" placeholder="Ket (Misal: Kasbon Rabu)" value="${defaultKet}" class="ket-manual w-full text-[10px] p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:border-red-400 outline-none"></div>
+                <div class="w-4/12"><input type="text" placeholder="Rp" value="${strNom}" oninput="formatInputRibuan(this); kalkulasiSemua()" class="nom-manual w-full text-[10px] p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:border-red-400 outline-none text-right font-medium"></div>
                 <div class="w-1/12 text-right"><button onclick="this.parentElement.parentElement.remove(); kalkulasiSemua();" class="text-gray-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 p-1"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button></div>
             `;
             container.appendChild(div); feather.replace();
@@ -881,6 +882,35 @@
             });
         });
 
+        function filterBarang(tipe) {
+            ['semua', 'jadi', 'bahan'].forEach(t => {
+                const btn = document.getElementById('btnFilterBarang_' + t);
+                if(t === tipe) {
+                    btn.className = "flex-1 text-[11px] font-bold py-1.5 rounded-md bg-white dark:bg-slate-600 shadow-sm text-blue-600 dark:text-blue-400 transition";
+                } else {
+                    btn.className = "flex-1 text-[11px] font-bold py-1.5 rounded-md text-gray-500 hover:text-gray-700 dark:text-slate-400 transition hover:bg-gray-200 dark:hover:bg-slate-700";
+                }
+            });
+
+            const colJadi = document.getElementById('colBarangJadi');
+            const colBahan = document.getElementById('colBahanBaku');
+            const gridContainer = document.getElementById('gridMasterBarang');
+
+            if(tipe === 'semua') {
+                gridContainer.className = "grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-hidden mt-1";
+                colJadi.style.display = 'flex';
+                colBahan.style.display = 'flex';
+            } else if(tipe === 'jadi') {
+                gridContainer.className = "grid grid-cols-1 gap-4 flex-1 overflow-hidden mt-1";
+                colJadi.style.display = 'flex';
+                colBahan.style.display = 'none';
+            } else if(tipe === 'bahan') {
+                gridContainer.className = "grid grid-cols-1 gap-4 flex-1 overflow-hidden mt-1";
+                colJadi.style.display = 'none';
+                colBahan.style.display = 'flex';
+            }
+        }
+
         function openFormModal(id) {
             const el = document.getElementById(id);
             el.classList.remove('hidden');
@@ -894,7 +924,6 @@
             setTimeout(() => { el.classList.add('hidden'); }, 200);
         }
 
-        // --- AGEN ---
         function resetFormAgen() {
             document.getElementById('editAgenId').value = ''; 
             document.getElementById('inputNamaAgen').value = '';
@@ -929,11 +958,10 @@
             } catch (err) { showNotification("Gagal menghapus: " + err.message, "error"); }
         }
 
-        // --- BARANG ---
         function resetFormBarang() {
             document.getElementById('editBarangId').value = ''; 
             document.getElementById('inputNamaBarang').value = '';
-            document.getElementById('inputTipeBarang').value = 'jadi'; 
+            document.getElementById('inputTipeBarang').value = ''; 
             document.getElementById('inputHargaDefault').value = '';
             document.getElementById('labelFormBarang').innerText = "Tambah Barang Baru";
         }
@@ -951,6 +979,7 @@
             const tipe = document.getElementById('inputTipeBarang').value;
             const harga = parseFloat(document.getElementById('inputHargaDefault').value.replace(/[^0-9]/g, '')) || 0;
             if(!nama) return showNotification("Nama barang tidak boleh kosong!", "error");
+            if(!tipe) return showNotification("Tipe barang harus dipilih!", "error");
             try {
                 if(id) {
                     const { error } = await supabaseClient.from('barang').update({ nama_barang: nama, tipe: tipe, harga_default: harga }).eq('id', id);
@@ -970,7 +999,6 @@
             } catch (err) { showNotification("Gagal menghapus: " + err.message, "error"); }
         }
 
-        // --- HARGA KHUSUS ---
         function resetFormHarga() {
             document.getElementById('inputHargaKhususVal').value = '';
             document.getElementById('selectHargaReseller').value = '';
@@ -1030,7 +1058,6 @@
             } catch (err) { showNotification("Gagal menghapus: " + err.message, "error"); }
         }
 
-        // ================= RIWAYAT PEMBAYARAN =================
         async function fetchRiwayatData() {
             const container = document.getElementById('containerRiwayat');
             container.innerHTML = `<div class="flex justify-center py-8"><i data-feather="loader" class="w-6 h-6 animate-spin text-blue-500"></i></div>`;
@@ -1063,7 +1090,7 @@
 
             let html = '<ul class="space-y-2">';
             Object.keys(grouped).forEach(date => {
-                const formattedDate = formatTanggalID(date); // Pakai DD/MMM/YY
+                const formattedDate = formatTanggalID(date);
                 html += `
                 <li onclick="renderRiwayatReseller('${date}')" class="flex justify-between items-center p-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-sm cursor-pointer transition">
                     <div class="flex items-center gap-3">
@@ -1086,7 +1113,7 @@
             const container = document.getElementById('containerRiwayat');
             
             const trxs = riwayatTransactions.filter(t => t.tanggal_transaksi === date);
-            const formattedDate = formatTanggalID(date); // Pakai DD/MMM/YY
+            const formattedDate = formatTanggalID(date);
             
             let html = `<div class="mb-3"><span class="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Transaksi pada:</span><br><span class="text-sm font-black text-gray-800 dark:text-slate-100">${formattedDate}</span></div><ul class="space-y-2">`;
             
@@ -1122,7 +1149,10 @@
             document.getElementById('notaNama').innerText = reseller ? reseller.nama : 'Reseller Dihapus';
             document.getElementById('notaTgl').innerText = formatTanggalID(trx.tanggal_transaksi);
 
+            // Sembunyikan tombol Simpan, Tampilkan tombol Edit Data
             document.getElementById('btnSimpanPratinjau').style.display = 'none';
+            document.getElementById('btnEditRiwayat').classList.remove('hidden');
+            document.getElementById('btnEditRiwayat').setAttribute('onclick', `siapkanEditTransaksi('${trxId}')`);
 
             showNotification("Memuat detail transaksi...", "info");
             try {
@@ -1146,18 +1176,22 @@
                 document.getElementById('notaListSetoran').innerHTML = htmlSetoran || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada setoran</td></tr>';
                 document.getElementById('notaSubSetoran').innerText = formatRupiah(trx.total_setoran);
 
+                // MEMPERBAIKI MASALAH MINUS GANDA (Memastikan selalu diolah sebagai angka absolut positif)
+                const kasbonBahanAbs = Math.abs(parseFloat(trx.total_kasbon_bahan) || 0);
+                const kasbonManAbs = Math.abs(parseFloat(trx.kasbon_manual) || 0);
+
                 document.getElementById('notaListBahan').innerHTML = htmlBahan || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pengambilan bahan</td></tr>';
-                document.getElementById('notaSubBahan').innerText = "- " + formatRupiah(trx.total_kasbon_bahan);
+                document.getElementById('notaSubBahan').innerText = "- " + formatRupiah(kasbonBahanAbs);
 
                 let htmlManual = '';
-                if(trx.kasbon_manual > 0) {
-                    htmlManual = `<tr><td colspan="3" class="py-1.5">${trx.keterangan_manual || 'Pinjaman/Kasbon Lainnya'}</td><td class="text-right font-medium">${formatRupiah(trx.kasbon_manual)}</td></tr>`;
+                if(kasbonManAbs > 0) {
+                    htmlManual = `<tr><td colspan="3" class="py-1.5">${trx.keterangan_manual || 'Pinjaman/Kasbon Lainnya'}</td><td class="text-right font-medium">${formatRupiah(kasbonManAbs)}</td></tr>`;
                 }
                 document.getElementById('notaListManual').innerHTML = htmlManual || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pinjaman uang</td></tr>';
-                document.getElementById('notaSubManual').innerText = "- " + formatRupiah(trx.kasbon_manual);
+                document.getElementById('notaSubManual').innerText = "- " + formatRupiah(kasbonManAbs);
 
                 document.getElementById('notaSummarySetoran').innerText = formatRupiah(trx.total_setoran);
-                document.getElementById('notaSummaryKasbon').innerText = "- " + formatRupiah(trx.total_kasbon_bahan);
+                document.getElementById('notaSummaryKasbon').innerText = "- " + formatRupiah(kasbonBahanAbs);
 
                 document.getElementById('notaGrandTotal').innerText = formatRupiah(trx.net_pembayaran);
                 const netVal = parseFloat(trx.net_pembayaran) || 0;
@@ -1169,8 +1203,88 @@
             } catch (err) { showNotification("Gagal memuat pratinjau: " + err.message, "error"); }
         }
 
+        async function siapkanEditTransaksi(trxId) {
+            // Tutup semua pop-up yang sedang terbuka
+            closeModal('modalPratinjau');
+            closeModal('modalRiwayat');
+            showNotification("Memuat data lama untuk diperbaiki...", "info");
 
-        // ================= PRATINJAU NOTA =================
+            const trx = riwayatTransactions.find(t => String(t.id) === String(trxId));
+            if(!trx) return;
+
+            // Masuk Mode Edit
+            modeEditTrxId = trx.id;
+
+            // Set Data di Dashboard
+            document.getElementById('resellerSelect').value = trx.reseller_id;
+            selectedResellerId = trx.reseller_id; 
+            document.getElementById('tglTransaksi').value = trx.tanggal_transaksi;
+            updateTglDisplay();
+
+            // Kosongkan list default
+            document.getElementById('containerBarangJadi').innerHTML = '';
+            document.getElementById('containerBahanBaku').innerHTML = '';
+            document.getElementById('listKasbonManual').innerHTML = '';
+
+            try {
+                const { data: details, error } = await supabaseClient.from('transaksi_detail').select('*').eq('transaksi_id', trx.id);
+                if (error) throw error;
+                
+                details.forEach(d => {
+                    const isBahan = masterData.bahanBaku.some(b => String(b.id) === String(d.barang_id));
+                    const isJadi = masterData.barangJadi.some(b => String(b.id) === String(d.barang_id));
+                    
+                    if(isBahan) {
+                        addRow('bahanBaku', d.barang_id, d.qty);
+                    } else if (isJadi) {
+                        addRow('barangJadi', d.barang_id, d.qty);
+                    }
+                });
+
+                if(trx.kasbon_manual > 0) {
+                    const ket = trx.keterangan_manual || 'Pinjaman';
+                    addKasbonManual(ket, trx.kasbon_manual);
+                }
+
+                // Supaya UX tetap bagus, jika list kosong, tambah baris default
+                if(document.querySelectorAll('#containerBarangJadi .row-item').length === 0) addRow('barangJadi');
+                for(let i=document.querySelectorAll('#containerBahanBaku .row-item').length; i<4; i++) addRow('bahanBaku');
+
+                kalkulasiSemua();
+                
+                // Ubah gaya tombol Simpan di dashboard
+                document.getElementById('btnSubmit').innerHTML = `<i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Update Data`;
+                document.getElementById('btnSubmit').classList.replace('bg-blue-600', 'bg-amber-500');
+                document.getElementById('btnSubmit').classList.replace('hover:bg-blue-500', 'hover:bg-amber-400');
+                
+                document.getElementById('btnGroupEdit').classList.remove('hidden');
+                feather.replace();
+                
+                showNotification("Silakan lakukan perbaikan lalu klik Update Data!", "success");
+
+            } catch(err) {
+                showNotification("Gagal memuat detail untuk edit: " + err.message, "error");
+            }
+        }
+
+        function batalEdit() {
+            modeEditTrxId = null;
+            document.getElementById('btnSubmit').innerHTML = `<i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan`;
+            document.getElementById('btnSubmit').classList.replace('bg-amber-500', 'bg-blue-600');
+            document.getElementById('btnSubmit').classList.replace('hover:bg-amber-400', 'hover:bg-blue-500');
+            document.getElementById('btnGroupEdit').classList.add('hidden');
+            
+            document.getElementById('containerBarangJadi').innerHTML = ''; 
+            document.getElementById('containerBahanBaku').innerHTML = '';
+            document.getElementById('listKasbonManual').innerHTML = '';
+            
+            for(let i=0; i<8; i++) addRow('bahanBaku'); 
+            addRow('barangJadi'); 
+            addKasbonManual();
+            kalkulasiSemua();
+            showNotification("Mode edit dibatalkan. Kembali ke nota baru.", "info");
+        }
+
         function bukaPratinjau() {
             if (!selectedResellerId) return showNotification("Pilih Reseller terlebih dahulu untuk pratinjau!", "error");
             
@@ -1180,6 +1294,7 @@
             const rawTgl = document.getElementById('tglTransaksi').value;
             document.getElementById('notaTgl').innerText = formatTanggalID(rawTgl);
 
+            document.getElementById('btnEditRiwayat').classList.add('hidden');
             document.getElementById('btnSimpanPratinjau').style.display = 'flex';
 
             let htmlSetoran = '';
@@ -1206,7 +1321,10 @@
                 }
             });
             document.getElementById('notaListBahan').innerHTML = htmlBahan || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pengambilan bahan</td></tr>';
-            document.getElementById('notaSubBahan').innerText = "- " + document.getElementById('subtotalBahanBakuLayar').innerText;
+            
+            // Mengambil angka positif mutlak sebelum diformat
+            let rawSubBahan = document.getElementById('subtotalBahanBakuLayar').innerText.replace(/[^0-9,-]+/g,"");
+            document.getElementById('notaSubBahan').innerText = "- " + formatRupiah(Math.abs(parseFloat(rawSubBahan) || 0));
 
             let htmlManual = '';
             document.querySelectorAll('.row-kasbon-manual').forEach(row => {
@@ -1218,10 +1336,12 @@
                 }
             });
             document.getElementById('notaListManual').innerHTML = htmlManual || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pinjaman uang</td></tr>';
-            document.getElementById('notaSubManual').innerText = document.getElementById('summaryManual').innerText;
+            
+            let rawSubManual = document.getElementById('summaryManual').innerText.replace(/[^0-9,-]+/g,"");
+            document.getElementById('notaSubManual').innerText = "- " + formatRupiah(Math.abs(parseFloat(rawSubManual) || 0));
 
             document.getElementById('notaSummarySetoran').innerText = document.getElementById('subtotalBarangJadiLayar').innerText;
-            document.getElementById('notaSummaryKasbon').innerText = "- " + document.getElementById('subtotalBahanBakuLayar').innerText;
+            document.getElementById('notaSummaryKasbon').innerText = "- " + formatRupiah(Math.abs(parseFloat(rawSubBahan) || 0));
 
             document.getElementById('notaGrandTotal').innerText = document.getElementById('summaryNet').innerText;
             const netVal = parseFloat(document.getElementById('summaryNet').innerText.replace(/[^0-9,-]+/g,"")) || 0;
@@ -1254,7 +1374,8 @@
 
             const tgl = document.getElementById('tglTransaksi').value;
             const totalSetoran = parseFloat(document.getElementById('summarySetoran').innerText.replace(/[^0-9,-]+/g,"")) || 0;
-            const totalKasbon = parseFloat(document.getElementById('summaryKasbon').innerText.replace(/[^0-9,-]+/g,"")) || 0;
+            // MEMPERBAIKI PENYIMPANAN MINUS GANDA (Memastikan tersimpan sbg positif)
+            const totalKasbon = Math.abs(parseFloat(document.getElementById('summaryKasbon').innerText.replace(/[^0-9,-]+/g,""))) || 0;
             
             let manualNominalTotal = 0; let manualKetArr = [];
             document.querySelectorAll('.row-kasbon-manual').forEach(row => {
@@ -1267,12 +1388,36 @@
             const net = totalSetoran - totalKasbon - manualNominalTotal;
 
             try {
-                const { data: trxData, error: trxError } = await supabaseClient.from('transaksi').insert([{
-                    reseller_id: selectedResellerId, tanggal_transaksi: tgl, total_setoran: totalSetoran,
-                    total_kasbon_bahan: totalKasbon, kasbon_manual: manualNominalTotal, keterangan_manual: manualKetGabungan, net_pembayaran: net
-                }]).select();
-                if (trxError) throw trxError;
-                const trxId = trxData[0].id;
+                let trxId;
+
+                if (modeEditTrxId) {
+                    // JIKA SEDANG MODE UPDATE / EDIT DATA
+                    const { error: updateError } = await supabaseClient.from('transaksi').update({
+                        reseller_id: selectedResellerId, 
+                        tanggal_transaksi: tgl, 
+                        total_setoran: totalSetoran,
+                        total_kasbon_bahan: totalKasbon, 
+                        kasbon_manual: manualNominalTotal, 
+                        keterangan_manual: manualKetGabungan, 
+                        net_pembayaran: net
+                    }).eq('id', modeEditTrxId);
+                    if (updateError) throw updateError;
+                    
+                    trxId = modeEditTrxId;
+                    
+                    // Bersihkan daftar rincian barang lama pada transaksi ini
+                    const { error: delError } = await supabaseClient.from('transaksi_detail').delete().eq('transaksi_id', trxId);
+                    if(delError) throw delError;
+
+                } else {
+                    // JIKA SIMPAN DATA BARU (NORMAL)
+                    const { data: trxData, error: trxError } = await supabaseClient.from('transaksi').insert([{
+                        reseller_id: selectedResellerId, tanggal_transaksi: tgl, total_setoran: totalSetoran,
+                        total_kasbon_bahan: totalKasbon, kasbon_manual: manualNominalTotal, keterangan_manual: manualKetGabungan, net_pembayaran: net
+                    }]).select();
+                    if (trxError) throw trxError;
+                    trxId = trxData[0].id;
+                }
 
                 let detailData = [];
                 document.querySelectorAll('.row-item').forEach(row => {
@@ -1282,27 +1427,45 @@
                     const sub = parseFloat(row.dataset.subtotal) || 0;
                     if (barangId && qty > 0) detailData.push({ transaksi_id: trxId, barang_id: barangId, qty: qty, harga_satuan: harga, subtotal: sub });
                 });
+                
                 if (detailData.length > 0) {
                     const { error: detailError } = await supabaseClient.from('transaksi_detail').insert(detailData);
                     if (detailError) throw detailError;
                 }
 
-                showNotification('Transaksi Berhasil Disimpan!', 'success');
+                showNotification(modeEditTrxId ? 'Data Transaksi Berhasil Di-Update!' : 'Transaksi Berhasil Disimpan!', 'success');
+                
+                // RESET TOTAL SESUDAH SIMPAN
+                modeEditTrxId = null;
+                document.getElementById('btnGroupEdit').classList.add('hidden');
+                
                 document.getElementById('containerBarangJadi').innerHTML = ''; document.getElementById('containerBahanBaku').innerHTML = '';
                 document.getElementById('listKasbonManual').innerHTML = '';
                 
-                kalkulasiSemua(); feather.replace(); addRow('bahanBaku'); addRow('barangJadi'); addKasbonManual();
+                kalkulasiSemua(); feather.replace(); 
+                for(let i=0; i<8; i++) addRow('bahanBaku'); 
+                addRow('barangJadi'); 
+                addKasbonManual();
                 closeModal('modalPratinjau'); 
 
             } catch (error) {
                 showNotification("Gagal menyimpan: " + error.message, "error");
             } finally {
-                if(btn) { btn.innerHTML = `<i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan`; btn.disabled = false; }
-                if(btnPratinjau) { btnPratinjau.innerHTML = `<i data-feather="check-circle" class="w-3 h-3 mr-1"></i> Simpan Data`; btnPratinjau.disabled = false; }
+                if(btn) { 
+                    btn.innerHTML = modeEditTrxId ? `<i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Update Data` : `<i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan`; 
+                    btn.disabled = false; 
+                    if(!modeEditTrxId) {
+                        btn.classList.replace('bg-amber-500', 'bg-blue-600');
+                        btn.classList.replace('hover:bg-amber-400', 'hover:bg-blue-500');
+                    }
+                }
+                if(btnPratinjau) { 
+                    btnPratinjau.innerHTML = `<i data-feather="check-circle" class="w-3 h-3 mr-1"></i> Simpan Data`; 
+                    btnPratinjau.disabled = false; 
+                }
             }
         }
 
-        // ================= MODAL LOGICS UTAMA =================
         function closeModal(id) {
             const modalEl = document.getElementById(id);
             if(modalEl.children[0] && modalEl.children[0].classList.contains('scale-100')) {
@@ -1314,7 +1477,6 @@
             setTimeout(() => { 
                 modalEl.classList.add('hidden');
                 if (id === 'modalPratinjau' && !document.getElementById('modalRiwayat').classList.contains('hidden')) {
-                    // Biarkan overlay tetap ada
                 } else {
                     document.getElementById('modalOverlay').classList.add('hidden'); 
                 }
@@ -1344,6 +1506,9 @@
                 });
             }
             if(id === 'modalBarang') {
+                // Pastikan layout kembali ke Semua saat modal dibuka pertama kali
+                filterBarang('semua');
+                
                 const uiJadi = document.getElementById('listModalBarangJadi'); 
                 const uiBahan = document.getElementById('listModalBahanBaku');
                 uiJadi.innerHTML = ''; uiBahan.innerHTML = '';
@@ -1440,7 +1605,11 @@
         });
 
         window.onload = () => {
-            loadMasterData().then(() => { addRow('bahanBaku'); addRow('barangJadi'); addKasbonManual(); });
+            loadMasterData().then(() => { 
+                for(let i=0; i<8; i++) addRow('bahanBaku'); 
+                addRow('barangJadi'); 
+                addKasbonManual(); 
+            });
         };
     </script>
 </body>
