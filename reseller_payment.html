@@ -42,14 +42,17 @@
         body.dark .custom-scroll::-webkit-scrollbar-thumb { background-color: #475569; }
 
         @media print {
-            @page { size: A4 landscape; margin: 10mm; }
+            /* Menyesuaikan margin kertas A4 (atas 15mm, kanan-kiri 12mm) */
+            @page { size: A4 portrait; margin: 5mm 12mm 12mm 12mm; }
             body, html { background-color: white !important; margin: 0; padding: 0; width: 100%; height: 100%; }
             body > *:not(#modalPratinjau) { display: none !important; }
             nav, #toastContainer, #modalOverlay { display: none !important; }
             #modalPratinjau { position: absolute !important; left: 0 !important; top: 0 !important; display: block !important; width: 100% !important; padding: 0 !important; background: white !important; }
             #modalPratinjau > div:first-child { display: none !important; } 
             #modalPratinjau > div:last-child { position: relative !important; max-width: 100% !important; width: 100% !important; box-shadow: none !important; border: none !important; transform: none !important; max-height: none !important; background: white !important; }
-            #areaPrint { overflow: visible !important; height: auto !important; padding: 0 !important; }
+            
+            /* Menambahkan padding atas (10mm) dan samping (8mm) agar header dan margin tidak terpotong */
+            #areaPrint { overflow: visible !important; height: auto !important; padding: 5mm 8mm 0 8mm !important; }
             .no-print { display: none !important; }
         }
     </style>
@@ -219,11 +222,14 @@
                         </div>
                     </div>
 
-                    <div class="mt-5 grid grid-cols-2 gap-3" id="btnGroupNormal">
-                        <button onclick="bukaPratinjau()" class="w-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm">
+                    <div class="mt-5 flex gap-2.5" id="btnGroupNormal">
+                        <button onclick="konfirmasiReset()" class="bg-orange-500 hover:bg-orange-400 text-white font-bold p-2.5 rounded-lg flex justify-center items-center transition shadow-sm shrink-0" title="Reset Form">
+                            <i data-feather="refresh-cw" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="bukaPratinjau()" class="flex-1 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm">
                             <i data-feather="eye" class="w-3.5 h-3.5 mr-1.5"></i> Pratinjau
                         </button>
-                        <button id="btnSubmit" onclick="simpanTransaksi()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm shadow-blue-200 dark:shadow-none">
+                        <button id="btnSubmit" onclick="simpanTransaksi()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm shadow-blue-200 dark:shadow-none">
                             <i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan
                         </button>
                     </div>
@@ -272,20 +278,19 @@
                     </div>
                 </div>
 
-                <!-- Grid 2 Kolom -->
-                <div class="grid grid-cols-2 gap-8 mb-4 items-start">
+                <div class="grid grid-cols-2 gap-4 mb-4 items-start">
                     <!-- KIRI: Pengambilan Bahan Baku -->
                     <div>
                         <h4 class="text-[11px] font-bold text-gray-800 bg-red-50 border border-red-100 px-2 py-1.5 mb-2 rounded flex items-center">
                             <i data-feather="arrow-up-right" class="w-3 h-3 mr-1 text-red-500"></i> PENGAMBILAN BAHAN BAKU
                         </h4>
-                        <table class="w-full text-[11px] text-left mb-2">
+                        <table class="w-full text-xs text-left mb-2">
                             <thead>
                                 <tr class="border-b border-gray-200 text-gray-500">
-                                    <th class="pb-1 font-semibold text-center w-12">Qty</th>
-                                    <th class="pb-1 font-semibold pl-2">Item</th>
-                                    <th class="pb-1 font-semibold text-right w-20">Harga</th>
-                                    <th class="pb-1 font-semibold text-right w-24">Total</th>
+                                    <th class="pb-1 font-semibold text-center w-8">Qty</th>
+                                    <th class="pb-1 font-semibold pl-1 w-full">Item</th>
+                                    <th class="pb-1 font-semibold text-right whitespace-nowrap pl-2">Harga</th>
+                                    <th class="pb-1 font-semibold text-right whitespace-nowrap pl-2">Total</th>
                                 </tr>
                             </thead>
                             <tbody id="notaListBahan" class="text-gray-700"></tbody>
@@ -296,18 +301,18 @@
                     </div>
                     
                     <!-- KANAN: Setoran Barang Jadi & Ringkasan -->
-                    <div class="flex flex-col gap-6">
+                    <div class="flex flex-col gap-3">
                         <div>
                             <h4 class="text-[11px] font-bold text-gray-800 bg-blue-50 border border-blue-100 px-2 py-1.5 mb-2 rounded flex items-center">
                                 <i data-feather="arrow-down-left" class="w-3 h-3 mr-1 text-blue-500"></i> SETORAN BARANG JADI
                             </h4>
-                            <table class="w-full text-[11px] text-left mb-2">
+                            <table class="w-full text-xs text-left mb-2">
                                 <thead>
                                     <tr class="border-b border-gray-200 text-gray-500">
-                                        <th class="pb-1 font-semibold text-center w-12">Qty</th>
-                                        <th class="pb-1 font-semibold pl-2">Item</th>
-                                        <th class="pb-1 font-semibold text-right w-20">Harga</th>
-                                        <th class="pb-1 font-semibold text-right w-24">Total</th>
+                                        <th class="pb-1 font-semibold text-center w-8">Qty</th>
+                                        <th class="pb-1 font-semibold pl-1 w-full">Item</th>
+                                        <th class="pb-1 font-semibold text-right whitespace-nowrap pl-2">Harga</th>
+                                        <th class="pb-1 font-semibold text-right whitespace-nowrap pl-2">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody id="notaListSetoran" class="text-gray-700"></tbody>
@@ -317,28 +322,28 @@
                             </div>
                         </div>
 
-                        <!-- Ringkasan Tepat di Bawah Setoran Barang Jadi -->
-                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mt-auto">
-                            <div class="mb-4 space-y-2 border-b border-gray-300 pb-3">
+                        <!-- Area Ringkasan -->
+                        <div class="bg-gray-50 p-3 rounded border border-gray-200 mt-auto">
+                            <div class="mb-2 space-y-0.5 border-b border-gray-300 pb-1.5">
                                 <div class="flex justify-between items-center">
                                     <span class="text-[11px] font-bold text-gray-600">Total Setoran Barang Jadi</span>
-                                    <span id="notaSummarySetoran" class="text-xs font-bold text-blue-600">Rp 0</span>
+                                    <span id="notaSummarySetoran" class="text-[11px] font-bold text-blue-600">Rp 0</span>
                                 </div>
                                 <div class="flex justify-between items-center">
                                     <span class="text-[11px] font-bold text-gray-600">Total Pengambilan Bahan Baku</span>
-                                    <span id="notaSummaryKasbon" class="text-xs font-bold text-red-500">- Rp 0</span>
+                                    <span id="notaSummaryKasbon" class="text-[11px] font-bold text-red-500">- Rp 0</span>
                                 </div>
                             </div>
 
-                            <div class="mb-4">
-                                <h4 class="text-[11px] font-bold text-gray-800 border-b border-gray-300 pb-1 mb-2">PINJAMAN / KASBON UANG LAINNYA</h4>
-                                <table class="w-full text-[11px] text-left mb-2"><tbody id="notaListManual" class="text-gray-700"></tbody></table>
-                                <div class="flex justify-end text-[11px] font-bold text-red-600 border-t border-gray-200 pt-1">Total Kasbon Uang: <span id="notaSubManual" class="ml-4">- Rp 0</span></div>
+                            <div class="mb-2">
+                                <h4 class="text-[10px] font-bold text-gray-800 border-b border-gray-300 pb-0.5 mb-1">PINJAMAN / KASBON UANG LAINNYA</h4>
+                                <table class="w-full text-[11px] text-left mb-1"><tbody id="notaListManual" class="text-gray-700"></tbody></table>
+                                <div class="flex justify-end text-[10px] font-bold text-red-600 border-t border-gray-200 pt-1">Total Kasbon Uang: <span id="notaSubManual" class="ml-4">- Rp 0</span></div>
                             </div>
                             
-                            <div class="border-t-2 border-dashed border-gray-300 pt-4 flex justify-between items-center">
-                                <span class="text-sm font-black text-gray-700 uppercase tracking-wide">Total Net Pembayaran</span>
-                                <span id="notaGrandTotal" class="text-xl font-black text-gray-900">Rp 0</span>
+                            <div class="border-t-2 border-dashed border-gray-300 pt-2 flex justify-between items-center">
+                                <span class="text-xs font-black text-gray-700 uppercase tracking-wide">Total Net Pembayaran</span>
+                                <span id="notaGrandTotal" class="text-lg font-black text-gray-900">Rp 0</span>
                             </div>
                         </div>
                     </div>
@@ -355,6 +360,24 @@
     <!-- MODAL OVERLAY DASAR -->
     <div id="modalOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-opacity-80 backdrop-blur-sm hidden z-40 transition-opacity"></div>
     
+    <!-- MODAL RESET KONFIRMASI -->
+    <div id="modalReset" class="fixed inset-0 z-[100] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-gray-900/60 dark:bg-gray-900/80 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalReset')"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col transform scale-95 transition-all duration-200">
+            <div class="p-5 text-center">
+                <div class="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-500 flex items-center justify-center mx-auto mb-3">
+                    <i data-feather="alert-triangle" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-base font-bold text-gray-800 dark:text-slate-100 mb-1">Reset Form?</h3>
+                <p class="text-xs text-gray-500 dark:text-slate-400 mb-5">Semua data inputan yang belum disimpan akan dikosongkan. Anda yakin?</p>
+                <div class="flex gap-2 justify-center">
+                    <button onclick="closeFormModal('modalReset')" class="bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-300 text-xs font-bold px-4 py-2 rounded-lg transition flex-1">Batal</button>
+                    <button onclick="jalankanReset()" class="bg-orange-500 hover:bg-orange-400 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition flex-1">Ya, Kosongkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL CRUD: DATA AGEN -->
     <div id="modalAgen" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
         <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-all duration-200 flex flex-col max-h-[85vh]">
@@ -633,7 +656,7 @@
         let masterData = { resellers: [], barangJadi: [], bahanBaku: [], hargaDefault: {}, hargaKhusus: {}, rawHargaKhusus: [] };
         let selectedResellerId = '';
         let riwayatTransactions = []; 
-        let modeEditTrxId = null; // Menyimpan ID Transaksi jika sedang dalam mode Edit
+        let modeEditTrxId = null;
 
         async function loadMasterData() {
             try {
@@ -704,6 +727,30 @@
             updateTglDisplay();
         };
 
+        function konfirmasiReset() {
+            openFormModal('modalReset');
+        }
+
+        function jalankanReset() {
+            document.getElementById('resellerSelect').value = '';
+            selectedResellerId = '';
+            const tzOffset = (new Date()).getTimezoneOffset() * 60000;
+            document.getElementById('tglTransaksi').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
+            updateTglDisplay();
+            
+            document.getElementById('containerBarangJadi').innerHTML = '';
+            document.getElementById('containerBahanBaku').innerHTML = '';
+            document.getElementById('listKasbonManual').innerHTML = '';
+            
+            for(let i=0; i<8; i++) addRow('bahanBaku');
+            addRow('barangJadi');
+            addKasbonManual();
+            
+            kalkulasiSemua();
+            closeFormModal('modalReset');
+            showNotification('Form berhasil dikosongkan secara keseluruhan!', 'success');
+        }
+
         function refreshDropdownsUI() {
             document.querySelectorAll('.row-item').forEach(row => {
                 const selectEl = row.querySelector('.item-select');
@@ -719,7 +766,6 @@
             kalkulasiSemua();
         }
 
-        // Modifikasi addRow untuk bisa menerima nilai default saat menarik data edit
         const addRow = (tipe, defaultItemId = '', defaultQty = '') => {
             const container = document.getElementById(tipe === 'barangJadi' ? 'containerBarangJadi' : 'containerBahanBaku');
             const items = tipe === 'barangJadi' ? masterData.barangJadi : masterData.bahanBaku;
@@ -820,7 +866,6 @@
             activeQtyInput.dispatchEvent(new Event('input'));
         }
 
-        // Modifikasi addKasbonManual untuk bisa menerima nilai default
         const addKasbonManual = (defaultKet = '', defaultNom = '') => {
             const container = document.getElementById('listKasbonManual');
             const div = document.createElement('div');
@@ -1149,7 +1194,6 @@
             document.getElementById('notaNama').innerText = reseller ? reseller.nama : 'Reseller Dihapus';
             document.getElementById('notaTgl').innerText = formatTanggalID(trx.tanggal_transaksi);
 
-            // Sembunyikan tombol Simpan, Tampilkan tombol Edit Data
             document.getElementById('btnSimpanPratinjau').style.display = 'none';
             document.getElementById('btnEditRiwayat').classList.remove('hidden');
             document.getElementById('btnEditRiwayat').setAttribute('onclick', `siapkanEditTransaksi('${trxId}')`);
@@ -1167,7 +1211,7 @@
                     const itemName = item ? item.nama : 'Item Dihapus';
                     const isBahan = masterData.bahanBaku.some(b => String(b.id) === String(d.barang_id));
                     
-                    const rowHtml = `<tr><td class="text-center font-bold">${d.qty}</td><td class="py-1 pl-2">${itemName}</td><td class="text-right text-gray-500">${formatRupiah(d.harga_satuan)}</td><td class="text-right font-medium">${formatRupiah(d.subtotal)}</td></tr>`;
+                    const rowHtml = `<tr><td class="text-center font-bold">${d.qty}</td><td class="py-1 pl-1">${itemName}</td><td class="text-right text-gray-500 whitespace-nowrap pl-2">${formatRupiah(d.harga_satuan)}</td><td class="text-right font-medium whitespace-nowrap pl-2">${formatRupiah(d.subtotal)}</td></tr>`;
                     
                     if(isBahan) htmlBahan += rowHtml;
                     else htmlSetoran += rowHtml;
@@ -1176,7 +1220,6 @@
                 document.getElementById('notaListSetoran').innerHTML = htmlSetoran || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada setoran</td></tr>';
                 document.getElementById('notaSubSetoran').innerText = formatRupiah(trx.total_setoran);
 
-                // MEMPERBAIKI MASALAH MINUS GANDA (Memastikan selalu diolah sebagai angka absolut positif)
                 const kasbonBahanAbs = Math.abs(parseFloat(trx.total_kasbon_bahan) || 0);
                 const kasbonManAbs = Math.abs(parseFloat(trx.kasbon_manual) || 0);
 
@@ -1185,7 +1228,8 @@
 
                 let htmlManual = '';
                 if(kasbonManAbs > 0) {
-                    htmlManual = `<tr><td colspan="3" class="py-1.5">${trx.keterangan_manual || 'Pinjaman/Kasbon Lainnya'}</td><td class="text-right font-medium">${formatRupiah(kasbonManAbs)}</td></tr>`;
+                    let cleanKet = (trx.keterangan_manual || 'Pinjaman/Kasbon Lainnya').replace(/\s*\([^)]*\)/g, '');
+                    htmlManual = `<tr><td colspan="3" class="py-0.5 text-[10px]">${cleanKet}</td><td class="text-right font-medium whitespace-nowrap pl-2">${formatRupiah(kasbonManAbs)}</td></tr>`;
                 }
                 document.getElementById('notaListManual').innerHTML = htmlManual || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pinjaman uang</td></tr>';
                 document.getElementById('notaSubManual').innerText = "- " + formatRupiah(kasbonManAbs);
@@ -1195,7 +1239,7 @@
 
                 document.getElementById('notaGrandTotal').innerText = formatRupiah(trx.net_pembayaran);
                 const netVal = parseFloat(trx.net_pembayaran) || 0;
-                document.getElementById('notaGrandTotal').className = `text-xl font-black ${netVal < 0 ? 'text-red-600' : 'text-gray-900'}`;
+                document.getElementById('notaGrandTotal').className = `text-lg font-black ${netVal < 0 ? 'text-red-600' : 'text-gray-900'}`;
 
                 const pratinjauModal = document.getElementById('modalPratinjau');
                 pratinjauModal.classList.remove('hidden');
@@ -1204,7 +1248,6 @@
         }
 
         async function siapkanEditTransaksi(trxId) {
-            // Tutup semua pop-up yang sedang terbuka
             closeModal('modalPratinjau');
             closeModal('modalRiwayat');
             showNotification("Memuat data lama untuk diperbaiki...", "info");
@@ -1212,16 +1255,13 @@
             const trx = riwayatTransactions.find(t => String(t.id) === String(trxId));
             if(!trx) return;
 
-            // Masuk Mode Edit
             modeEditTrxId = trx.id;
 
-            // Set Data di Dashboard
             document.getElementById('resellerSelect').value = trx.reseller_id;
             selectedResellerId = trx.reseller_id; 
             document.getElementById('tglTransaksi').value = trx.tanggal_transaksi;
             updateTglDisplay();
 
-            // Kosongkan list default
             document.getElementById('containerBarangJadi').innerHTML = '';
             document.getElementById('containerBahanBaku').innerHTML = '';
             document.getElementById('listKasbonManual').innerHTML = '';
@@ -1242,17 +1282,15 @@
                 });
 
                 if(trx.kasbon_manual > 0) {
-                    const ket = trx.keterangan_manual || 'Pinjaman';
+                    const ket = (trx.keterangan_manual || 'Pinjaman').replace(/\s*\([^)]*\)/g, '');
                     addKasbonManual(ket, trx.kasbon_manual);
                 }
 
-                // Supaya UX tetap bagus, jika list kosong, tambah baris default
                 if(document.querySelectorAll('#containerBarangJadi .row-item').length === 0) addRow('barangJadi');
                 for(let i=document.querySelectorAll('#containerBahanBaku .row-item').length; i<4; i++) addRow('bahanBaku');
 
                 kalkulasiSemua();
                 
-                // Ubah gaya tombol Simpan di dashboard
                 document.getElementById('btnSubmit').innerHTML = `<i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Update Data`;
                 document.getElementById('btnSubmit').classList.replace('bg-blue-600', 'bg-amber-500');
                 document.getElementById('btnSubmit').classList.replace('hover:bg-blue-500', 'hover:bg-amber-400');
@@ -1304,7 +1342,7 @@
                 if(sel.value && qty > 0) {
                     const itemName = sel.options[sel.selectedIndex].text;
                     const hrg = row.querySelector('.harga-input').value; const sub = row.querySelector('.subtotal-input').value;
-                    htmlSetoran += `<tr><td class="text-center font-bold">${qty}</td><td class="py-1 pl-2">${itemName}</td><td class="text-right text-gray-500">${hrg}</td><td class="text-right font-medium">${sub}</td></tr>`;
+                    htmlSetoran += `<tr><td class="text-center font-bold">${qty}</td><td class="py-1 pl-1">${itemName}</td><td class="text-right text-gray-500 whitespace-nowrap pl-2">${hrg}</td><td class="text-right font-medium whitespace-nowrap pl-2">${sub}</td></tr>`;
                 }
             });
             document.getElementById('notaListSetoran').innerHTML = htmlSetoran || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada setoran</td></tr>';
@@ -1317,12 +1355,11 @@
                 if(sel.value && qty > 0) {
                     const itemName = sel.options[sel.selectedIndex].text;
                     const hrg = row.querySelector('.harga-input').value; const sub = row.querySelector('.subtotal-input').value;
-                    htmlBahan += `<tr><td class="text-center font-bold">${qty}</td><td class="py-1 pl-2">${itemName}</td><td class="text-right text-gray-500">${hrg}</td><td class="text-right font-medium">${sub}</td></tr>`;
+                    htmlBahan += `<tr><td class="text-center font-bold">${qty}</td><td class="py-1 pl-1">${itemName}</td><td class="text-right text-gray-500 whitespace-nowrap pl-2">${hrg}</td><td class="text-right font-medium whitespace-nowrap pl-2">${sub}</td></tr>`;
                 }
             });
             document.getElementById('notaListBahan').innerHTML = htmlBahan || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pengambilan bahan</td></tr>';
             
-            // Mengambil angka positif mutlak sebelum diformat
             let rawSubBahan = document.getElementById('subtotalBahanBakuLayar').innerText.replace(/[^0-9,-]+/g,"");
             document.getElementById('notaSubBahan').innerText = "- " + formatRupiah(Math.abs(parseFloat(rawSubBahan) || 0));
 
@@ -1332,7 +1369,7 @@
                 let valStr = row.querySelector('.nom-manual').value.replace(/[^0-9]/g, '');
                 const nom = parseFloat(valStr) || 0;
                 if(nom > 0) {
-                    htmlManual += `<tr><td colspan="3" class="py-1.5">${ket}</td><td class="text-right font-medium">${formatRupiah(nom)}</td></tr>`;
+                    htmlManual += `<tr><td colspan="3" class="py-0.5 text-[10px]">${ket}</td><td class="text-right font-medium whitespace-nowrap pl-2">${formatRupiah(nom)}</td></tr>`;
                 }
             });
             document.getElementById('notaListManual').innerHTML = htmlManual || '<tr><td colspan="4" class="text-center py-2 text-gray-400 italic">Tidak ada pinjaman uang</td></tr>';
@@ -1345,7 +1382,7 @@
 
             document.getElementById('notaGrandTotal').innerText = document.getElementById('summaryNet').innerText;
             const netVal = parseFloat(document.getElementById('summaryNet').innerText.replace(/[^0-9,-]+/g,"")) || 0;
-            document.getElementById('notaGrandTotal').className = `text-xl font-black ${netVal < 0 ? 'text-red-600' : 'text-gray-900'}`;
+            document.getElementById('notaGrandTotal').className = `text-lg font-black ${netVal < 0 ? 'text-red-600' : 'text-gray-900'}`;
 
             document.getElementById('modalPratinjau').classList.remove('hidden');
             setTimeout(() => { document.getElementById('modalPratinjau').children[1].classList.replace('scale-95','scale-100'); }, 10);
@@ -1374,7 +1411,6 @@
 
             const tgl = document.getElementById('tglTransaksi').value;
             const totalSetoran = parseFloat(document.getElementById('summarySetoran').innerText.replace(/[^0-9,-]+/g,"")) || 0;
-            // MEMPERBAIKI PENYIMPANAN MINUS GANDA (Memastikan tersimpan sbg positif)
             const totalKasbon = Math.abs(parseFloat(document.getElementById('summaryKasbon').innerText.replace(/[^0-9,-]+/g,""))) || 0;
             
             let manualNominalTotal = 0; let manualKetArr = [];
@@ -1382,7 +1418,7 @@
                 const ket = row.querySelector('.ket-manual').value.trim() || 'Lainnya';
                 let valStr = row.querySelector('.nom-manual').value.replace(/[^0-9]/g, '');
                 const nom = parseFloat(valStr) || 0;
-                if(nom > 0) { manualNominalTotal += nom; manualKetArr.push(`${ket} (${formatRupiah(nom)})`); }
+                if(nom > 0) { manualNominalTotal += nom; manualKetArr.push(ket); } 
             });
             const manualKetGabungan = manualKetArr.join(', ');
             const net = totalSetoran - totalKasbon - manualNominalTotal;
@@ -1391,7 +1427,6 @@
                 let trxId;
 
                 if (modeEditTrxId) {
-                    // JIKA SEDANG MODE UPDATE / EDIT DATA
                     const { error: updateError } = await supabaseClient.from('transaksi').update({
                         reseller_id: selectedResellerId, 
                         tanggal_transaksi: tgl, 
@@ -1405,12 +1440,10 @@
                     
                     trxId = modeEditTrxId;
                     
-                    // Bersihkan daftar rincian barang lama pada transaksi ini
                     const { error: delError } = await supabaseClient.from('transaksi_detail').delete().eq('transaksi_id', trxId);
                     if(delError) throw delError;
 
                 } else {
-                    // JIKA SIMPAN DATA BARU (NORMAL)
                     const { data: trxData, error: trxError } = await supabaseClient.from('transaksi').insert([{
                         reseller_id: selectedResellerId, tanggal_transaksi: tgl, total_setoran: totalSetoran,
                         total_kasbon_bahan: totalKasbon, kasbon_manual: manualNominalTotal, keterangan_manual: manualKetGabungan, net_pembayaran: net
@@ -1435,7 +1468,6 @@
 
                 showNotification(modeEditTrxId ? 'Data Transaksi Berhasil Di-Update!' : 'Transaksi Berhasil Disimpan!', 'success');
                 
-                // RESET TOTAL SESUDAH SIMPAN
                 modeEditTrxId = null;
                 document.getElementById('btnGroupEdit').classList.add('hidden');
                 
@@ -1506,7 +1538,6 @@
                 });
             }
             if(id === 'modalBarang') {
-                // Pastikan layout kembali ke Semua saat modal dibuka pertama kali
                 filterBarang('semua');
                 
                 const uiJadi = document.getElementById('listModalBarangJadi'); 
@@ -1594,7 +1625,8 @@
                !document.getElementById('modalFormBarang').classList.contains('hidden') ||
                !document.getElementById('modalFormHarga').classList.contains('hidden') ||
                !document.getElementById('modalDetailHargaKhusus').classList.contains('hidden') ||
-               !document.getElementById('modalKotretan').classList.contains('hidden')) {
+               !document.getElementById('modalKotretan').classList.contains('hidden') ||
+               !document.getElementById('modalReset').classList.contains('hidden')) {
                 return;
             }
             if(!document.getElementById('modalPratinjau').classList.contains('hidden')) {
