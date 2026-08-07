@@ -221,7 +221,14 @@
                         </div>
                     </div>
 
-                    <div class="mt-5 flex gap-2.5" id="btnGroupNormal">
+                    <!-- TOMBOL BATAL EDIT KELAP KELIP (Hanya Muncul Saat Mode Edit) -->
+                    <div id="btnGroupEdit" class="mt-4 mb-2 hidden">
+                        <button onclick="batalEdit()" class="w-full bg-red-600 text-white text-[11px] tracking-wide font-black py-2.5 rounded-lg shadow-[0_0_15px_rgba(220,38,38,0.5)] animate-pulse hover:bg-red-700 transition flex justify-center items-center gap-1.5 border border-red-500">
+                            <i data-feather="alert-triangle" class="w-4 h-4"></i> !! MODE EDIT, TEKAN UNTUK BATALKAN
+                        </button>
+                    </div>
+
+                    <div class="mt-4 flex gap-2.5" id="btnGroupNormal">
                         <button onclick="konfirmasiReset()" class="bg-orange-500 hover:bg-orange-400 text-white font-bold p-2.5 rounded-lg flex justify-center items-center transition shadow-sm shrink-0" title="Reset Form">
                             <i data-feather="refresh-cw" class="w-4 h-4"></i>
                         </button>
@@ -231,9 +238,6 @@
                         <button id="btnSubmit" onclick="simpanTransaksi()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm">
                             <i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan
                         </button>
-                    </div>
-                    <div id="btnGroupEdit" class="mt-3 hidden text-center">
-                        <button onclick="batalEdit()" class="text-[11px] font-medium text-red-500 hover:text-red-700 underline">Batalkan Mode Edit</button>
                     </div>
                 </div>
 
@@ -276,9 +280,10 @@
 
                 <div class="grid grid-cols-2 gap-4 mb-4 items-start">
                     <div>
-                        <h4 class="text-[11px] font-bold text-gray-800 bg-red-50 border border-red-100 px-2 py-1.5 mb-2 rounded flex items-center">
-                            <i data-feather="arrow-up-right" class="w-3 h-3 mr-1 text-red-500"></i> PENGAMBILAN BAHAN BAKU
-                        </h4>
+                        <div class="text-[11px] font-bold text-gray-800 bg-red-50 border border-red-100 px-2 py-1.5 mb-2 rounded flex items-center justify-between">
+                            <span class="flex items-center"><i data-feather="arrow-up-right" class="w-3 h-3 mr-1 text-red-500"></i> PENGAMBILAN BAHAN BAKU</span>
+                            <button id="btnHistoryBahan" onclick="bukaHistoryHarian('bahan')" class="no-print hidden text-[9px] bg-white border border-red-200 text-red-600 px-1.5 py-0.5 rounded shadow-sm hover:bg-red-50 transition items-center gap-1"><i data-feather="clock" class="w-3 h-3"></i> Rincian</button>
+                        </div>
                         <table class="w-full text-xs text-left mb-2">
                             <thead>
                                 <tr class="border-b border-gray-200 text-gray-500">
@@ -297,9 +302,10 @@
                     
                     <div class="flex flex-col gap-3">
                         <div>
-                            <h4 class="text-[11px] font-bold text-gray-800 bg-blue-50 border border-blue-100 px-2 py-1.5 mb-2 rounded flex items-center">
-                                <i data-feather="arrow-down-left" class="w-3 h-3 mr-1 text-blue-500"></i> SETORAN BARANG JADI
-                            </h4>
+                            <div class="text-[11px] font-bold text-gray-800 bg-blue-50 border border-blue-100 px-2 py-1.5 mb-2 rounded flex items-center justify-between">
+                                <span class="flex items-center"><i data-feather="arrow-down-left" class="w-3 h-3 mr-1 text-blue-500"></i> SETORAN BARANG JADI</span>
+                                <button id="btnHistoryJadi" onclick="bukaHistoryHarian('jadi')" class="no-print hidden text-[9px] bg-white border border-blue-200 text-blue-600 px-1.5 py-0.5 rounded shadow-sm hover:bg-blue-50 transition items-center gap-1"><i data-feather="clock" class="w-3 h-3"></i> Rincian</button>
+                            </div>
                             <table class="w-full text-xs text-left mb-2">
                                 <thead>
                                     <tr class="border-b border-gray-200 text-gray-500">
@@ -328,7 +334,8 @@
                                 </div>
                             </div>
 
-                            <div class="mb-2">
+                            <!-- KONTAINER KASBON MANUAL DIBUAT TERPISAH AGAR BISA DISEMBUNYIKAN -->
+                            <div id="notaContainerManual" class="mb-2">
                                 <h4 class="text-[10px] font-bold text-gray-800 border-b border-gray-300 pb-0.5 mb-1">PINJAMAN / KASBON UANG LAINNYA</h4>
                                 <table class="w-full text-[11px] text-left mb-1"><tbody id="notaListManual" class="text-gray-700"></tbody></table>
                                 <div class="flex justify-end text-[10px] font-bold text-red-600 border-t border-gray-200 pt-1">Total Kasbon Uang: <span id="notaSubManual" class="ml-4">- Rp 0</span></div>
@@ -379,7 +386,7 @@
                             <select id="inputTipeHarian" onchange="updateOpsiHarian()" class="w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-blue-50 dark:bg-slate-900 text-blue-700 dark:text-blue-400 font-semibold outline-none focus:border-blue-500 transition-colors">
                                 <option value="semua">Tampilkan Semua</option>
                                 <option value="jadi">📦 Barang Jadi (Setoran)</option>
-                                <option value="bahan">🌾 Bahan Baku (Ambil)</option>
+                                <option value="bahan">🛍️ Bahan Baku (Ambil)</option>
                             </select>
                         </div>
                     </div>
@@ -398,13 +405,24 @@
                     </div>
                 </div>
                 
-                <!-- Kanan: List Rekap Berkelompok -->
+                <!-- Kanan: List Rekap Berkelompok (Dibuat Compact, Flex, Scroll) -->
                 <div class="w-full md:w-1/2 p-4 flex flex-col h-full overflow-hidden">
-                    <h4 class="text-[11px] font-bold text-gray-500 uppercase mb-3 flex justify-between items-center">
+                    <h4 class="text-[11px] font-bold text-gray-500 uppercase mb-3 flex justify-between items-center shrink-0">
                         Daftar Draft Tersimpan
                         <button onclick="fetchListHarian()" class="text-blue-500 hover:text-blue-600 flex items-center gap-1 normal-case"><i data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan</button>
                     </h4>
-                    <div class="flex-1 overflow-y-auto custom-scroll pr-1 space-y-3" id="listCatatanHarian">
+                    
+                    <div class="mb-3 bg-gray-50 dark:bg-slate-900/50 p-2.5 rounded-lg border border-gray-100 dark:border-slate-700 space-y-2 shrink-0">
+                        <div class="flex gap-2">
+                            <input type="date" id="filterTglAwal" class="w-1/2 text-[10px] p-1.5 rounded border border-gray-300 dark:border-slate-600 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
+                            <input type="date" id="filterTglAkhir" class="w-1/2 text-[10px] p-1.5 rounded border border-gray-300 dark:border-slate-600 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
+                        </div>
+                        <select id="filterDraftAgen" class="w-full text-[10px] p-1.5 rounded border border-gray-300 dark:border-slate-600 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
+                            <option value="">Semua Agen</option>
+                        </select>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto custom-scroll pr-1 space-y-2" id="listCatatanHarian">
                         <div class="flex justify-center py-4"><i data-feather="loader" class="w-5 h-5 animate-spin text-blue-500"></i></div>
                     </div>
                 </div>
@@ -426,6 +444,39 @@
                     <button onclick="closeFormModal('modalReset')" class="bg-gray-100 text-gray-700 text-xs font-bold px-4 py-2 rounded-lg flex-1">Batal</button>
                     <button onclick="jalankanReset()" class="bg-orange-500 hover:bg-orange-400 text-white text-xs font-bold px-4 py-2 rounded-lg flex-1">Ya, Kosongkan</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PIN -->
+    <div id="modalPin" class="fixed inset-0 z-[100] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalPin')"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="lock" class="w-4 h-4 mr-2 text-blue-500"></i> Verifikasi Keamanan</h3>
+                <button onclick="closeFormModal('modalPin')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            <p class="text-[11px] text-gray-500 dark:text-slate-400 mb-3">Masukkan PIN untuk menghapus rincian draft ini.</p>
+            <input type="password" id="inputPinHapus" placeholder="•••" class="w-full text-center tracking-widest text-lg font-bold p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500 mb-4">
+            <div class="flex gap-2">
+                <button onclick="closeFormModal('modalPin')" class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-xs font-bold px-4 py-2 rounded-lg flex-1">Batal</button>
+                <button onclick="prosesHapusCatatanHarian()" class="bg-red-500 hover:bg-red-400 text-white text-xs font-bold px-4 py-2 rounded-lg flex-1 shadow-sm">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HISTORY HARIAN -->
+    <div id="modalHistoryHarian" class="fixed inset-0 z-[110] flex items-center justify-center hidden p-4 pointer-events-none">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm pointer-events-auto transition-opacity" onclick="closeFormModal('modalHistoryHarian')"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl relative z-10 flex flex-col max-h-[85vh] pointer-events-auto">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center">
+                    <i data-feather="clock" class="w-4 h-4 mr-2 text-blue-500"></i> Riwayat <span id="titleHistoryHarian" class="ml-1"></span>
+                </h3>
+                <button onclick="closeFormModal('modalHistoryHarian')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto custom-scroll space-y-3" id="contentHistoryHarian">
+                <!-- List History render here -->
             </div>
         </div>
     </div>
@@ -714,6 +765,7 @@
         let riwayatTransactions = []; 
         let modeEditTrxId = null;
         let currentDraftIds = [];
+        let currentViewTrxId = null; 
 
         async function loadMasterData() {
             try {
@@ -784,6 +836,7 @@
             document.getElementById('resellerSelect').value = '';
             selectedResellerId = '';
             currentDraftIds = [];
+            currentViewTrxId = null;
             
             const tzOffset = (new Date()).getTimezoneOffset() * 60000;
             document.getElementById('tglTransaksi').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
@@ -976,7 +1029,7 @@
                 html += '</optgroup>';
             }
             if (tipeFokus === 'semua' || tipeFokus === 'bahan') {
-                html += '<optgroup label="🌾 BAHAN BAKU">';
+                html += '<optgroup label="🛍️ BAHAN BAKU">';
                 masterData.bahanBaku.forEach(b => html += `<option value="${b.id}">${b.nama}</option>`);
                 html += '</optgroup>';
             }
@@ -998,18 +1051,25 @@
             const container = document.getElementById('containerHarianRows');
             const tipeFokus = document.getElementById('inputTipeHarian')?.value || 'semua';
             const div = document.createElement('div');
-            div.className = 'flex gap-2 row-input-harian mb-2 items-center';
+            // Menjadikan jarak kolom multi-baris lebih compact
+            div.className = 'row-input-harian mb-1.5 flex flex-col gap-1 bg-gray-50 dark:bg-slate-700/50 p-1.5 rounded-lg border border-gray-200 dark:border-slate-600';
             div.innerHTML = `
-                <div class="w-8/12">
-                    <select class="item-harian w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
-                        ${getOptionsHarianHtml(tipeFokus)}
-                    </select>
+                <div class="flex gap-2 items-center">
+                    <div class="w-7/12">
+                        <select class="item-harian w-full text-xs p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                            ${getOptionsHarianHtml(tipeFokus)}
+                        </select>
+                    </div>
+                    <div class="w-3/12">
+                        <input type="number" placeholder="Qty" min="1" class="qty-harian w-full text-xs p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 text-center">
+                    </div>
+                    <div class="w-2/12 flex justify-end gap-1">
+                        <button type="button" onclick="this.closest('.row-input-harian').querySelector('.keterangan-container').classList.toggle('hidden')" class="text-blue-400 hover:text-blue-600 p-1 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 rounded transition" title="Tambah Keterangan"><i data-feather="edit-2" class="w-3 h-3"></i></button>
+                        <button type="button" onclick="this.closest('.row-input-harian').remove()" class="text-red-400 hover:text-red-600 p-1 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 rounded transition" title="Hapus Baris"><i data-feather="x" class="w-3 h-3"></i></button>
+                    </div>
                 </div>
-                <div class="w-3/12">
-                    <input type="number" placeholder="Qty" min="1" class="qty-harian w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 text-center">
-                </div>
-                <div class="w-1/12 text-right">
-                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-400 hover:text-red-600 p-1 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 rounded transition" title="Hapus Baris"><i data-feather="x" class="w-4 h-4"></i></button>
+                <div class="keterangan-container hidden w-full">
+                    <input type="text" placeholder="Tulis catatan / keterangan..." class="keterangan-input w-full text-[10px] p-1.5 rounded border border-gray-200 dark:border-slate-500 bg-white dark:bg-slate-800 outline-none focus:border-blue-400 mt-1">
                 </div>
             `;
             container.appendChild(div);
@@ -1023,46 +1083,72 @@
             try {
                 const { data, error } = await supabaseClient.from('buku_harian').select('*').eq('is_paid', false).order('tanggal_setor', { ascending: false });
                 if(error) throw error;
-                if(!data || data.length === 0) {
-                    container.innerHTML = '<div class="text-center text-gray-400 text-xs py-6 italic">Belum ada catatan harian tersimpan.</div>';
-                    return;
-                }
                 
                 globalDraftData = {};
-                data.forEach(d => {
-                    let key = `${d.tanggal_setor}_${d.reseller_id}`;
-                    if(!globalDraftData[key]) {
-                        globalDraftData[key] = { tgl: d.tanggal_setor, reseller_id: d.reseller_id, items: [] };
-                    }
-                    globalDraftData[key].items.push(d);
-                });
+                if(data && data.length > 0) {
+                    data.forEach(d => {
+                        let key = `${d.tanggal_setor}_${d.reseller_id}`;
+                        if(!globalDraftData[key]) {
+                            globalDraftData[key] = { tgl: d.tanggal_setor, reseller_id: d.reseller_id, items: [] };
+                        }
+                        globalDraftData[key].items.push(d);
+                    });
+                }
+                
+                const selDraftAgen = document.getElementById('filterDraftAgen');
+                const currVal = selDraftAgen.value;
+                selDraftAgen.innerHTML = '<option value="">Semua Agen</option>';
+                masterData.resellers.forEach(r => selDraftAgen.innerHTML += `<option value="${r.id}">${r.nama}</option>`);
+                selDraftAgen.value = currVal; 
 
-                let html = '';
-                Object.keys(globalDraftData).forEach(key => {
-                    let group = globalDraftData[key];
-                    let reseller = masterData.resellers.find(r => r.id === group.reseller_id);
-                    let rName = reseller ? reseller.nama : 'Unknown Reseller';
-                    let formattedDate = formatTanggalID(group.tgl);
-                    let totalItems = group.items.length;
-
-                    html += `
-                    <div onclick="bukaDetailDraft('${key}')" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 shadow-sm text-xs mb-3 cursor-pointer hover:border-blue-400 hover:shadow-md transition group">
-                        <div class="flex justify-between items-center">
-                            <span class="font-black text-gray-800 dark:text-slate-200 flex items-center gap-1.5"><i data-feather="user" class="w-3.5 h-3.5 text-blue-500"></i> ${rName}</span>
-                            <span class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold px-2 py-0.5 rounded text-[10px]">${formattedDate}</span>
-                        </div>
-                        <div class="mt-2.5 pt-2 border-t border-gray-100 dark:border-slate-700 text-[10px] text-gray-500 dark:text-slate-400 flex justify-between items-center">
-                            <span>Menyimpan <strong class="text-blue-500">${totalItems} rincian</strong> barang.</span>
-                            <span class="text-blue-500 font-semibold group-hover:underline">Buka Detail &rarr;</span>
-                        </div>
-                    </div>`;
-                });
-
-                container.innerHTML = html;
-                feather.replace();
+                renderFilteredDrafts();
             } catch (err) {
                 container.innerHTML = `<div class="text-center text-red-500 text-xs py-4">Gagal memuat: ${err.message}</div>`;
             }
+        }
+
+        function renderFilteredDrafts() {
+            const container = document.getElementById('listCatatanHarian');
+            const filterAgen = document.getElementById('filterDraftAgen').value;
+            const filterTglAwal = document.getElementById('filterTglAwal').value;
+            const filterTglAkhir = document.getElementById('filterTglAkhir').value;
+
+            if(Object.keys(globalDraftData).length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 text-xs py-6 italic">Belum ada catatan harian tersimpan.</div>';
+                return;
+            }
+
+            let html = '';
+            Object.keys(globalDraftData).forEach(key => {
+                let group = globalDraftData[key];
+                
+                if (filterAgen && group.reseller_id !== filterAgen) return;
+                if (filterTglAwal && group.tgl < filterTglAwal) return;
+                if (filterTglAkhir && group.tgl > filterTglAkhir) return;
+
+                let reseller = masterData.resellers.find(r => r.id === group.reseller_id);
+                let rName = reseller ? reseller.nama : 'Unknown Reseller';
+                let formattedDate = formatTanggalID(group.tgl);
+                let totalItems = group.items.length;
+
+                // Tampilan Draft Super Compact & Rapi
+                html += `
+                <div onclick="bukaDetailDraft('${key}')" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-2 shadow-sm text-xs mb-2 cursor-pointer hover:border-blue-400 hover:shadow-md transition flex justify-between items-center group">
+                    <div class="font-bold text-gray-800 dark:text-slate-200 flex items-center gap-1.5">
+                        <i data-feather="user" class="w-3.5 h-3.5 text-blue-500"></i>
+                        ${rName} <span class="text-gray-500 font-medium text-[10px]">(${totalItems} rincian)</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <div class="text-pink-500 bg-pink-50 p-1 rounded-md group-hover:bg-pink-100 transition" title="Buka Detail">
+                            <i data-feather="file-text" class="w-3.5 h-3.5"></i>
+                        </div>
+                        <span class="font-semibold text-gray-600 dark:text-gray-400 text-[10px]">${formattedDate}</span>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html || '<div class="text-center text-gray-400 text-xs py-6 italic">Data tidak ditemukan pada rentang filter ini.</div>';
+            feather.replace();
         }
 
         function bukaDetailDraft(key) {
@@ -1071,12 +1157,11 @@
 
             let reseller = masterData.resellers.find(r => r.id === group.reseller_id);
             let rName = reseller ? reseller.nama : 'Unknown Reseller';
-            let formattedDate = formatTanggalID(group.tgl);
 
             document.getElementById('headerDetailDraft').innerHTML = `
                 <div class="flex justify-between items-center">
                     <span class="font-black text-gray-800 dark:text-slate-200 text-sm">${rName}</span>
-                    <span class="text-xs font-semibold text-gray-500 dark:text-slate-400">${formattedDate}</span>
+                    <span class="text-xs font-semibold text-gray-500 dark:text-slate-400">${formatTanggalID(group.tgl)}</span>
                 </div>
             `;
 
@@ -1085,18 +1170,22 @@
                 let barang = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
                 let bName = barang ? barang.nama : 'Barang Dihapus';
                 let badgeColor = item.tipe === 'bahan' ? 'bg-red-50 text-red-600 border-red-100 dark:bg-red-900/30 dark:border-red-800' : 'bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-900/30 dark:border-blue-800';
-                let badgeText = item.tipe === 'bahan' ? 'Bahan' : 'Jadi';
+                
+                let textKet = item.keterangan ? `<div class="w-full mt-1.5 pt-1 border-t border-gray-200/60 text-[10px] text-gray-500 italic">Catatan: ${item.keterangan}</div>` : '';
 
                 htmlList += `
-                <li class="flex justify-between items-center bg-gray-50/70 dark:bg-slate-700/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-600">
-                    <div class="flex items-center gap-2">
-                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor}">${badgeText}</span>
-                        <span class="font-semibold text-gray-700 dark:text-slate-300 text-xs">${bName}</span>
+                <li class="flex flex-col bg-gray-50/70 dark:bg-slate-700/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-600">
+                    <div class="flex justify-between items-center w-full">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor}">${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}</span>
+                            <span class="font-semibold text-gray-700 dark:text-slate-300 text-xs">${bName}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-black text-blue-600 dark:text-blue-400 text-xs">Qty: ${item.qty}</span>
+                            <button onclick="hapusCatatanHarian('${item.id}', '${key}', this)" class="text-red-400 hover:text-red-600 p-1.5 rounded-lg transition bg-white dark:bg-slate-800 border border-red-100 dark:border-red-900/30 shadow-sm"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-black text-blue-600 dark:text-blue-400 text-xs">Qty: ${item.qty}</span>
-                        <button onclick="hapusCatatanHarian('${item.id}', '${key}')" class="text-red-400 hover:text-red-600 p-1.5 rounded-lg transition bg-white dark:bg-slate-800 border border-red-100 dark:border-red-900/30 shadow-sm"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
-                    </div>
+                    ${textKet}
                 </li>`;
             });
 
@@ -1105,24 +1194,49 @@
             feather.replace();
         }
 
-        async function hapusCatatanHarian(id, groupKey = null) {
-            if(!confirm("Yakin ingin menghapus catatan ini?")) return;
+        let draftToDelete = null;
+
+        function hapusCatatanHarian(id, groupKey = null, btnElement = null) {
+            draftToDelete = { id, groupKey, btnElement };
+            document.getElementById('inputPinHapus').value = '';
+            openFormModal('modalPin');
+        }
+
+        async function prosesHapusCatatanHarian() {
+            const pin = document.getElementById('inputPinHapus').value;
+            if (pin !== "942715") {
+                showNotification("PIN Salah! Aksi dibatalkan.", "error");
+                return;
+            }
+
+            if(!draftToDelete) return;
+            const { id, groupKey, btnElement } = draftToDelete;
+
             try {
                 const { error } = await supabaseClient.from('buku_harian').delete().eq('id', id);
                 if(error) throw error;
                 showNotification("Catatan dihapus!", "success");
+                
+                if (btnElement) {
+                    const li = btnElement.closest('li');
+                    if (li) li.remove();
+                }
 
                 if (groupKey && globalDraftData[groupKey]) {
                     globalDraftData[groupKey].items = globalDraftData[groupKey].items.filter(item => item.id !== id);
                     if (globalDraftData[groupKey].items.length === 0) {
                         delete globalDraftData[groupKey];
                         closeFormModal('modalDetailDraft');
-                    } else {
-                        bukaDetailDraft(groupKey); 
                     }
                 }
-                fetchListHarian(); 
-            } catch (err) { showNotification("Gagal menghapus: " + err.message, "error"); }
+                
+                renderFilteredDrafts();
+                closeFormModal('modalPin');
+            } catch (err) { 
+                showNotification("Gagal menghapus: " + err.message, "error"); 
+            } finally {
+                draftToDelete = null;
+            }
         }
 
         async function simpanCatatanHarian() {
@@ -1137,6 +1251,7 @@
             rows.forEach(row => {
                 const bId = row.querySelector('.item-harian').value;
                 const qty = parseFloat(row.querySelector('.qty-harian').value) || 0;
+                const ket = row.querySelector('.keterangan-input').value;
                 
                 if (bId && qty > 0) {
                     const tipeOtomatis = masterData.bahanBaku.some(b => b.id === bId) ? 'bahan' : 'jadi';
@@ -1146,7 +1261,8 @@
                         barang_id: bId, 
                         tanggal_setor: tgl, 
                         qty: qty, 
-                        tipe: tipeOtomatis, 
+                        tipe: tipeOtomatis,
+                        keterangan: ket,
                         is_paid: false 
                     });
                 }
@@ -1196,15 +1312,111 @@
                     pulledIds.push(d.id);
                 });
 
+                const containerId = targetTipe === 'bahan' ? 'containerBahanBaku' : 'containerBarangJadi';
+                const container = document.getElementById(containerId);
+
                 Object.keys(aggregated).forEach(bId => {
-                    if (targetTipe === 'bahan') addRow('bahanBaku', bId, aggregated[bId]);
-                    else addRow('barangJadi', bId, aggregated[bId]);
+                    const qtyVal = aggregated[bId];
+                    let placed = false;
+                    
+                    const existingRows = container.querySelectorAll('.row-item');
+                    for (let i = 0; i < existingRows.length; i++) {
+                        const row = existingRows[i];
+                        const selectEl = row.querySelector('.item-select');
+                        const qtyEl = row.querySelector('.qty-input');
+                        
+                        if (!selectEl.value && (!qtyEl.value || qtyEl.value === "0")) {
+                            selectEl.value = bId;
+                            qtyEl.value = qtyVal;
+                            selectEl.dispatchEvent(new Event('change')); 
+                            placed = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!placed) {
+                        addRow(targetTipe === 'bahan' ? 'bahanBaku' : 'barangJadi', bId, qtyVal);
+                    }
                 });
                 
                 currentDraftIds = [...new Set([...currentDraftIds, ...pulledIds])];
                 showNotification(`Berhasil menarik rekap ${targetTipe} harian ke nota!`, "success");
             } catch (err) {
                 showNotification("Gagal menarik data: " + err.message, "error");
+            }
+        }
+
+        async function bukaHistoryHarian(tipe) {
+            const container = document.getElementById('contentHistoryHarian');
+            document.getElementById('titleHistoryHarian').innerText = tipe === 'bahan' ? 'Bahan Baku' : 'Setoran Jadi';
+            container.innerHTML = `<div class="flex justify-center py-6"><i data-feather="loader" class="w-6 h-6 animate-spin text-blue-500"></i></div>`;
+            openFormModal('modalHistoryHarian');
+            
+            try {
+                let dataToRender = [];
+                
+                if (currentViewTrxId) {
+                    const { data, error } = await supabaseClient.from('buku_harian')
+                        .select('*')
+                        .eq('transaksi_id', currentViewTrxId)
+                        .eq('tipe', tipe)
+                        .order('tanggal_setor', { ascending: false });
+                    if (error) throw error;
+                    dataToRender = data;
+                } else {
+                    if (currentDraftIds.length === 0) {
+                        container.innerHTML = `<div class="text-center text-xs text-gray-500 italic py-4">Tidak ada riwayat catatan harian ditarik. Data diinput manual.</div>`;
+                        return;
+                    }
+                    const { data, error } = await supabaseClient.from('buku_harian')
+                        .select('*')
+                        .in('id', currentDraftIds)
+                        .eq('tipe', tipe)
+                        .order('tanggal_setor', { ascending: false });
+                    if (error) throw error;
+                    dataToRender = data;
+                }
+
+                if (!dataToRender || dataToRender.length === 0) {
+                    container.innerHTML = `<div class="text-center text-xs text-gray-500 italic py-4">Tidak ada riwayat catatan harian yang terkait. Kemungkinan nota diinput manual tanpa fitur Tarik Harian.</div>`;
+                    return;
+                }
+
+                let grouped = {};
+                dataToRender.forEach(d => {
+                    if(!grouped[d.tanggal_setor]) grouped[d.tanggal_setor] = [];
+                    grouped[d.tanggal_setor].push(d);
+                });
+
+                let html = '';
+                Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)).forEach(date => {
+                    html += `
+                    <div class="mb-4">
+                        <div class="bg-gray-100 dark:bg-slate-700/50 px-3 py-1.5 rounded-t-lg border border-gray-200 dark:border-slate-600 font-bold text-xs text-gray-700 dark:text-slate-200">
+                            ${formatTanggalID(date)}
+                        </div>
+                        <ul class="border-x border-b border-gray-200 dark:border-slate-600 rounded-b-lg divide-y divide-gray-100 dark:divide-slate-600/50 bg-white dark:bg-slate-800">
+                    `;
+                    grouped[date].forEach(item => {
+                        let barang = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
+                        let bName = barang ? barang.nama : 'Barang Dihapus';
+                        let ketHtml = item.keterangan ? `<p class="text-[10px] text-gray-500 dark:text-slate-400 italic mt-0.5">Catatan: ${item.keterangan}</p>` : '';
+                        
+                        html += `
+                        <li class="p-2.5 flex justify-between items-start">
+                            <div>
+                                <span class="font-semibold text-xs text-gray-800 dark:text-slate-200">${bName}</span>
+                                ${ketHtml}
+                            </div>
+                            <span class="font-black text-blue-600 dark:text-blue-400 text-xs bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded">Qty: ${item.qty}</span>
+                        </li>`;
+                    });
+                    html += `</ul></div>`;
+                });
+
+                container.innerHTML = html;
+            } catch (err) {
+                container.innerHTML = `<div class="text-center text-red-500 text-xs py-4">Gagal memuat rincian: ${err.message}</div>`;
             }
         }
         // ================== SELESAI LOGIKA CATATAN HARIAN =====================
@@ -1334,12 +1546,18 @@
         async function lihatPratinjauRiwayat(trxId) {
             const trx = riwayatTransactions.find(t => String(t.id) === String(trxId));
             if (!trx) return showNotification("Tidak ditemukan!", "error");
+            
+            currentViewTrxId = trxId; 
+            
             const reseller = masterData.resellers.find(r => String(r.id) === String(trx.reseller_id));
             document.getElementById('notaNama').innerText = reseller ? reseller.nama : 'Unknown';
             document.getElementById('notaTgl').innerText = formatTanggalID(trx.tanggal_transaksi);
             document.getElementById('btnSimpanPratinjau').style.display = 'none';
             document.getElementById('btnEditRiwayat').classList.remove('hidden');
             document.getElementById('btnEditRiwayat').setAttribute('onclick', `siapkanEditTransaksi('${trxId}')`);
+
+            document.getElementById('btnHistoryBahan').classList.remove('hidden');
+            document.getElementById('btnHistoryJadi').classList.remove('hidden');
 
             try {
                 const { data: details } = await supabaseClient.from('transaksi_detail').select('*').eq('transaksi_id', trx.id);
@@ -1357,6 +1575,18 @@
                 document.getElementById('notaSubBahan').innerText = "- " + formatRupiah(Math.abs(trx.total_kasbon_bahan));
                 document.getElementById('notaSummarySetoran').innerText = formatRupiah(trx.total_setoran);
                 document.getElementById('notaSummaryKasbon').innerText = "- " + formatRupiah(Math.abs(trx.total_kasbon_bahan));
+                
+                // Menentukan Kasbon Uang/Manual untuk Pratinjau History
+                let manualKasbon = Math.round(trx.total_setoran - Math.abs(trx.total_kasbon_bahan) - trx.net_pembayaran);
+                const notaContainerManual = document.getElementById('notaContainerManual');
+                if (manualKasbon > 0) {
+                    notaContainerManual.style.display = 'block';
+                    document.getElementById('notaListManual').innerHTML = `<tr><td class="py-1">Pinjaman/Kasbon Lainnya</td><td class="text-right font-medium">${formatRupiah(manualKasbon)}</td></tr>`;
+                    document.getElementById('notaSubManual').innerText = "- " + formatRupiah(manualKasbon);
+                } else {
+                    notaContainerManual.style.display = 'none';
+                }
+
                 document.getElementById('notaGrandTotal').innerText = formatRupiah(trx.net_pembayaran);
                 
                 const pratinjauModal = document.getElementById('modalPratinjau');
@@ -1398,6 +1628,10 @@
 
         function bukaPratinjau() {
             if (!selectedResellerId) return showNotification("Pilih Reseller terlebih dahulu!", "error");
+            
+            document.getElementById('btnHistoryBahan').classList.remove('hidden');
+            document.getElementById('btnHistoryJadi').classList.remove('hidden');
+            
             const reseller = masterData.resellers.find(r => r.id === selectedResellerId);
             document.getElementById('notaNama').innerText = reseller ? reseller.nama : '-';
             document.getElementById('notaTgl').innerText = formatTanggalID(document.getElementById('tglTransaksi').value);
@@ -1420,6 +1654,28 @@
             document.getElementById('notaSubBahan').innerText = "- " + document.getElementById('subtotalBahanBakuLayar').innerText;
             document.getElementById('notaSummarySetoran').innerText = document.getElementById('subtotalBarangJadiLayar').innerText;
             document.getElementById('notaSummaryKasbon').innerText = "- " + document.getElementById('subtotalBahanBakuLayar').innerText;
+            
+            // Menyembunyikan Kasbon Manual di Pratinjau jika 0
+            let manualHtml = '';
+            let manualTotal = 0;
+            document.querySelectorAll('.row-kasbon-manual').forEach(row => {
+                let val = parseFloat(row.querySelector('.nom-manual').value.replace(/[^0-9]/g, '')) || 0;
+                let ket = row.querySelector('.ket-manual').value || 'Kasbon';
+                if(val > 0) {
+                    manualTotal += val;
+                    manualHtml += `<tr><td class="py-1">${ket}</td><td class="text-right font-medium">${formatRupiah(val)}</td></tr>`;
+                }
+            });
+            
+            const notaContainerManual = document.getElementById('notaContainerManual');
+            if (manualTotal > 0) {
+                notaContainerManual.style.display = 'block';
+                document.getElementById('notaListManual').innerHTML = manualHtml;
+                document.getElementById('notaSubManual').innerText = "- " + formatRupiah(manualTotal);
+            } else {
+                notaContainerManual.style.display = 'none';
+            }
+
             document.getElementById('notaGrandTotal').innerText = document.getElementById('summaryNet').innerText;
 
             const modal = document.getElementById('modalPratinjau');
@@ -1465,7 +1721,12 @@
                 if (detailData.length > 0) await supabaseClient.from('transaksi_detail').insert(detailData);
 
                 if(currentDraftIds.length > 0 && !modeEditTrxId) {
-                    await supabaseClient.from('buku_harian').update({ is_paid: true }).in('id', currentDraftIds);
+                    const { error: errUpdate } = await supabaseClient.from('buku_harian').update({ is_paid: true, transaksi_id: trxId }).in('id', currentDraftIds);
+                    
+                    if (errUpdate) {
+                        await supabaseClient.from('buku_harian').update({ is_paid: true }).in('id', currentDraftIds);
+                        console.warn("Harap pastikan kolom 'transaksi_id' sudah ada di tabel 'buku_harian'.");
+                    }
                 }
 
                 showNotification("Transaksi Berhasil Disimpan!", "success");
