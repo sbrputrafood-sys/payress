@@ -692,7 +692,7 @@
                 commands.push(...encoder.encode(`Hari/tgl : ${namaHari}, ${formatTanggalID(groupData.tgl)}\n`));
                 commands.push(...encoder.encode("--------------------------------\n"));
                 commands.push(...encoder.encode("QTY | NAMA BARANG\n"));
-                commands.push(...encoder.encode("--------------------------------\n\n"));
+                commands.push(...encoder.encode("--------------------------------\n"));
 
                 groupData.items.forEach(item => {
                     let barang = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
@@ -705,10 +705,10 @@
                 
                 commands.push(...encoder.encode("\n"));
                 commands.push(0x1B, 0x61, 0x01); // Center
-                commands.push(...encoder.encode(`Dibuat/disiapkan oleh : ${groupData.input_by || '-'}\n`));
+                commands.push(...encoder.encode(`Disiapkan oleh : ${groupData.input_by || '-'}\n`));
                 commands.push(...encoder.encode("--------------------------------\n"));
                 commands.push(0x1B, 0x61, 0x01); // Center
-                commands.push(...encoder.encode("MOHON CEK KEMBALI\n\n\n\n"));
+                commands.push(...encoder.encode("MOHON CEK KEMBALI\n\n\n\n\n"));
                 commands.push(0x1D, 0x56, 0x41, 0x03); // Cut
 
                 await targetCharacteristic.writeValue(new Uint8Array(commands));
