@@ -87,13 +87,11 @@
             <div class="grid grid-cols-2 gap-2.5 mb-3">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Input By ?</label>
-                    <!-- Onchange simpan lokal telah dihapus -->
                     <select id="inputByPegawai" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
                         <option value="">Pilih Nama...</option>
                         <option value="Fatah">Fatah</option>
                         <option value="Rio">Rio</option>
                         <option value="Admin">Admin</option>
-                        
                     </select>
                 </div>
                 <div>
@@ -227,7 +225,6 @@
             return `${day}/${months[d.getMonth()]}/${String(d.getFullYear()).slice(-2)}`;
         }
 
-        // Format Tanggal baru dengan penambahan Hari
         function formatHariTanggalID(dateStr) {
             if(!dateStr) return '-';
             const d = new Date(dateStr);
@@ -305,7 +302,6 @@
             document.getElementById('inputTglHarian').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
 
             document.getElementById('containerHarianRows').innerHTML = '';
-            // Default 5 kolom
             for(let i=0; i<5; i++) {
                 addRowHarian();
             }
@@ -476,7 +472,7 @@
                 let textKet = item.keterangan ? `<div class="w-full mt-1 pt-1 border-t border-gray-200/60 text-[10px] text-gray-500 italic">Catatan: ${item.keterangan}</div>` : '';
 
                 htmlList += `
-                <li class="flex flex-col bg-gray-50 dark:bg-slate-700/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-600 text-xs">
+                <li id="draft-item-${item.id}" class="flex flex-col bg-gray-50 dark:bg-slate-700/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-600 text-xs transition-all duration-300 origin-top overflow-hidden">
                     <div class="flex justify-between items-center w-full">
                         <div class="flex items-center gap-1.5">
                             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor}">${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}</span>
@@ -514,7 +510,21 @@
             if(!draftToDelete) return;
             const { id, groupKey } = draftToDelete;
 
-            // 1. OPTIMISTIC UI UPDATE (Real-time Feel)
+            // 1. TUTUP MODAL PIN LANGSUNG AGAR TERASA INSTAN
+            closeFormModal('modalPin');
+
+            // 2. MANIPULASI DOM LANGSUNG UNTUK ANIMASI HILANG (SUPER REALTIME)
+            const itemEl = document.getElementById(`draft-item-${id}`);
+            if (itemEl) {
+                itemEl.style.opacity = '0';
+                itemEl.style.transform = 'scale(0.95)';
+                itemEl.style.height = '0px';
+                itemEl.style.padding = '0px';
+                itemEl.style.marginBottom = '0px';
+                itemEl.style.borderWidth = '0px';
+            }
+
+            // 3. UPDATE STATE DATA
             let isGroupEmpty = false;
             if (groupKey && globalDraftData[groupKey]) {
                 globalDraftData[groupKey].items = globalDraftData[groupKey].items.filter(item => item.id !== id);
@@ -524,15 +534,17 @@
                 }
             }
 
-            if (isGroupEmpty) {
-                closeFormModal('modalDetailDraft');
-            } else if (groupKey && globalDraftData[groupKey]) {
-                bukaDetailDraft(groupKey); 
-            }
-            renderFilteredDrafts(); 
-            closeFormModal('modalPin');
+            // 4. UPDATE BACKGROUND LIST & TUTUP MODAL JIKA KOSONG
+            setTimeout(() => {
+                if (isGroupEmpty) {
+                    closeFormModal('modalDetailDraft');
+                } else if (groupKey && globalDraftData[groupKey]) {
+                    bukaDetailDraft(groupKey);
+                }
+                renderFilteredDrafts(); 
+            }, 250);
 
-            // 2. PROSES BACKEND
+            // 5. PROSES BACKEND (Berjalan diam-diam di latar belakang)
             try {
                 const { error } = await supabaseClient.from('buku_harian').delete().eq('id', id);
                 if(error) throw error;
@@ -590,16 +602,14 @@
                 
                 lastSavedGroupKey = `${tgl}_${rId}`;
 
-                // --- RESET FORM KE SEMULA SETELAH SUKSES SIMPAN ---
                 const tzOffset = (new Date()).getTimezoneOffset() * 60000;
                 document.getElementById('inputTglHarian').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
                 document.getElementById('inputResellerHarian').value = '';
-                document.getElementById('inputByPegawai').value = ''; // Reset Input By kembali kosong
+                document.getElementById('inputByPegawai').value = '';
                 document.getElementById('inputTipeHarian').value = 'semua';
                 updateOpsiHarian();
                 
                 document.getElementById('containerHarianRows').innerHTML = '';
-                // Render 5 baris kosong kembali
                 for(let i=0; i<5; i++) {
                     addRowHarian();
                 }
@@ -692,7 +702,7 @@
                 commands.push(...encoder.encode(`Hari/tgl : ${namaHari}, ${formatTanggalID(groupData.tgl)}\n`));
                 commands.push(...encoder.encode("--------------------------------\n"));
                 commands.push(...encoder.encode("QTY | NAMA BARANG\n"));
-                commands.push(...encoder.encode("--------------------------------\n"));
+                commands.push(...encoder.encode("--------------------------------\n\n"));
 
                 groupData.items.forEach(item => {
                     let barang = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
@@ -705,13 +715,23 @@
                 
                 commands.push(...encoder.encode("\n"));
                 commands.push(0x1B, 0x61, 0x01); // Center
-                commands.push(...encoder.encode(`Disiapkan oleh : ${groupData.input_by || '-'}\n`));
+                commands.push(...encoder.encode(`Dibuat/disiapkan oleh : ${groupData.input_by || '-'}\n`));
                 commands.push(...encoder.encode("--------------------------------\n"));
                 commands.push(0x1B, 0x61, 0x01); // Center
-                commands.push(...encoder.encode("MOHON CEK KEMBALI\n\n\n\n\n"));
+                commands.push(...encoder.encode("MOHON CEK KEMBALI\n\n\n\n"));
                 commands.push(0x1D, 0x56, 0x41, 0x03); // Cut
 
-                await targetCharacteristic.writeValue(new Uint8Array(commands));
+                // --- MODIFIKASI TRANSFER DATA BERTAHAP (CHUNKING) ---
+                const rawData = new Uint8Array(commands);
+                const CHUNK_SIZE = 64; 
+                
+                for (let i = 0; i < rawData.length; i += CHUNK_SIZE) {
+                    const chunk = rawData.slice(i, i + CHUNK_SIZE);
+                    await targetCharacteristic.writeValue(chunk);
+                    await new Promise(resolve => setTimeout(resolve, 50)); 
+                }
+                // ---------------------------------------------------
+
                 showNotification("Berhasil mencetak nota ke printer!", "success");
             } catch (err) {
                 console.error(err);
@@ -730,7 +750,6 @@
 
         window.onload = () => {
             loadMasterData();
-            // Pemanggilan loadPegawaiLokal() telah dihapus
         };
     </script>
 </body>
