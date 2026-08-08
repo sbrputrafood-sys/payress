@@ -705,6 +705,19 @@
             </div>
         </div>
     </div>
+    
+    <!-- MODAL LOADING PROSES PNG -->
+    <div id="modalLoadingPng" class="fixed inset-0 z-[200] flex items-center justify-center hidden bg-slate-900/40 backdrop-blur-sm transition-opacity opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 flex flex-col items-center shadow-2xl transform scale-95 transition-transform duration-300 w-64">
+            <div class="relative w-16 h-16 mb-4">
+                <div class="absolute inset-0 border-4 border-gray-100 dark:border-slate-700 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin spinner-border"></div>
+                <i data-feather="image" class="absolute inset-0 m-auto w-6 h-6 text-blue-500 icon-loading"></i>
+            </div>
+            <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 mb-1" id="loadingPngTitle">Memproses Nota...</h3>
+            <p class="text-[10px] text-gray-500 dark:text-slate-400 text-center" id="loadingPngDesc">Meningkatkan resolusi & merender gambar.</p>
+        </div>
+    </div>
 
     <!-- SCRIPT LOGIKA -->
     <script>
@@ -730,6 +743,15 @@
             const day = String(d.getDate()).padStart(2, '0');
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
             return `${day}/${months[d.getMonth()]}/${String(d.getFullYear()).slice(-2)}`;
+        }
+        
+        function formatHariTanggalID(dateStr) {
+            if(!dateStr) return '-';
+            const d = new Date(dateStr);
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const day = String(d.getDate()).padStart(2, '0');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+            return `${days[d.getDay()]}, ${day}/${months[d.getMonth()]}/${String(d.getFullYear()).slice(-2)}`;
         }
         
         function updateTglDisplay() {
@@ -1128,7 +1150,7 @@
 
                 let reseller = masterData.resellers.find(r => r.id === group.reseller_id);
                 let rName = reseller ? reseller.nama : 'Unknown Reseller';
-                let formattedDate = formatTanggalID(group.tgl);
+                let formattedDate = formatHariTanggalID(group.tgl);
                 let totalItems = group.items.length;
 
                 // Tampilan Draft Super Compact & Rapi
@@ -1157,11 +1179,19 @@
 
             let reseller = masterData.resellers.find(r => r.id === group.reseller_id);
             let rName = reseller ? reseller.nama : 'Unknown Reseller';
+            
+            // Mengambil input_by dari record pertama (fallback ke 'Admin' jika kosong)
+            let inputBy = group.items[0]?.input_by || 'Admin';
 
             document.getElementById('headerDetailDraft').innerHTML = `
-                <div class="flex justify-between items-center">
-                    <span class="font-black text-gray-800 dark:text-slate-200 text-sm">${rName}</span>
-                    <span class="text-xs font-semibold text-gray-500 dark:text-slate-400">${formatTanggalID(group.tgl)}</span>
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex justify-between items-center">
+                        <span class="font-black text-gray-800 dark:text-slate-200 text-sm">${rName}</span>
+                        <span class="text-xs font-semibold text-gray-500 dark:text-slate-400">${formatHariTanggalID(group.tgl)}</span>
+                    </div>
+                    <div class="text-[10px] text-gray-500 dark:text-slate-400 border-t border-gray-100 dark:border-slate-700 pt-1.5 mt-0.5">
+                        Di siapkan oleh : <span class="font-bold text-blue-600 dark:text-blue-400">${inputBy}</span>
+                    </div>
                 </div>
             `;
 
@@ -1242,12 +1272,18 @@
                         const rName = masterData.resellers.find(r => r.id === globalDraftData[groupKey].reseller_id)?.nama || 'Unknown Reseller';
                         const elHeader = document.getElementById('headerDetailDraft');
                         if (elHeader) {
+                            let inputBy = globalDraftData[groupKey].items[0]?.input_by || 'Admin';
                             elHeader.innerHTML = `
-                                <div class="flex justify-between items-center">
-                                    <span class="font-black text-gray-800 dark:text-slate-200 text-sm">
-                                        ${rName} <span class="text-blue-500 text-[10px] ml-1 bg-blue-50 dark:bg-slate-700 px-1.5 py-0.5 rounded">(${globalDraftData[groupKey].items.length} rincian)</span>
-                                    </span>
-                                    <span class="text-xs font-semibold text-gray-500 dark:text-slate-400">${formatTanggalID(globalDraftData[groupKey].tgl)}</span>
+                                <div class="flex flex-col gap-1.5">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-black text-gray-800 dark:text-slate-200 text-sm">
+                                            ${rName} <span class="text-blue-500 text-[10px] ml-1 bg-blue-50 dark:bg-slate-700 px-1.5 py-0.5 rounded">(${globalDraftData[groupKey].items.length} rincian)</span>
+                                        </span>
+                                        <span class="text-xs font-semibold text-gray-500 dark:text-slate-400">${formatHariTanggalID(globalDraftData[groupKey].tgl)}</span>
+                                    </div>
+                                    <div class="text-[10px] text-gray-500 dark:text-slate-400 border-t border-gray-100 dark:border-slate-700 pt-1.5 mt-0.5">
+                                        Di siapkan oleh : <span class="font-bold text-blue-600 dark:text-blue-400">${inputBy}</span>
+                                    </div>
                                 </div>
                             `;
                         }
@@ -1417,10 +1453,18 @@
 
                 let html = '';
                 Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)).forEach(date => {
+                    // Ambil input_by dari rincian pertama, default ke Admin jika kosong
+                    let inputBy = grouped[date][0]?.input_by || 'Admin';
+
                     html += `
                     <div class="mb-4">
-                        <div class="bg-gray-100 dark:bg-slate-700/50 px-3 py-1.5 rounded-t-lg border border-gray-200 dark:border-slate-600 font-bold text-xs text-gray-700 dark:text-slate-200">
-                            ${formatTanggalID(date)}
+                        <div class="bg-gray-100 dark:bg-slate-700/50 px-3 py-2 rounded-t-lg border border-gray-200 dark:border-slate-600 flex flex-col gap-1.5">
+                            <div class="font-bold text-xs text-gray-700 dark:text-slate-200">
+                                ${formatHariTanggalID(date)}
+                            </div>
+                            <div class="text-[10px] text-gray-500 dark:text-slate-400 border-t border-gray-200 dark:border-slate-600 pt-1.5">
+                                Di siapkan oleh : <span class="font-bold text-blue-600 dark:text-blue-400">${inputBy}</span>
+                            </div>
                         </div>
                         <ul class="border-x border-b border-gray-200 dark:border-slate-600 rounded-b-lg divide-y divide-gray-100 dark:divide-slate-600/50 bg-white dark:bg-slate-800">
                     `;
@@ -1553,7 +1597,7 @@
             riwayatTransactions.forEach(t => { if(!grouped[t.tanggal_transaksi]) grouped[t.tanggal_transaksi] = 0; grouped[t.tanggal_transaksi] += t.net_pembayaran; });
             let html = '<ul class="space-y-2">';
             Object.keys(grouped).forEach(date => {
-                html += `<li onclick="renderRiwayatReseller('${date}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 cursor-pointer transition"><div class="flex items-center gap-3"><div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i data-feather="calendar" class="w-4 h-4"></i></div><span class="font-bold text-xs text-gray-800">${formatTanggalID(date)}</span></div><div class="text-right"><span class="block text-[10px] text-gray-500">Total</span><span class="font-black text-xs text-green-600">${formatRupiah(grouped[date])}</span></div></li>`;
+                html += `<li onclick="renderRiwayatReseller('${date}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 cursor-pointer transition"><div class="flex items-center gap-3"><div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i data-feather="calendar" class="w-4 h-4"></i></div><span class="font-bold text-xs text-gray-800">${formatHariTanggalID(date)}</span></div><div class="text-right"><span class="block text-[10px] text-gray-500">Total</span><span class="font-black text-xs text-green-600">${formatRupiah(grouped[date])}</span></div></li>`;
             });
             html += '</ul>'; container.innerHTML = html; feather.replace();
         }
@@ -1562,7 +1606,7 @@
             document.getElementById('btnBackRiwayat').classList.remove('hidden');
             const container = document.getElementById('containerRiwayat');
             const trxs = riwayatTransactions.filter(t => t.tanggal_transaksi === date);
-            let html = `<div class="mb-3"><span class="text-[11px] font-bold text-gray-500 uppercase">Tanggal:</span><br><span class="text-sm font-black text-gray-800">${formatTanggalID(date)}</span></div><ul class="space-y-2">`;
+            let html = `<div class="mb-3"><span class="text-[11px] font-bold text-gray-500 uppercase">Tanggal:</span><br><span class="text-sm font-black text-gray-800">${formatHariTanggalID(date)}</span></div><ul class="space-y-2">`;
             trxs.forEach(trx => {
                 const reseller = masterData.resellers.find(r => r.id === trx.reseller_id);
                 html += `<li onclick="lihatPratinjauRiwayat('${trx.id}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 cursor-pointer transition"><div class="flex items-center gap-3"><div class="bg-gray-100 p-2 rounded-lg text-gray-600"><i data-feather="user" class="w-4 h-4"></i></div><span class="font-bold text-xs text-gray-800">${reseller ? reseller.nama : 'Unknown'}</span></div><div class="text-right flex items-center gap-3"><span class="font-black text-xs text-blue-600">${formatRupiah(trx.net_pembayaran)}</span><i data-feather="chevron-right" class="w-4 h-4 text-gray-400"></i></div></li>`;
@@ -1578,7 +1622,7 @@
             
             const reseller = masterData.resellers.find(r => String(r.id) === String(trx.reseller_id));
             document.getElementById('notaNama').innerText = reseller ? reseller.nama : 'Unknown';
-            document.getElementById('notaTgl').innerText = formatTanggalID(trx.tanggal_transaksi);
+            document.getElementById('notaTgl').innerText = formatHariTanggalID(trx.tanggal_transaksi);
             document.getElementById('btnSimpanPratinjau').style.display = 'none';
             document.getElementById('btnEditRiwayat').classList.remove('hidden');
             document.getElementById('btnEditRiwayat').setAttribute('onclick', `siapkanEditTransaksi('${trxId}')`);
@@ -1661,7 +1705,7 @@
             
             const reseller = masterData.resellers.find(r => r.id === selectedResellerId);
             document.getElementById('notaNama').innerText = reseller ? reseller.nama : '-';
-            document.getElementById('notaTgl').innerText = formatTanggalID(document.getElementById('tglTransaksi').value);
+            document.getElementById('notaTgl').innerText = formatHariTanggalID(document.getElementById('tglTransaksi').value);
             document.getElementById('btnEditRiwayat').classList.add('hidden');
             document.getElementById('btnSimpanPratinjau').style.display = 'flex';
 
@@ -1709,12 +1753,102 @@
             modal.classList.remove('hidden'); setTimeout(() => { modal.children[1].classList.replace('scale-95','scale-100'); }, 10);
         }
 
-        function simpanPNG() {
-            html2canvas(document.getElementById('areaPrint'), { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+        async function simpanPNG() {
+            const modal = document.getElementById('modalLoadingPng');
+            const title = document.getElementById('loadingPngTitle');
+            const desc = document.getElementById('loadingPngDesc');
+            
+            // 1. Tampilkan animasi popup loading anti-lag
+            modal.classList.remove('hidden');
+            setTimeout(() => { 
+                modal.classList.remove('opacity-0');
+                modal.children[0].classList.replace('scale-95', 'scale-100');
+            }, 10);
+            
+            const areaPrint = document.getElementById('areaPrint');
+            const btnBahan = document.getElementById('btnHistoryBahan');
+            const btnJadi = document.getElementById('btnHistoryJadi');
+            
+            // 2. Simpan style asli agar UI tidak rusak setelah render
+            const originalStyle = areaPrint.getAttribute('style') || '';
+            const originalClass = areaPrint.className;
+            
+            // Sembunyikan tombol "Rincian" agar tidak ikut terfoto
+            if(btnBahan) btnBahan.style.display = 'none';
+            if(btnJadi) btnJadi.style.display = 'none';
+            
+            // 3. Modifikasi sementara area Print untuk resolusi tinggi (Tinggi otomatis menyesuaikan isi)
+            areaPrint.style.width = '900px'; 
+            areaPrint.style.height = 'auto'; // Biarkan otomatis agar tercrop pas di footer
+            areaPrint.style.padding = '40px';
+            areaPrint.style.backgroundColor = '#ffffff';
+            areaPrint.style.margin = '0';
+            areaPrint.classList.remove('overflow-y-auto'); 
+            
+            try {
+                // Jeda sepersekian detik agar DOM sempat menyesuaikan dimensi
+                await new Promise(r => setTimeout(r, 300));
+                
+                // Render via html2canvas dengan skala tinggi
+                const canvas = await html2canvas(areaPrint, {
+                    scale: 3, // Resolusi 3x lipat agar sangat tajam
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    windowWidth: 900
+                });
+                
+                // Langsung gunakan canvas bawaan tanpa dipaksa rasio 3:4
+                const imgData = canvas.toDataURL('image/png', 1.0);
+                
+                // 4. Animasi Sukses
+                title.innerText = 'Berhasil!';
+                title.classList.add('text-emerald-600');
+                desc.innerText = 'Gambar nota sedang diunduh.';
+                modal.querySelector('.spinner-border').classList.add('hidden');
+                modal.querySelector('.icon-loading').setAttribute('data-feather', 'check-circle');
+                modal.querySelector('.icon-loading').classList.replace('text-blue-500', 'text-emerald-500');
+                feather.replace();
+                
+                // Trigger download
                 const link = document.createElement('a');
-                link.download = `Nota_${document.getElementById('notaNama').innerText}.png`;
-                link.href = canvas.toDataURL('image/png'); link.click();
-            });
+                const cleanName = document.getElementById('notaNama').innerText.replace(/[^a-zA-Z0-9]/g, '_');
+                link.download = `Nota_SBR_${cleanName}_${new Date().getTime()}.png`;
+                link.href = imgData;
+                link.click();
+                
+                // Tutup popup
+                setTimeout(() => {
+                    modal.classList.add('opacity-0');
+                    modal.children[0].classList.replace('scale-100', 'scale-95');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        // Reset modal ke state semula
+                        title.innerText = 'Memproses Nota...';
+                        title.classList.remove('text-emerald-600');
+                        desc.innerText = 'Meningkatkan resolusi & merender gambar.';
+                        modal.querySelector('.spinner-border').classList.remove('hidden');
+                        modal.querySelector('.icon-loading').setAttribute('data-feather', 'image');
+                        modal.querySelector('.icon-loading').classList.replace('text-emerald-500', 'text-blue-500');
+                        feather.replace();
+                    }, 300);
+                }, 1500);
+
+            } catch (error) {
+                console.error('Render gagal:', error);
+                title.innerText = 'Gagal Memproses!';
+                title.classList.add('text-red-600');
+                desc.innerText = 'Terjadi kesalahan sistem.';
+                setTimeout(() => {
+                    modal.classList.add('opacity-0');
+                    setTimeout(() => modal.classList.add('hidden'), 300);
+                }, 2000);
+            } finally {
+                // 5. Kembalikan UI layout pratinjau dan tombol ke bentuk normal
+                areaPrint.setAttribute('style', originalStyle);
+                areaPrint.className = originalClass;
+                if(btnBahan) btnBahan.style.display = '';
+                if(btnJadi) btnJadi.style.display = '';
+            }
         }
 
         async function simpanTransaksi() {
