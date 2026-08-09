@@ -47,7 +47,7 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Username</label>
-                    <input type="text" id="loginUsername" placeholder="Contoh: fatah / dedeh" class="w-full text-sm p-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                    <input type="text" id="loginUsername" placeholder="Contoh: fatah / namaanda" class="w-full text-sm p-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">PIN (6 Angka)</label>
@@ -157,12 +157,18 @@
                     <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center">
                         <i data-feather="archive" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Daftar Catatan (Belum Lunas)
                     </h3>
-                    <button onclick="fetchListHarian()" class="text-blue-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1">
-                        <i data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan
-                    </button>
+                    <div class="flex gap-3">
+                        <button onclick="toggleFilterDraft()" class="text-gray-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1 transition">
+                            <i data-feather="filter" class="w-3 h-3"></i> Filter
+                        </button>
+                        <button onclick="fetchListHarian()" class="text-blue-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1 transition">
+                            <i data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="bg-gray-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-700 space-y-2 mb-3">
+                <!-- Filter Container (Hidden by default) -->
+                <div id="containerFilterDraft" class="hidden bg-gray-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-700 space-y-2 mb-3 transition-all">
                     <div class="flex gap-2">
                         <input type="date" id="filterTglAwal" class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
                         <input type="date" id="filterTglAkhir" class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
@@ -231,7 +237,7 @@
                 <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="lock" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Otorisasi Admin</h3>
                 <button onclick="closeFormModal('modalPin')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
-            <p class="text-[10px] text-gray-500 dark:text-slate-400 mb-3">Hanya Admin yang bisa menghapus rincian data. Masukkan PIN Admin (942715).</p>
+            <p class="text-[10px] text-gray-500 dark:text-slate-400 mb-3">Hanya Admin yang bisa menghapus rincian data. Masukkan PIN Admin.</p>
             <input type="password" id="inputPinHapus" placeholder="6 Angka PIN Admin" inputmode="numeric" maxlength="6" class="w-full text-center tracking-widest text-base font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500 mb-3">
             <div class="flex gap-2">
                 <button onclick="closeFormModal('modalPin')" class="bg-gray-100 dark:bg-slate-700 text-gray-700 text-xs font-bold px-3 py-2 rounded-xl flex-1">Batal</button>
@@ -319,6 +325,16 @@
             } else {
                 document.getElementById('iconMoon').classList.remove('hidden');
                 document.getElementById('iconSun').classList.add('hidden');
+            }
+        }
+
+        // FUNGSI TOGGLE FILTER DRAFT
+        function toggleFilterDraft() {
+            const filterEl = document.getElementById('containerFilterDraft');
+            if (filterEl.classList.contains('hidden')) {
+                filterEl.classList.remove('hidden');
+            } else {
+                filterEl.classList.add('hidden');
             }
         }
 
@@ -724,6 +740,8 @@
                 
                 if (currentUserInfo.role === 'reseller' && currentUserInfo.reseller_id) {
                     query = query.eq('reseller_id', currentUserInfo.reseller_id);
+                } else if (currentUserInfo.role === 'karyawan') {
+                    query = query.eq('tipe', 'bahan');
                 }
 
                 const { data, error } = await query;
@@ -903,10 +921,9 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <span class="font-black text-gray-800 dark:text-slate-200 text-sm block">${resellerName}</span>
-                            <span class="text-[10px] text-gray-500 dark:text-slate-400">Oleh: <b>${inputBy}</b></span>
+                            <span class="text-[10px] text-gray-500 dark:text-slate-400">Draf untuk tanggal: <b>${formatHariTanggalID(tgl)}</b></span>
                         </div>
                         <div class="text-right">
-                            <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-slate-700 px-1.5 py-0.5 rounded block mb-1">${formatHariTanggalID(tgl)}</span>
                             ${isGroupPending 
                                 ? `<span class="text-[9px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-bold border border-orange-200">Menunggu Review</span>` 
                                 : `<span class="text-[9px] bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded font-bold border border-emerald-200">Disetujui</span>`}
@@ -928,16 +945,31 @@
                 let viewModeHtml = `
                     <div class="view-mode flex flex-col w-full ${hideViewDefault ? 'hidden' : ''}">
                         <div class="flex justify-between items-center w-full">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor} dark:bg-opacity-20">${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}</span>
-                                <span class="font-semibold text-gray-700 dark:text-slate-300 text-xs">${bName}</span>
+                            <div class="flex items-center gap-1.5 w-8/12">
+                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor} dark:bg-opacity-20 shrink-0">
+                                    ${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}
+                                </span>
+                                <span class="font-semibold text-gray-700 dark:text-slate-300 text-xs truncate">
+                                    ${bName} 
+                                    <span class="text-gray-400 dark:text-slate-500 font-normal text-[9.5px] italic ml-1 whitespace-nowrap">
+                                        (by: ${item.input_by || 'Sistem'})
+                                    </span>
+                                </span>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-black text-blue-600 dark:text-blue-400 text-xs bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-800">Qty: ${item.qty}</span>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="font-black text-blue-600 dark:text-blue-400 text-xs bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-800">
+                                    Qty: ${item.qty}
+                                </span>
                                 ${isAdmin ? `<button onclick="toggleEditRow(this)" class="text-amber-500 hover:text-amber-600 p-1 rounded-lg transition bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800/50 shadow-sm" title="Koreksi Data"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>` : ''}
                             </div>
                         </div>
-                        ${item.keterangan ? `<div class="w-full mt-1.5 pt-1.5 border-t border-gray-200/60 dark:border-slate-600 text-[10px] text-gray-500 dark:text-slate-400 italic">Ket: ${item.keterangan}</div>` : ''}
+                        ${item.keterangan ? `
+                        <div class="w-full mt-2 pt-2 border-t border-gray-100 dark:border-slate-600/50 flex items-start gap-1.5">
+                            <i data-feather="message-circle" class="w-3.5 h-3.5 text-gray-400 shrink-0 mt-[1px]"></i>
+                            <span class="text-[10px] text-gray-500 dark:text-slate-400 italic leading-snug">
+                                ${item.keterangan}
+                            </span>
+                        </div>` : ''}
                     </div>
                 `;
 
