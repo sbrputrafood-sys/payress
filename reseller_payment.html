@@ -71,14 +71,21 @@
                     </button>
 
                     <div class="relative group">
-                        <button class="flex items-center space-x-1 text-xs font-medium text-gray-600 dark:text-slate-300 hover:text-blue-600 focus:outline-none px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition cursor-pointer">
+                        <button class="flex items-center space-x-1 text-xs font-medium text-gray-600 dark:text-slate-300 hover:text-blue-600 focus:outline-none px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition cursor-pointer relative">
                             <i data-feather="database" class="w-3.5 h-3.5"></i>
                             <span class="hidden sm:inline">Manajemen Data</span>
                             <i data-feather="chevron-down" class="w-3 h-3 mt-0.5"></i>
+                            <span id="notif-pending-nav" class="absolute -top-1 -right-1 flex h-2.5 w-2.5 hidden">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-500 border border-white dark:border-slate-900"></span>
+                            </span>
                         </button>
-                        <div class="absolute right-0 mt-1 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
+                        <div class="absolute right-0 mt-1 w-52 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
                             <div class="py-1">
-                                <a href="#" onclick="openModal('modalHarian'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="edit-3" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Catatan Harian</a>
+                                <a href="#" onclick="openModal('modalHarian'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-600 transition">
+                                    <i data-feather="edit-3" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Catatan Harian
+                                    <span id="notif-pending-menu" class="ml-auto bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full hidden shadow-sm">0 Pending</span>
+                                </a>
                                 <a href="#" onclick="openModal('modalAgen'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="users" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Data Reseller</a>
                                 <a href="#" onclick="openModal('modalBarang'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="layers" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Master Barang</a>
                                 <a href="#" onclick="openModal('modalHarga'); return false;" class="group flex items-center px-4 py-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-600 transition"><i data-feather="tag" class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Harga Khusus</a>
@@ -221,7 +228,7 @@
                         </div>
                     </div>
 
-                    <!-- TOMBOL BATAL EDIT KELAP KELIP (Hanya Muncul Saat Mode Edit) -->
+                    <!-- TOMBOL BATAL EDIT KELAP KELIP -->
                     <div id="btnGroupEdit" class="mt-4 mb-2 hidden">
                         <button onclick="batalEdit()" class="w-full bg-red-600 text-white text-[11px] tracking-wide font-black py-2.5 rounded-lg shadow-[0_0_15px_rgba(220,38,38,0.5)] animate-pulse hover:bg-red-700 transition flex justify-center items-center gap-1.5 border border-red-500">
                             <i data-feather="alert-triangle" class="w-4 h-4"></i> !! MODE EDIT, TEKAN UNTUK BATALKAN
@@ -334,7 +341,6 @@
                                 </div>
                             </div>
 
-                            <!-- KONTAINER KASBON MANUAL DIBUAT TERPISAH AGAR BISA DISEMBUNYIKAN -->
                             <div id="notaContainerManual" class="mb-2">
                                 <h4 class="text-[10px] font-bold text-gray-800 border-b border-gray-300 pb-0.5 mb-1">PINJAMAN / KASBON UANG LAINNYA</h4>
                                 <table class="w-full text-[11px] text-left mb-1"><tbody id="notaListManual" class="text-gray-700"></tbody></table>
@@ -360,28 +366,35 @@
     <!-- MODAL OVERLAY -->
     <div id="modalOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-opacity-80 backdrop-blur-sm hidden z-40 transition-opacity"></div>
     
-    <!-- MODAL CATATAN HARIAN (MULTI-BARIS) -->
+    <!-- MODAL CATATAN HARIAN -->
     <div id="modalHarian" class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-4">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-4xl rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-all duration-200 flex flex-col max-h-[90vh]">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-5xl rounded-2xl shadow-xl pointer-events-auto transform scale-95 transition-all duration-200 flex flex-col max-h-[95vh]">
             <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
-                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="edit-3" class="w-4 h-4 mr-2 text-blue-500"></i> Catatan Harian Multi-Baris</h3>
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="edit-3" class="w-4 h-4 mr-2 text-blue-500"></i> Catatan Harian</h3>
                 <button onclick="closeModal('modalHarian')" class="text-gray-400 hover:text-gray-600 p-1.5 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
             
             <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
-                <!-- Kiri: Form Input Harian Multi Barang -->
+                <!-- Kiri: Form Input Harian (Dengan Toggle Opsi Mode) -->
                 <div class="w-full md:w-1/2 border-b md:border-b-0 md:border-r border-gray-100 dark:border-slate-700 p-4 bg-gray-50/50 dark:bg-slate-800/30 overflow-y-auto flex flex-col">
                     
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4 shrink-0">
-                        <div class="col-span-1">
-                            <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Tanggal</label>
-                            <input type="date" id="inputTglHarian" class="w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
-                        </div>
+                    <!-- TOGGLE SWITCH MODE INPUT -->
+                    <div class="bg-gray-200 dark:bg-slate-700 p-1 rounded-xl flex gap-1 mb-4 shrink-0 shadow-inner">
+                        <button id="btnModeStandard" onclick="switchInputMode('standard')" class="flex-1 text-[11px] font-bold py-1.5 px-2 rounded-lg bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm transition flex justify-center items-center gap-1">
+                            <i data-feather="list" class="w-3 h-3"></i> Mode Standard (5 Baris)
+                        </button>
+                        <button id="btnModeMatrix" onclick="switchInputMode('matrix')" class="flex-1 text-[11px] font-bold py-1.5 px-2 rounded-lg text-gray-600 dark:text-slate-300 hover:text-blue-600 transition flex justify-center items-center gap-1">
+                            <i data-feather="grid" class="w-3 h-3"></i> Mode Matrix (Multi Tanggal)
+                        </button>
+                    </div>
+
+                    <!-- Pilihan Reseller & Filter Tipe Universal -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3 shrink-0">
                         <div class="col-span-1">
                             <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Agen / Reseller</label>
                             <select id="inputResellerHarian" class="w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500"><option value="">Pilih...</option></select>
                         </div>
-                        <div class="col-span-2 md:col-span-1">
+                        <div class="col-span-1">
                             <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Fokus Tipe Input</label>
                             <select id="inputTipeHarian" onchange="updateOpsiHarian()" class="w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-blue-50 dark:bg-slate-900 text-blue-700 dark:text-blue-400 font-semibold outline-none focus:border-blue-500 transition-colors">
                                 <option value="semua">Tampilkan Semua</option>
@@ -391,21 +404,28 @@
                         </div>
                     </div>
 
-                    <div class="flex-1 overflow-y-auto custom-scroll pr-2 mb-4" id="containerHarianRows">
-                        <!-- Baris Input akan ditambahkan ke sini oleh JavaScript -->
+                    <!-- Tanggal Universal (Khusus Mode Standard) -->
+                    <div id="wrapperTglStandard" class="mb-3 shrink-0">
+                        <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Tanggal Input</label>
+                        <input type="date" id="inputTglHarianStandard" class="w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                    </div>
+
+                    <!-- Container Dynamic Inputs -->
+                    <div class="flex-1 overflow-y-auto custom-scroll pr-1 mb-4" id="containerHarianRows">
+                        <!-- Diisi via JS sesuai mode aktif -->
                     </div>
 
                     <div class="shrink-0 flex gap-2 pt-2 border-t border-gray-200 dark:border-slate-700">
-                        <button onclick="addRowHarian()" class="bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-bold px-3 py-2.5 rounded-lg shadow-sm transition flex items-center justify-center border border-blue-200">
+                        <button id="btnAddRowHarian" onclick="addRowHarian()" class="bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-bold px-3 py-2.5 rounded-lg shadow-sm transition flex items-center justify-center border border-blue-200">
                             <i data-feather="plus" class="w-3.5 h-3.5 mr-1"></i> Baris
                         </button>
                         <button id="btnSimpanHarian" onclick="simpanCatatanHarian()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition flex items-center justify-center">
-                            <i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Catatan
+                            <i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Draft
                         </button>
                     </div>
                 </div>
                 
-                <!-- Kanan: List Rekap Berkelompok (Dibuat Compact, Flex, Scroll) -->
+                <!-- Kanan: List Rekap Berkelompok -->
                 <div class="w-full md:w-1/2 p-4 flex flex-col h-full overflow-hidden">
                     <h4 class="text-[11px] font-bold text-gray-500 uppercase mb-3 flex justify-between items-center shrink-0">
                         Daftar Draft Tersimpan
@@ -426,6 +446,29 @@
                         <div class="flex justify-center py-4"><i data-feather="loader" class="w-5 h-5 animate-spin text-blue-500"></i></div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL DRAFT TERSIMPAN (REVIEW & KOREKSI) -->
+    <div id="modalDetailDraft" class="fixed inset-0 z-[70] flex items-center justify-center hidden p-4 pointer-events-none">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm pointer-events-auto transition-opacity" onclick="closeFormModal('modalDetailDraft')"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-2xl shadow-2xl relative z-10 flex flex-col max-h-[90vh] pointer-events-auto">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700 shrink-0">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center">
+                    <i data-feather="check-square" class="w-4 h-4 mr-2 text-blue-500"></i> Review & Koreksi Rincian
+                </h3>
+                <button onclick="closeFormModal('modalDetailDraft')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            
+            <div class="p-4 overflow-y-auto custom-scroll flex-1 bg-gray-50/50 dark:bg-slate-800/50">
+                <div id="headerDetailDraft" class="mb-3 border-b border-gray-200 dark:border-slate-600 pb-3"></div>
+                <ul id="listDetailDraft" class="space-y-2"></ul>
+            </div>
+            
+            <!-- Sticky Bottom Action Bar -->
+            <div id="footerDetailDraft" class="border-t border-gray-100 dark:border-slate-700 p-4 bg-white dark:bg-slate-800 shrink-0 flex gap-2 rounded-b-2xl">
+                <!-- Diisi via JavaScript berdasarkan status pending/approved -->
             </div>
         </div>
     </div>
@@ -636,11 +679,11 @@
             <div class="p-4 space-y-3">
                 <div>
                     <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Pilih Agen</label>
-                    <select id="selectHargaReseller" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500"><option value="">Pilih...</option></select>
+                    <select id="selectHargaReseller" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 disabled:bg-gray-100"><option value="">Pilih...</option></select>
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Pilih Barang</label>
-                    <select id="selectHargaBarang" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500"><option value="">Pilih...</option></select>
+                    <select id="selectHargaBarang" class="w-full text-xs p-2.5 rounded-lg border border-gray-300 outline-none focus:border-blue-500 disabled:bg-gray-100"><option value="">Pilih...</option></select>
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1">Harga Khusus (Rp)</label>
@@ -663,46 +706,6 @@
                 <button onclick="closeFormModal('modalDetailHargaKhusus')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
             <div class="p-4 overflow-y-auto space-y-2 custom-scroll flex-1 bg-gray-50 rounded-b-2xl" id="listDetailHargaKhusus"></div>
-        </div>
-    </div>
-
-    <!-- MODAL KOTRETAN QTY -->
-    <div id="modalKotretan" class="fixed inset-0 z-[80] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="closeFormModal('modalKotretan')"></div>
-        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl relative z-10 flex flex-col">
-            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
-                <h3 class="text-sm font-bold text-gray-800 flex items-center"><i data-feather="grid" class="w-4 h-4 mr-2 text-blue-500"></i> Rincian Qty (Kotretan)</h3>
-                <button onclick="closeFormModal('modalKotretan')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
-            </div>
-            <div class="p-4">
-                <p class="text-[10px] text-gray-500 mb-3">Ketik rincian qty di kotak kecil ini. Data ini akan otomatis dijumlahkan.</p>
-                <div class="grid grid-cols-5 gap-2 mb-4" id="gridKotretan"></div>
-                <div class="flex justify-between items-center border-t border-gray-200 pt-3 mb-4">
-                    <span class="text-xs font-bold text-gray-600">Total Akumulasi:</span>
-                    <span class="text-xl font-black text-blue-600" id="totalKotretan">0</span>
-                </div>
-                <div class="flex gap-2 justify-end">
-                    <button onclick="closeFormModal('modalKotretan')" class="bg-gray-100 text-gray-700 text-xs font-bold px-4 py-2 rounded-lg">Batal</button>
-                    <button onclick="simpanKotretan()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm">Terapkan</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DETAIL DRAFT TERSIMPAN -->
-    <div id="modalDetailDraft" class="fixed inset-0 z-[70] flex items-center justify-center hidden p-4 pointer-events-none">
-        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm pointer-events-auto transition-opacity" onclick="closeFormModal('modalDetailDraft')"></div>
-        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl relative z-10 flex flex-col max-h-[85vh] pointer-events-auto">
-            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
-                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center">
-                    <i data-feather="list" class="w-4 h-4 mr-2 text-blue-500"></i> Rincian Draft Tersimpan
-                </h3>
-                <button onclick="closeFormModal('modalDetailDraft')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
-            </div>
-            <div class="p-4 overflow-y-auto custom-scroll space-y-3">
-                <div id="headerDetailDraft" class="mb-2 border-b border-gray-100 dark:border-slate-700 pb-3"></div>
-                <ul id="listDetailDraft" class="space-y-2"></ul>
-            </div>
         </div>
     </div>
     
@@ -789,6 +792,26 @@
         let currentDraftIds = [];
         let currentViewTrxId = null; 
 
+        async function cekNotifikasiPending() {
+            try {
+                const { count, error } = await supabaseClient.from('buku_harian')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('is_paid', false)
+                    .eq('status', 'pending');
+                    
+                const badgeMenu = document.getElementById('notif-pending-menu');
+                const badgeNav = document.getElementById('notif-pending-nav');
+                
+                if (!error && count > 0) {
+                    if(badgeMenu) { badgeMenu.classList.remove('hidden'); badgeMenu.innerText = count + ' Pending'; }
+                    if(badgeNav) badgeNav.classList.remove('hidden');
+                } else {
+                    if(badgeMenu) badgeMenu.classList.add('hidden');
+                    if(badgeNav) badgeNav.classList.add('hidden');
+                }
+            } catch(e) { console.warn("Kolom status mungkin belum ada: ", e); }
+        }
+
         async function loadMasterData() {
             try {
                 const [resellersData, barangData, hargaKhususData] = await Promise.all([
@@ -801,7 +824,10 @@
                 if (barangData.error) throw barangData.error;
                 if (hargaKhususData.error) throw hargaKhususData.error;
 
-                masterData.resellers = resellersData.data.map(r => ({ id: r.id, nama: r.nama_reseller }));
+                masterData.resellers = resellersData.data
+                    .sort((a, b) => a.nama_reseller.localeCompare(b.nama_reseller))
+                    .map(r => ({ id: r.id, nama: r.nama_reseller }));
+                    
                 masterData.barangJadi = []; masterData.bahanBaku = []; masterData.hargaDefault = {}; masterData.hargaKhusus = {};
                 masterData.rawHargaKhusus = hargaKhususData.data; 
 
@@ -822,6 +848,8 @@
                 txt.innerText = 'Connected'; txt.classList.replace('text-yellow-700', 'text-green-700');
 
                 initDefaults(); refreshDropdownsUI();
+                cekNotifikasiPending();
+
             } catch (error) {
                 const statusConn = document.getElementById('status-connection');
                 statusConn.classList.replace('bg-yellow-50', 'bg-red-50');
@@ -1040,19 +1068,42 @@
             setTimeout(() => { el.classList.add('hidden'); }, 200);
         }
 
-        // ================== LOGIKA CATATAN HARIAN (MULTI-BARIS & OPTGROUP) =====================
+        // ================== LOGIKA MODE INPUT & LIST DRAFT BERTINGKAT =====================
+        let currentHarianMode = 'standard'; 
         let globalDraftData = {};
 
-        function getOptionsHarianHtml(tipeFokus = 'semua') {
+        function switchInputMode(mode) {
+            currentHarianMode = mode;
+            const btnStd = document.getElementById('btnModeStandard');
+            const btnMtx = document.getElementById('btnModeMatrix');
+            const wrpTgl = document.getElementById('wrapperTglStandard');
+            const btnAddRow = document.getElementById('btnAddRowHarian');
+
+            if(mode === 'standard') {
+                btnStd.className = "flex-1 text-[11px] font-bold py-1.5 px-2 rounded-lg bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm transition flex justify-center items-center gap-1";
+                btnMtx.className = "flex-1 text-[11px] font-bold py-1.5 px-2 rounded-lg text-gray-600 dark:text-slate-300 hover:text-blue-600 transition flex justify-center items-center gap-1";
+                wrpTgl.classList.remove('hidden');
+                btnAddRow.innerHTML = `<i data-feather="plus" class="w-3.5 h-3.5 mr-1"></i> Baris`;
+            } else {
+                btnMtx.className = "flex-1 text-[11px] font-bold py-1.5 px-2 rounded-lg bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm transition flex justify-center items-center gap-1";
+                btnStd.className = "flex-1 text-[11px] font-bold py-1.5 px-2 rounded-lg text-gray-600 dark:text-slate-300 hover:text-blue-600 transition flex justify-center items-center gap-1";
+                wrpTgl.classList.add('hidden');
+                btnAddRow.innerHTML = `<i data-feather="plus" class="w-3.5 h-3.5 mr-1"></i> Barang Lain`;
+            }
+            renderFormHarianBody();
+            feather.replace();
+        }
+
+        function getOptionsHarianHtmlWithSelected(selectedId = null, tipeFokus = 'semua') {
             let html = '<option value="">Pilih Barang / Bahan...</option>';
             if (tipeFokus === 'semua' || tipeFokus === 'jadi') {
                 html += '<optgroup label="📦 BARANG JADI">';
-                masterData.barangJadi.forEach(b => html += `<option value="${b.id}">${b.nama}</option>`);
+                masterData.barangJadi.forEach(b => html += `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.nama}</option>`);
                 html += '</optgroup>';
             }
             if (tipeFokus === 'semua' || tipeFokus === 'bahan') {
                 html += '<optgroup label="🛍️ BAHAN BAKU">';
-                masterData.bahanBaku.forEach(b => html += `<option value="${b.id}">${b.nama}</option>`);
+                masterData.bahanBaku.forEach(b => html += `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.nama}</option>`);
                 html += '</optgroup>';
             }
             return html;
@@ -1060,7 +1111,7 @@
 
         function updateOpsiHarian() {
             const tipeFokus = document.getElementById('inputTipeHarian').value;
-            const newHtml = getOptionsHarianHtml(tipeFokus);
+            const newHtml = getOptionsHarianHtmlWithSelected(null, tipeFokus);
             document.querySelectorAll('.item-harian').forEach(select => {
                 const currentVal = select.value;
                 select.innerHTML = newHtml;
@@ -1069,21 +1120,32 @@
             });
         }
 
+        function renderFormHarianBody() {
+            const container = document.getElementById('containerHarianRows');
+            container.innerHTML = '';
+            if(currentHarianMode === 'standard') { for(let i=0; i<5; i++) addRowHarianStandard(); } 
+            else { addRowHarianMatrix(); }
+        }
+
         function addRowHarian() {
+            if(currentHarianMode === 'standard') addRowHarianStandard();
+            else addRowHarianMatrix();
+        }
+
+        function addRowHarianStandard() {
             const container = document.getElementById('containerHarianRows');
             const tipeFokus = document.getElementById('inputTipeHarian')?.value || 'semua';
             const div = document.createElement('div');
-            // Menjadikan jarak kolom multi-baris lebih compact
-            div.className = 'row-input-harian mb-1.5 flex flex-col gap-1 bg-gray-50 dark:bg-slate-700/50 p-1.5 rounded-lg border border-gray-200 dark:border-slate-600';
+            div.className = 'row-input-harian mode-std mb-2 flex flex-col gap-1 bg-gray-50 dark:bg-slate-700/50 p-2 rounded-lg border border-gray-200 dark:border-slate-600';
             div.innerHTML = `
                 <div class="flex gap-2 items-center">
                     <div class="w-7/12">
                         <select class="item-harian w-full text-xs p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
-                            ${getOptionsHarianHtml(tipeFokus)}
+                            ${getOptionsHarianHtmlWithSelected(null, tipeFokus)}
                         </select>
                     </div>
                     <div class="w-3/12">
-                        <input type="number" placeholder="Qty" min="1" class="qty-harian w-full text-xs p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 text-center">
+                        <input type="number" placeholder="Qty" min="1" class="qty-harian w-full text-xs p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 text-center font-bold">
                     </div>
                     <div class="w-2/12 flex justify-end gap-1">
                         <button type="button" onclick="this.closest('.row-input-harian').querySelector('.keterangan-container').classList.toggle('hidden')" class="text-blue-400 hover:text-blue-600 p-1 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 rounded transition" title="Tambah Keterangan"><i data-feather="edit-2" class="w-3 h-3"></i></button>
@@ -1098,6 +1160,122 @@
             feather.replace();
         }
 
+        function addRowHarianMatrix() {
+            const container = document.getElementById('containerHarianRows');
+            const tipeFokus = document.getElementById('inputTipeHarian')?.value || 'semua';
+            const div = document.createElement('div');
+            div.className = 'row-input-harian mode-mtx mb-3 p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-slate-600';
+            div.innerHTML = `
+                <div class="flex gap-2 items-start mb-2">
+                    <div class="w-full">
+                        <select class="item-harian w-full text-xs p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 mb-1">
+                            ${getOptionsHarianHtmlWithSelected(null, tipeFokus)}
+                        </select>
+                        <input type="text" placeholder="Catatan/Keterangan (Satu catatan untuk semua tanggal di bawah)" class="keterangan-input w-full text-[10px] p-1.5 rounded border border-gray-200 dark:border-slate-500 bg-white dark:bg-slate-800 outline-none focus:border-blue-400">
+                    </div>
+                    <button type="button" onclick="this.closest('.row-input-harian').remove()" class="text-red-400 hover:text-red-600 p-1.5 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 rounded transition shrink-0 border border-red-100" title="Hapus Barang"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+                </div>
+                <div class="sub-tanggal-container grid grid-cols-2 md:grid-cols-3 gap-1.5"></div>
+                <button type="button" onclick="tambahSubTanggal(this)" class="mt-2 text-[10px] text-blue-600 font-bold bg-blue-50 hover:bg-blue-100 py-1.5 px-2 rounded flex items-center gap-1 transition w-full justify-center border border-blue-200 shadow-sm"><i data-feather="plus" class="w-3 h-3"></i> Tambah Tanggal Input</button>
+            `;
+            container.appendChild(div);
+            for(let i=0; i<3; i++) tambahSubTanggal(div.querySelector('button[onclick="tambahSubTanggal(this)"]'));
+            feather.replace();
+        }
+
+        function tambahSubTanggal(btnElement) {
+            const container = btnElement.previousElementSibling;
+            const div = document.createElement('div');
+            div.className = 'flex flex-col gap-1 border border-gray-200 dark:border-slate-600 p-1.5 rounded bg-white dark:bg-slate-800 relative group';
+            
+            let defaultDate = '';
+            const existingDates = container.querySelectorAll('.tgl-harian');
+            if (existingDates.length > 0) {
+                const lastDate = existingDates[existingDates.length - 1].value;
+                if(lastDate) {
+                    const d = new Date(lastDate);
+                    d.setDate(d.getDate() + 1);
+                    defaultDate = d.toISOString().slice(0, 10);
+                }
+            } else {
+                const tzOffset = (new Date()).getTimezoneOffset() * 60000; 
+                defaultDate = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
+            }
+
+            div.innerHTML = `
+                <input type="date" value="${defaultDate}" class="tgl-harian w-full text-[10px] p-1 rounded border border-gray-300 dark:border-slate-600 outline-none focus:border-blue-400 bg-gray-50 dark:bg-slate-700 dark:text-white cursor-pointer">
+                <input type="number" placeholder="Qty" min="1" class="qty-harian w-full text-xs p-1 rounded border border-gray-300 dark:border-slate-600 outline-none focus:border-blue-400 text-center bg-gray-50 dark:bg-slate-700 dark:text-white font-bold">
+                <button type="button" onclick="this.parentElement.remove()" class="absolute -top-1.5 -right-1.5 bg-red-100 text-red-600 rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition shadow-sm border border-red-200"><i data-feather="x" class="w-2.5 h-2.5"></i></button>
+            `;
+            container.appendChild(div);
+            feather.replace();
+        }
+
+        async function simpanCatatanHarian() {
+            const rId = document.getElementById('inputResellerHarian').value;
+            if(!rId) return showNotification("Harap pilih Agen / Reseller di atas!", "error");
+            
+            let dataToInsert = [];
+
+            if (currentHarianMode === 'standard') {
+                const tglStd = document.getElementById('inputTglHarianStandard').value;
+                if(!tglStd) return showNotification("Harap tentukan Tanggal Input!", "error");
+
+                const rows = document.querySelectorAll('.row-input-harian.mode-std');
+                rows.forEach(row => {
+                    const bId = row.querySelector('.item-harian').value;
+                    const qty = parseFloat(row.querySelector('.qty-harian').value) || 0;
+                    const ket = row.querySelector('.keterangan-input').value;
+                    
+                    if (bId && qty > 0) {
+                        const tipeOtomatis = masterData.bahanBaku.some(b => b.id === bId) ? 'bahan' : 'jadi';
+                        dataToInsert.push({ reseller_id: rId, barang_id: bId, tanggal_setor: tglStd, qty: qty, tipe: tipeOtomatis, keterangan: ket, is_paid: false, status: 'pending' });
+                    }
+                });
+            } else {
+                const rows = document.querySelectorAll('.row-input-harian.mode-mtx');
+                rows.forEach(row => {
+                    const bId = row.querySelector('.item-harian').value;
+                    const ket = row.querySelector('.keterangan-input').value;
+                    
+                    if (bId) {
+                        const tipeOtomatis = masterData.bahanBaku.some(b => b.id === bId) ? 'bahan' : 'jadi';
+                        const subDates = row.querySelectorAll('.sub-tanggal-container > div');
+                        subDates.forEach(sub => {
+                            const tgl = sub.querySelector('.tgl-harian').value;
+                            const qty = parseFloat(sub.querySelector('.qty-harian').value) || 0;
+                            
+                            if (tgl && qty > 0) {
+                                dataToInsert.push({ reseller_id: rId, barang_id: bId, tanggal_setor: tgl, qty: qty, tipe: tipeOtomatis, keterangan: ket, is_paid: false, status: 'pending' });
+                            }
+                        });
+                    }
+                });
+            }
+
+            if (dataToInsert.length === 0) return showNotification("Minimal isi 1 barang dengan Qty lebih dari 0!", "error");
+            
+            const btn = document.getElementById('btnSimpanHarian');
+            btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 mr-1.5 animate-spin"></i> Menyimpan...`;
+            btn.disabled = true;
+
+            try {
+                const { error } = await supabaseClient.from('buku_harian').insert(dataToInsert);
+                if(error) throw error;
+                
+                showNotification(`${dataToInsert.length} catatan harian berhasil disimpan! (Status: Pending)`, "success");
+                renderFormHarianBody(); 
+                fetchListHarian();
+                cekNotifikasiPending();
+            } catch (err) {
+                showNotification("Gagal menyimpan: " + err.message, "error");
+            } finally {
+                btn.innerHTML = `<i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Draft`;
+                btn.disabled = false;
+                feather.replace();
+            }
+        }
+
         async function fetchListHarian() {
             const container = document.getElementById('listCatatanHarian');
             container.innerHTML = `<div class="flex justify-center py-4"><i data-feather="loader" class="w-5 h-5 animate-spin text-blue-500"></i></div>`;
@@ -1109,11 +1287,16 @@
                 globalDraftData = {};
                 if(data && data.length > 0) {
                     data.forEach(d => {
-                        let key = `${d.tanggal_setor}_${d.reseller_id}`;
-                        if(!globalDraftData[key]) {
-                            globalDraftData[key] = { tgl: d.tanggal_setor, reseller_id: d.reseller_id, items: [] };
+                        let rId = d.reseller_id;
+                        let tgl = d.tanggal_setor;
+                        
+                        if(!globalDraftData[rId]) {
+                            let resellerObj = masterData.resellers.find(r => r.id === rId);
+                            globalDraftData[rId] = { reseller_id: rId, reseller_name: resellerObj ? resellerObj.nama : 'Unknown Reseller', dates: {} };
                         }
-                        globalDraftData[key].items.push(d);
+                        
+                        if(!globalDraftData[rId].dates[tgl]) { globalDraftData[rId].dates[tgl] = []; }
+                        globalDraftData[rId].dates[tgl].push(d);
                     });
                 }
                 
@@ -1124,9 +1307,7 @@
                 selDraftAgen.value = currVal; 
 
                 renderFilteredDrafts();
-            } catch (err) {
-                container.innerHTML = `<div class="text-center text-red-500 text-xs py-4">Gagal memuat: ${err.message}</div>`;
-            }
+            } catch (err) { container.innerHTML = `<div class="text-center text-red-500 text-xs py-4">Gagal memuat: ${err.message}</div>`; }
         }
 
         function renderFilteredDrafts() {
@@ -1141,108 +1322,272 @@
             }
 
             let html = '';
-            Object.keys(globalDraftData).forEach(key => {
-                let group = globalDraftData[key];
-                
-                if (filterAgen && group.reseller_id !== filterAgen) return;
-                if (filterTglAwal && group.tgl < filterTglAwal) return;
-                if (filterTglAkhir && group.tgl > filterTglAkhir) return;
+            
+            Object.keys(globalDraftData).forEach(rId => {
+                const groupReseller = globalDraftData[rId];
+                if (filterAgen && rId !== filterAgen) return;
 
-                let reseller = masterData.resellers.find(r => r.id === group.reseller_id);
-                let rName = reseller ? reseller.nama : 'Unknown Reseller';
-                let formattedDate = formatHariTanggalID(group.tgl);
-                let totalItems = group.items.length;
+                let validDates = {};
+                Object.keys(groupReseller.dates).forEach(tgl => {
+                    if (filterTglAwal && tgl < filterTglAwal) return;
+                    if (filterTglAkhir && tgl > filterTglAkhir) return;
+                    validDates[tgl] = groupReseller.dates[tgl];
+                });
 
-                // Tampilan Draft Super Compact & Rapi
+                const totalHari = Object.keys(validDates).length;
+                if(totalHari === 0) return;
+
+                // Cek apakah di reseller ini ada yang pending
+                let isResellerHasPending = false;
+                Object.values(validDates).forEach(items => { if(items.some(i => i.status === 'pending')) isResellerHasPending = true; });
+
+                const resBadgeColor = isResellerHasPending ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 border-orange-200' : 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 border-blue-100 dark:border-blue-800';
+
                 html += `
-                <div onclick="bukaDetailDraft('${key}')" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-2 shadow-sm text-xs mb-2 cursor-pointer hover:border-blue-400 hover:shadow-md transition flex justify-between items-center group">
-                    <div class="font-bold text-gray-800 dark:text-slate-200 flex items-center gap-1.5">
-                        <i data-feather="user" class="w-3.5 h-3.5 text-blue-500"></i>
-                        ${rName} <span class="text-gray-500 font-medium text-[10px]">(${totalItems} rincian)</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <div class="text-pink-500 bg-pink-50 p-1 rounded-md group-hover:bg-pink-100 transition" title="Buka Detail">
-                            <i data-feather="file-text" class="w-3.5 h-3.5"></i>
+                <div class="border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-800 shadow-sm mb-2">
+                    <button onclick="toggleResellerAccordion('${rId}')" class="w-full p-3 flex justify-between items-center bg-gray-50/80 dark:bg-slate-700/50 hover:bg-gray-100 dark:hover:bg-slate-700 transition text-left">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">
+                                <i data-feather="user" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <span class="font-bold text-xs text-gray-800 dark:text-slate-100 block">${groupReseller.reseller_name}</span>
+                                <span class="text-[10px] text-gray-500 font-medium">${totalHari} Hari Tersimpan</span>
+                            </div>
                         </div>
-                        <span class="font-semibold text-gray-600 dark:text-gray-400 text-[10px]">${formattedDate}</span>
-                    </div>
-                </div>`;
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-black px-2 py-0.5 rounded-full border ${resBadgeColor}">
+                                ${isResellerHasPending ? 'Pending Approval' : totalHari + ' Hari'}
+                            </span>
+                            <i data-feather="chevron-down" id="iconAcc_${rId}" class="w-4 h-4 text-gray-400 transition-transform duration-200"></i>
+                        </div>
+                    </button>
+                    
+                    <div id="accContent_${rId}" class="hidden border-t border-gray-100 dark:border-slate-700 p-2 space-y-1 bg-white dark:bg-slate-800">
+                `;
+
+                Object.keys(validDates).sort((a,b) => new Date(b) - new Date(a)).forEach(tgl => {
+                    const itemsOnDate = validDates[tgl];
+                    const countItems = itemsOnDate.length;
+                    const countPending = itemsOnDate.filter(i => i.status === 'pending').length;
+                    const keyGroup = `${tgl}_${rId}`;
+                    
+                    const statusBadge = countPending > 0 
+                        ? `<span class="bg-orange-100 text-orange-600 text-[9px] font-bold px-1.5 py-0.5 rounded border border-orange-200">${countPending} Pending</span>`
+                        : `<span class="bg-emerald-100 text-emerald-600 text-[9px] font-bold px-1.5 py-0.5 rounded border border-emerald-200"><i data-feather="check" class="w-2.5 h-2.5 inline"></i> OK</span>`;
+
+                    html += `
+                        <div onclick="bukaDetailDraft('${keyGroup}')" class="flex justify-between items-center p-2 rounded-lg hover:bg-blue-50/60 dark:hover:bg-slate-700/50 cursor-pointer transition border border-transparent hover:border-blue-100 dark:hover:border-slate-600 group">
+                            <div class="flex items-center gap-2">
+                                <i data-feather="calendar" class="w-3.5 h-3.5 text-blue-500"></i>
+                                <span class="text-xs font-semibold text-gray-700 dark:text-slate-200">${formatHariTanggalID(tgl)}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                ${statusBadge}
+                                <span class="text-[10px] font-bold text-gray-500 dark:text-slate-400 ml-1">(${countItems} brg)</span>
+                                <i data-feather="chevron-right" class="w-3.5 h-3.5 text-gray-400 group-hover:text-blue-500 transition"></i>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
             });
 
             container.innerHTML = html || '<div class="text-center text-gray-400 text-xs py-6 italic">Data tidak ditemukan pada rentang filter ini.</div>';
             feather.replace();
         }
 
-        function bukaDetailDraft(key) {
-            const group = globalDraftData[key];
-            if(!group) return;
+        function toggleResellerAccordion(rId) {
+            const content = document.getElementById(`accContent_${rId}`);
+            const icon = document.getElementById(`iconAcc_${rId}`);
+            if (content.classList.contains('hidden')) { content.classList.remove('hidden'); icon.classList.add('rotate-180'); } 
+            else { content.classList.add('hidden'); icon.classList.remove('rotate-180'); }
+        }
 
-            let reseller = masterData.resellers.find(r => r.id === group.reseller_id);
-            let rName = reseller ? reseller.nama : 'Unknown Reseller';
+        function toggleEditRow(btn) {
+            const li = btn.closest('.draft-edit-row');
+            const viewMode = li.querySelector('.view-mode');
+            const editMode = li.querySelector('.edit-mode');
             
-            // Mengambil input_by dari record pertama (fallback ke 'Admin' jika kosong)
-            let inputBy = group.items[0]?.input_by || 'Admin';
+            if (viewMode.classList.contains('hidden')) {
+                viewMode.classList.remove('hidden');
+                editMode.classList.add('hidden');
+            } else {
+                viewMode.classList.add('hidden');
+                editMode.classList.remove('hidden');
+            }
+        }
+
+        // BUKA FORM APPROVAL / DETAIL DRAFT 
+        function bukaDetailDraft(keyGroup) {
+            const parts = keyGroup.split('_');
+            const tgl = parts[0];
+            const rId = parts[1];
+
+            if(!globalDraftData[rId] || !globalDraftData[rId].dates[tgl]) return;
+
+            const resellerName = globalDraftData[rId].reseller_name;
+            const items = globalDraftData[rId].dates[tgl];
+            const inputBy = items[0]?.input_by || 'Admin';
+            const isGroupPending = items.some(i => i.status === 'pending');
 
             document.getElementById('headerDetailDraft').innerHTML = `
                 <div class="flex flex-col gap-1.5">
-                    <div class="flex justify-between items-center">
-                        <span class="font-black text-gray-800 dark:text-slate-200 text-sm">${rName}</span>
-                        <span class="text-xs font-semibold text-gray-500 dark:text-slate-400">${formatHariTanggalID(group.tgl)}</span>
-                    </div>
-                    <div class="text-[10px] text-gray-500 dark:text-slate-400 border-t border-gray-100 dark:border-slate-700 pt-1.5 mt-0.5">
-                        Di siapkan oleh : <span class="font-bold text-blue-600 dark:text-blue-400">${inputBy}</span>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="font-black text-gray-800 dark:text-slate-200 text-base block">${resellerName}</span>
+                            <span class="text-[11px] text-gray-500 dark:text-slate-400">Di siapkan oleh: <b>${inputBy}</b></span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-slate-700 px-2 py-0.5 rounded block mb-1">${formatHariTanggalID(tgl)}</span>
+                            ${isGroupPending 
+                                ? `<span class="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-bold border border-orange-200">Menunggu Review</span>` 
+                                : `<span class="text-[10px] bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded font-bold border border-emerald-200">Disetujui</span>`}
+                        </div>
                     </div>
                 </div>
             `;
 
             let htmlList = '';
-            group.items.forEach(item => {
+            items.forEach(item => {
+                let badgeColor = item.tipe === 'bahan' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-blue-50 text-blue-600 border-blue-100';
+                let isPending = item.status === 'pending';
                 let barang = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
                 let bName = barang ? barang.nama : 'Barang Dihapus';
-                let badgeColor = item.tipe === 'bahan' ? 'bg-red-50 text-red-600 border-red-100 dark:bg-red-900/30 dark:border-red-800' : 'bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-900/30 dark:border-blue-800';
                 
-                let textKet = item.keterangan ? `<div class="w-full mt-1.5 pt-1 border-t border-gray-200/60 text-[10px] text-gray-500 italic">Catatan: ${item.keterangan}</div>` : '';
+                let textKet = item.keterangan ? `<div class="w-full mt-1.5 pt-1 border-t border-gray-200/60 dark:border-slate-600 text-[10px] text-gray-500 dark:text-slate-400 italic">Catatan: ${item.keterangan}</div>` : '';
 
-                htmlList += `
-                <li class="flex flex-col bg-gray-50/70 dark:bg-slate-700/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-600">
-                    <div class="flex justify-between items-center w-full">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor}">${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}</span>
-                            <span class="font-semibold text-gray-700 dark:text-slate-300 text-xs">${bName}</span>
+                // UI View (Ringkas)
+                let viewModeHtml = `
+                    <div class="view-mode flex flex-col w-full ${isPending ? 'hidden' : ''}">
+                        <div class="flex justify-between items-center w-full">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor} dark:bg-opacity-20">${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}</span>
+                                <span class="font-semibold text-gray-700 dark:text-slate-300 text-xs">${bName}</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="font-black text-blue-600 dark:text-blue-400 text-xs bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-800">Qty: ${item.qty}</span>
+                                <button onclick="toggleEditRow(this)" class="text-amber-500 hover:text-amber-600 p-1 rounded-lg transition bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800/50 shadow-sm" title="Koreksi Data"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span class="font-black text-blue-600 dark:text-blue-400 text-xs">Qty: ${item.qty}</span>
-                            <button onclick="hapusCatatanHarian('${item.id}', '${key}', this)" class="text-red-400 hover:text-red-600 p-1.5 rounded-lg transition bg-white dark:bg-slate-800 border border-red-100 dark:border-red-900/30 shadow-sm"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
+                        ${textKet}
+                    </div>
+                `;
+
+                // UI Edit (Kolom Lengkap)
+                let editModeHtml = `
+                    <div class="edit-mode flex flex-col w-full ${isPending ? '' : 'hidden'}">
+                        <div class="flex justify-between items-center gap-2 w-full mb-1">
+                            <div class="w-8/12 flex flex-col">
+                                <span class="text-[9px] font-bold px-1.5 py-0.5 mb-1 rounded border self-start ${badgeColor} dark:bg-opacity-20">${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}</span>
+                                <select class="edit-brg w-full text-xs p-1.5 border border-gray-300 dark:border-slate-500 rounded focus:border-blue-500 bg-gray-50 dark:bg-slate-800 font-semibold text-gray-800 dark:text-slate-100">
+                                    ${getOptionsHarianHtmlWithSelected(item.barang_id)}
+                                </select>
+                            </div>
+                            <div class="w-3/12">
+                                <label class="block text-[9px] font-bold text-gray-500 mb-0.5 text-center">Qty</label>
+                                <input type="number" class="edit-qty w-full text-xs p-1.5 border border-gray-300 dark:border-slate-500 rounded text-center font-black bg-gray-50 dark:bg-slate-800 text-blue-600" value="${item.qty}">
+                            </div>
+                            <div class="w-1/12 flex justify-end self-end mb-0.5 gap-1">
+                                <button onclick="hapusCatatanHarian('${item.id}', '${rId}', '${tgl}', this)" class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-slate-700 hover:bg-red-50 p-1.5 rounded border border-gray-200 dark:border-slate-600 transition" title="Hapus"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
+                            </div>
+                        </div>
+                        <div class="w-full flex gap-1.5 mt-1">
+                            <input type="text" class="edit-ket flex-1 text-[10px] p-1.5 border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-800 rounded placeholder-gray-400 text-gray-600 dark:text-gray-300" placeholder="Ketik catatan / keterangan opsional..." value="${item.keterangan || ''}">
+                            ${!isPending ? `<button onclick="toggleEditRow(this)" class="bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-300 px-2 rounded transition text-[10px] font-bold border border-gray-200 dark:border-slate-600 flex items-center gap-1" title="Batal Koreksi"><i data-feather="x" class="w-3 h-3"></i> Batal</button>` : ''}
                         </div>
                     </div>
-                    ${textKet}
+                `;
+
+                htmlList += `
+                <li class="draft-edit-row flex flex-col bg-white dark:bg-slate-700/50 p-2.5 rounded-xl border border-gray-200 dark:border-slate-600 shadow-sm" data-id="${item.id}">
+                    ${viewModeHtml}
+                    ${editModeHtml}
                 </li>`;
             });
 
             document.getElementById('listDetailDraft').innerHTML = htmlList;
+            
+            const footer = document.getElementById('footerDetailDraft');
+            if (isGroupPending) {
+                footer.innerHTML = `
+                    <button onclick="closeFormModal('modalDetailDraft')" class="flex-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-xs font-bold py-3 rounded-xl border border-gray-200 dark:border-slate-600">Batal Review</button>
+                    <button onclick="setujuiDanSimpanDraft('${rId}', '${tgl}')" class="w-2/3 bg-orange-500 hover:bg-orange-400 text-white text-xs font-bold py-3 rounded-xl flex items-center justify-center gap-1 shadow-sm"><i data-feather="check-circle" class="w-4 h-4"></i> Setujui & Simpan Semua</button>
+                `;
+            } else {
+                footer.innerHTML = `
+                    <button onclick="closeFormModal('modalDetailDraft')" class="flex-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-xs font-bold py-3 rounded-xl border border-gray-200 dark:border-slate-600">Tutup</button>
+                    <button onclick="setujuiDanSimpanDraft('${rId}', '${tgl}')" class="w-2/3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-3 rounded-xl flex items-center justify-center gap-1 shadow-sm"><i data-feather="save" class="w-4 h-4"></i> Simpan Perubahan Edit</button>
+                `;
+            }
+
             openFormModal('modalDetailDraft');
             feather.replace();
         }
 
+        // AKSI APPROVE & SIMPAN
+        async function setujuiDanSimpanDraft(rId, tgl) {
+            const rows = document.querySelectorAll('.draft-edit-row');
+            let updates = [];
+            let hasError = false;
+
+            rows.forEach(row => {
+                const id = row.dataset.id;
+                const bId = row.querySelector('.edit-brg').value;
+                const qty = parseFloat(row.querySelector('.edit-qty').value) || 0;
+                const ket = row.querySelector('.edit-ket').value;
+
+                if (!bId || qty <= 0) hasError = true;
+
+                const tipe = masterData.bahanBaku.some(b => b.id === bId) ? 'bahan' : 'jadi';
+                
+                updates.push({ 
+                    id: id,
+                    reseller_id: rId,
+                    tanggal_setor: tgl,
+                    barang_id: bId, 
+                    qty: qty, 
+                    keterangan: ket, 
+                    tipe: tipe, 
+                    status: 'approved',
+                    is_paid: false
+                });
+            });
+
+            if (hasError) return showNotification("Pastikan semua form barang telah terisi dengan Qty minimal 1!", "error");
+            if (updates.length === 0) return showNotification("Tidak ada data untuk disimpan.", "error");
+
+            try {
+                // Gunakan upsert Supabase agar melakukan mass update berdasarkan id PK
+                const { error } = await supabaseClient.from('buku_harian').upsert(updates);
+                if (error) throw error;
+
+                showNotification("Draf harian berhasil disetujui & diperbarui!", "success");
+                closeFormModal('modalDetailDraft');
+                
+                await fetchListHarian();
+                cekNotifikasiPending();
+
+            } catch(e) {
+                showNotification("Gagal memproses persetujuan: " + e.message, "error");
+            }
+        }
+
         let draftToDelete = null;
 
-        function hapusCatatanHarian(id, groupKey = null, btnElement = null) {
-            draftToDelete = { id, groupKey, btnElement };
+        function hapusCatatanHarian(id, rId = null, tgl = null, btnElement = null) {
+            draftToDelete = { id, rId, tgl, btnElement };
             document.getElementById('inputPinHapus').value = '';
             openFormModal('modalPin');
         }
 
         async function prosesHapusCatatanHarian() {
             const pin = document.getElementById('inputPinHapus').value;
-            if (pin !== "942715") {
-                showNotification("PIN Salah! Aksi dibatalkan.", "error");
-                return;
-            }
-
+            if (pin !== "942715") { showNotification("PIN Salah! Aksi dibatalkan.", "error"); return; }
             if(!draftToDelete) return;
-            const { id, groupKey, btnElement } = draftToDelete;
+            const { id, rId, tgl, btnElement } = draftToDelete;
 
-            // 1. Ubah tombol jadi loading state biar UI terasa instan tanpa lag
             const btnHapus = document.querySelector('#modalPin button.bg-red-500');
             const textAwal = btnHapus.innerText;
             btnHapus.innerHTML = `<i data-feather="loader" class="w-4 h-4 animate-spin"></i>`;
@@ -1251,110 +1596,33 @@
             try {
                 const { error } = await supabaseClient.from('buku_harian').delete().eq('id', id);
                 if(error) throw error;
-                showNotification("Catatan dihapus!", "success");
+                showNotification("Satu rincian draft dihapus!", "success");
 
-                // 2. Hapus baris list dari UI secara instan
                 if (btnElement) {
                     const li = btnElement.closest('li');
                     if (li) li.remove();
                 }
 
-                // 3. FIX: Gunakan String() untuk menghindari bug perbandingan Number vs String
-                if (groupKey && globalDraftData[groupKey]) {
-                    globalDraftData[groupKey].items = globalDraftData[groupKey].items.filter(item => String(item.id) !== String(id));
+                if (rId && tgl && globalDraftData[rId] && globalDraftData[rId].dates[tgl]) {
+                    globalDraftData[rId].dates[tgl] = globalDraftData[rId].dates[tgl].filter(item => String(item.id) !== String(id));
                     
-                    if (globalDraftData[groupKey].items.length === 0) {
-                        // Jika rincian habis, hapus grup dan tutup modal
-                        delete globalDraftData[groupKey];
+                    if (globalDraftData[rId].dates[tgl].length === 0) {
+                        delete globalDraftData[rId].dates[tgl];
                         closeFormModal('modalDetailDraft');
-                    } else {
-                        // Update angka rincian di header modal detail secara real-time
-                        const rName = masterData.resellers.find(r => r.id === globalDraftData[groupKey].reseller_id)?.nama || 'Unknown Reseller';
-                        const elHeader = document.getElementById('headerDetailDraft');
-                        if (elHeader) {
-                            let inputBy = globalDraftData[groupKey].items[0]?.input_by || 'Admin';
-                            elHeader.innerHTML = `
-                                <div class="flex flex-col gap-1.5">
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-black text-gray-800 dark:text-slate-200 text-sm">
-                                            ${rName} <span class="text-blue-500 text-[10px] ml-1 bg-blue-50 dark:bg-slate-700 px-1.5 py-0.5 rounded">(${globalDraftData[groupKey].items.length} rincian)</span>
-                                        </span>
-                                        <span class="text-xs font-semibold text-gray-500 dark:text-slate-400">${formatHariTanggalID(globalDraftData[groupKey].tgl)}</span>
-                                    </div>
-                                    <div class="text-[10px] text-gray-500 dark:text-slate-400 border-t border-gray-100 dark:border-slate-700 pt-1.5 mt-0.5">
-                                        Di siapkan oleh : <span class="font-bold text-blue-600 dark:text-blue-400">${inputBy}</span>
-                                    </div>
-                                </div>
-                            `;
-                        }
+                    }
+                    if (Object.keys(globalDraftData[rId].dates).length === 0) {
+                        delete globalDraftData[rId];
                     }
                 }
 
-                // 4. Render ulang list belakang tanpa perlu menekan tombol Segarkan
                 renderFilteredDrafts();
                 closeFormModal('modalPin');
-                
+                cekNotifikasiPending();
             } catch (err) {
                 showNotification("Gagal menghapus: " + err.message, "error");
             } finally {
                 draftToDelete = null;
-                btnHapus.innerText = textAwal; // Kembalikan teks tombol seperti semula
-            }
-        }
-
-        async function simpanCatatanHarian() {
-            const tgl = document.getElementById('inputTglHarian').value;
-            const rId = document.getElementById('inputResellerHarian').value;
-            
-            if(!tgl || !rId) return showNotification("Harap lengkapi Tanggal dan Agen!", "error");
-            
-            const rows = document.querySelectorAll('.row-input-harian');
-            let dataToInsert = [];
-            
-            rows.forEach(row => {
-                const bId = row.querySelector('.item-harian').value;
-                const qty = parseFloat(row.querySelector('.qty-harian').value) || 0;
-                const ket = row.querySelector('.keterangan-input').value;
-                
-                if (bId && qty > 0) {
-                    const tipeOtomatis = masterData.bahanBaku.some(b => b.id === bId) ? 'bahan' : 'jadi';
-                    
-                    dataToInsert.push({ 
-                        reseller_id: rId, 
-                        barang_id: bId, 
-                        tanggal_setor: tgl, 
-                        qty: qty, 
-                        tipe: tipeOtomatis,
-                        keterangan: ket,
-                        is_paid: false 
-                    });
-                }
-            });
-
-            if (dataToInsert.length === 0) return showNotification("Minimal isi 1 barang dengan Qty lebih dari 0!", "error");
-            
-            const btn = document.getElementById('btnSimpanHarian');
-            btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 mr-1.5 animate-spin"></i> Menyimpan...`;
-            btn.disabled = true;
-
-            try {
-                const { error } = await supabaseClient.from('buku_harian').insert(dataToInsert);
-                if(error) throw error;
-                
-                showNotification(`${dataToInsert.length} baris catatan berhasil disimpan!`, "success");
-                
-                document.getElementById('containerHarianRows').innerHTML = '';
-                for(let i=0; i<5; i++) {
-                    addRowHarian();
-                }
-                
-                fetchListHarian();
-            } catch (err) {
-                showNotification("Gagal menyimpan: " + err.message, "error");
-            } finally {
-                btn.innerHTML = `<i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Catatan`;
-                btn.disabled = false;
-                feather.replace();
+                btnHapus.innerText = textAwal;
             }
         }
 
@@ -1362,18 +1630,34 @@
             if(!selectedResellerId) return showNotification("Pilih Reseller terlebih dahulu di bagian atas!", "error");
             
             try {
-                const { data, error } = await supabaseClient.from('buku_harian').select('*').eq('reseller_id', selectedResellerId).eq('tipe', targetTipe).eq('is_paid', false);
+                const { data, error } = await supabaseClient.from('buku_harian')
+                    .select('*')
+                    .eq('reseller_id', selectedResellerId)
+                    .eq('tipe', targetTipe)
+                    .eq('is_paid', false);
                 if(error) throw error;
                 
                 if(!data || data.length === 0) return showNotification(`Tidak ada catatan harian (${targetTipe}) yang belum dibayar untuk agen ini.`, "info");
 
+                // Validasi Status PENDING
+                const pendingItems = data.filter(d => d.status === 'pending');
+                if (pendingItems.length > 0) {
+                    showNotification(`Ada ${pendingItems.length} rincian ${targetTipe} yang berstatus PENDING. Harap Buka Menu "Catatan Harian" dan Setujui (Approve) terlebih dahulu sebelum ditarik ke Nota!`, "error");
+                    return;
+                }
+
+                // Tarik hanya yang approved (atau null/lama)
+                const approvedItems = data.filter(d => d.status === 'approved' || !d.status);
+                
                 let aggregated = {};
                 let pulledIds = [];
-                data.forEach(d => {
+                approvedItems.forEach(d => {
                     if(!aggregated[d.barang_id]) aggregated[d.barang_id] = 0;
                     aggregated[d.barang_id] += parseFloat(d.qty);
                     pulledIds.push(d.id);
                 });
+
+                if (pulledIds.length === 0) return showNotification(`Tidak ada data ${targetTipe} yang tervalidasi siap ditarik.`, "info");
 
                 const containerId = targetTipe === 'bahan' ? 'containerBahanBaku' : 'containerBarangJadi';
                 const container = document.getElementById(containerId);
@@ -1403,7 +1687,7 @@
                 });
                 
                 currentDraftIds = [...new Set([...currentDraftIds, ...pulledIds])];
-                showNotification(`Berhasil menarik rekap ${targetTipe} harian ke nota!`, "success");
+                showNotification(`Berhasil menarik data ${targetTipe} yang tervalidasi (Approved) ke nota!`, "success");
             } catch (err) {
                 showNotification("Gagal menarik data: " + err.message, "error");
             }
@@ -1453,7 +1737,6 @@
 
                 let html = '';
                 Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)).forEach(date => {
-                    // Ambil input_by dari rincian pertama, default ke Admin jika kosong
                     let inputBy = grouped[date][0]?.input_by || 'Admin';
 
                     html += `
@@ -1490,7 +1773,6 @@
                 container.innerHTML = `<div class="text-center text-red-500 text-xs py-4">Gagal memuat rincian: ${err.message}</div>`;
             }
         }
-        // ================== SELESAI LOGIKA CATATAN HARIAN =====================
 
         function resetFormAgen() {
             document.getElementById('editAgenId').value = ''; document.getElementById('inputNamaAgen').value = '';
@@ -1566,7 +1848,67 @@
             document.getElementById('inputHargaKhususVal').value = '';
             document.getElementById('selectHargaReseller').value = '';
             document.getElementById('selectHargaBarang').value = '';
+            document.getElementById('selectHargaReseller').disabled = false;
+            document.getElementById('selectHargaBarang').disabled = false;
         }
+
+        function bukaDetailHargaKhusus(rId) {
+            const reseller = masterData.resellers.find(r => r.id === rId);
+            document.getElementById('namaResellerDetailHarga').innerText = reseller ? reseller.nama : 'Unknown';
+            const listContainer = document.getElementById('listDetailHargaKhusus');
+            const hkReseller = masterData.rawHargaKhusus.filter(hk => hk.reseller_id === rId);
+
+            let html = '<ul class="space-y-2">';
+            hkReseller.forEach(hk => {
+                const barang = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === hk.barang_id);
+                const namaBarang = barang ? barang.nama : 'Barang Dihapus';
+                html += `
+                <li class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl shadow-sm">
+                    <div>
+                        <span class="font-bold text-xs text-gray-800">${namaBarang}</span><br>
+                        <span class="text-[11px] font-black text-blue-600">${formatRupiah(hk.harga)}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="editHargaKhusus('${rId}', '${hk.barang_id}', ${hk.harga})" class="p-1.5 text-amber-600 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg transition" title="Edit Harga">
+                            <i data-feather="edit-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="hapusHargaKhusus('${rId}', '${hk.barang_id}')" class="p-1.5 text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition" title="Hapus Harga">
+                            <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </li>`;
+            });
+            html += '</ul>';
+            if(hkReseller.length === 0) html = '<div class="text-center text-xs text-gray-400 py-4">Belum ada harga khusus tersimpan.</div>';
+            
+            listContainer.innerHTML = html;
+            openFormModal('modalDetailHargaKhusus');
+            feather.replace();
+        }
+
+        function editHargaKhusus(resellerId, barangId, harga) {
+            closeFormModal('modalDetailHargaKhusus');
+            document.getElementById('selectHargaReseller').value = resellerId;
+            document.getElementById('selectHargaBarang').value = barangId;
+            document.getElementById('inputHargaKhususVal').value = new Intl.NumberFormat('id-ID').format(harga);
+            
+            document.getElementById('selectHargaReseller').disabled = true;
+            document.getElementById('selectHargaBarang').disabled = true;
+            openFormModal('modalFormHarga');
+        }
+
+        async function hapusHargaKhusus(resellerId, barangId) {
+            if(!confirm("Yakin ingin menghapus harga khusus ini?")) return;
+            try {
+                const { error } = await supabaseClient.from('harga_khusus').delete().match({ reseller_id: resellerId, barang_id: barangId });
+                if(error) throw error;
+                showNotification("Harga khusus berhasil dihapus!", "success");
+                await loadMasterData(); 
+                bukaDetailHargaKhusus(resellerId); 
+                openModal('modalHarga'); 
+            } catch (err) { showNotification("Gagal menghapus: " + err.message, "error"); }
+        }
+
         async function simpanHargaKhusus() {
             const resellerId = document.getElementById('selectHargaReseller').value;
             const barangId = document.getElementById('selectHargaBarang').value;
@@ -1647,7 +1989,6 @@
                 document.getElementById('notaSummarySetoran').innerText = formatRupiah(trx.total_setoran);
                 document.getElementById('notaSummaryKasbon').innerText = "- " + formatRupiah(Math.abs(trx.total_kasbon_bahan));
                 
-                // Menentukan Kasbon Uang/Manual untuk Pratinjau History
                 let manualKasbon = Math.round(trx.total_setoran - Math.abs(trx.total_kasbon_bahan) - trx.net_pembayaran);
                 const notaContainerManual = document.getElementById('notaContainerManual');
                 if (manualKasbon > 0) {
@@ -1726,7 +2067,6 @@
             document.getElementById('notaSummarySetoran').innerText = document.getElementById('subtotalBarangJadiLayar').innerText;
             document.getElementById('notaSummaryKasbon').innerText = "- " + document.getElementById('subtotalBahanBakuLayar').innerText;
             
-            // Menyembunyikan Kasbon Manual di Pratinjau jika 0
             let manualHtml = '';
             let manualTotal = 0;
             document.querySelectorAll('.row-kasbon-manual').forEach(row => {
@@ -1758,7 +2098,6 @@
             const title = document.getElementById('loadingPngTitle');
             const desc = document.getElementById('loadingPngDesc');
             
-            // 1. Tampilkan animasi popup loading anti-lag
             modal.classList.remove('hidden');
             setTimeout(() => { 
                 modal.classList.remove('opacity-0');
@@ -1769,38 +2108,31 @@
             const btnBahan = document.getElementById('btnHistoryBahan');
             const btnJadi = document.getElementById('btnHistoryJadi');
             
-            // 2. Simpan style asli agar UI tidak rusak setelah render
             const originalStyle = areaPrint.getAttribute('style') || '';
             const originalClass = areaPrint.className;
             
-            // Sembunyikan tombol "Rincian" agar tidak ikut terfoto
             if(btnBahan) btnBahan.style.display = 'none';
             if(btnJadi) btnJadi.style.display = 'none';
             
-            // 3. Modifikasi sementara area Print untuk resolusi tinggi (Tinggi otomatis menyesuaikan isi)
             areaPrint.style.width = '900px'; 
-            areaPrint.style.height = 'auto'; // Biarkan otomatis agar tercrop pas di footer
+            areaPrint.style.height = 'auto'; 
             areaPrint.style.padding = '40px';
             areaPrint.style.backgroundColor = '#ffffff';
             areaPrint.style.margin = '0';
             areaPrint.classList.remove('overflow-y-auto'); 
             
             try {
-                // Jeda sepersekian detik agar DOM sempat menyesuaikan dimensi
                 await new Promise(r => setTimeout(r, 300));
                 
-                // Render via html2canvas dengan skala tinggi
                 const canvas = await html2canvas(areaPrint, {
-                    scale: 3, // Resolusi 3x lipat agar sangat tajam
+                    scale: 3, 
                     useCORS: true,
                     backgroundColor: '#ffffff',
                     windowWidth: 900
                 });
                 
-                // Langsung gunakan canvas bawaan tanpa dipaksa rasio 3:4
                 const imgData = canvas.toDataURL('image/png', 1.0);
                 
-                // 4. Animasi Sukses
                 title.innerText = 'Berhasil!';
                 title.classList.add('text-emerald-600');
                 desc.innerText = 'Gambar nota sedang diunduh.';
@@ -1809,20 +2141,17 @@
                 modal.querySelector('.icon-loading').classList.replace('text-blue-500', 'text-emerald-500');
                 feather.replace();
                 
-                // Trigger download
                 const link = document.createElement('a');
                 const cleanName = document.getElementById('notaNama').innerText.replace(/[^a-zA-Z0-9]/g, '_');
                 link.download = `Nota_SBR_${cleanName}_${new Date().getTime()}.png`;
                 link.href = imgData;
                 link.click();
                 
-                // Tutup popup
                 setTimeout(() => {
                     modal.classList.add('opacity-0');
                     modal.children[0].classList.replace('scale-100', 'scale-95');
                     setTimeout(() => {
                         modal.classList.add('hidden');
-                        // Reset modal ke state semula
                         title.innerText = 'Memproses Nota...';
                         title.classList.remove('text-emerald-600');
                         desc.innerText = 'Meningkatkan resolusi & merender gambar.';
@@ -1843,7 +2172,6 @@
                     setTimeout(() => modal.classList.add('hidden'), 300);
                 }, 2000);
             } finally {
-                // 5. Kembalikan UI layout pratinjau dan tombol ke bentuk normal
                 areaPrint.setAttribute('style', originalStyle);
                 areaPrint.className = originalClass;
                 if(btnBahan) btnBahan.style.display = '';
@@ -1910,8 +2238,6 @@
             setTimeout(() => { document.getElementById(id).children[0].classList.replace('scale-95','scale-100'); }, 10);
             
             if(id === 'modalHarian') {
-                document.getElementById('inputTglHarian').value = document.getElementById('tglTransaksi').value;
-                
                 const selRes = document.getElementById('inputResellerHarian');
                 selRes.innerHTML = '<option value="">Pilih...</option>';
                 masterData.resellers.forEach(r => selRes.innerHTML += `<option value="${r.id}">${r.nama}</option>`);
@@ -1919,11 +2245,10 @@
                 const selTipe = document.getElementById('inputTipeHarian');
                 if(selTipe) selTipe.value = 'semua';
                 
-                document.getElementById('containerHarianRows').innerHTML = '';
-                for(let i=0; i<5; i++) {
-                    addRowHarian(); 
-                }
-                
+                const tzOffset = (new Date()).getTimezoneOffset() * 60000; 
+                document.getElementById('inputTglHarianStandard').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
+
+                switchInputMode('standard'); 
                 fetchListHarian();
             }
             if(id === 'modalAgen') {
