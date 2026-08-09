@@ -30,124 +30,158 @@
         .dark .custom-scroll::-webkit-scrollbar-thumb { background-color: #475569; }
     </style>
 </head>
-<body class="min-h-screen bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 pb-16 transition-colors duration-300">
+<body class="min-h-screen bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
 
     <!-- Toast Container -->
-    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 z-[110] flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 z-[130] flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- Mobile Header -->
-    <nav class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-30 px-4 py-3 shadow-sm">
-        <div class="flex justify-between items-center max-w-md mx-auto">
-            <div class="flex items-center space-x-2.5">
-                <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/677036e078cc7fa6c94788da8482dc53d883e2df/sbr_logo.png" alt="SBR Logo" class="w-7 h-7 object-contain rounded-md border border-gray-100 dark:border-slate-700 bg-white">
-                <div>
-                    <h1 class="font-bold text-xs leading-tight text-gray-900 dark:text-slate-100">Catatan Harian</h1>
-                    <p class="text-[9px] text-gray-500 dark:text-slate-400 font-medium">SBR Putra Food</p>
-                </div>
+    <!-- ==================== AREA LOGIN ==================== -->
+    <div id="loginArea" class="min-h-screen flex flex-col justify-center items-center px-4 bg-slate-100 dark:bg-slate-900 absolute inset-0 z-50">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-slate-700">
+            <div class="flex justify-center mb-4">
+                <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/677036e078cc7fa6c94788da8482dc53d883e2df/sbr_logo.png" alt="SBR Logo" class="w-17 h-17 bg-white">
             </div>
+            <h2 class="text-lg font-black text-center text-gray-800 dark:text-slate-100 mb-1">Masuk Sistem</h2>
+            <p class="text-[11px] text-center text-gray-500 dark:text-slate-400 mb-6 font-medium">Catatan Harian Reseller SBR Putra Food</p>
             
-            <div class="flex items-center space-x-2">
-                <!-- Theme Toggle Button -->
-                <button onclick="toggleTheme()" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition" title="Ganti Tema">
-                    <i data-feather="moon" id="iconMoon" class="w-4 h-4"></i>
-                    <i data-feather="sun" id="iconSun" class="w-4 h-4 hidden"></i>
-                </button>
-                <!-- Connection Status -->
-                <div class="flex items-center space-x-1 bg-yellow-50 dark:bg-yellow-900/30 px-2 py-1 rounded-full border border-yellow-100 dark:border-yellow-800/50" id="status-connection">
-                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span></span>
-                    <span id="text-connection" class="text-[9px] font-semibold text-yellow-700 dark:text-yellow-500">Loading</span>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content Container (Mobile Optimized) -->
-    <main class="max-w-md mx-auto px-3 pt-4 space-y-4">
-        
-        <!-- CARD 1: FORM INPUT HARIAN -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700">
-            <h2 class="text-xs font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center">
-                <i data-feather="edit-3" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Input Catatan Harian
-            </h2>
-            
-            <div class="grid grid-cols-2 gap-2.5 mb-3">
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Tanggal</label>
-                    <input type="date" id="inputTglHarian" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                    <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Username</label>
+                    <input type="text" id="loginUsername" placeholder="Contoh: fatah / dedeh" class="w-full text-sm p-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Agen / Reseller</label>
-                    <select id="inputResellerHarian" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
-                        <option value="">Pilih...</option>
-                    </select>
+                    <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">PIN (6 Angka)</label>
+                    <input type="password" id="loginPin" placeholder="••••••" inputmode="numeric" maxlength="6" class="w-full text-center tracking-[0.5em] text-lg font-bold p-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
                 </div>
-            </div>
-
-            <!-- Tambahan Kolom Input By dan Fokus Input -->
-            <div class="grid grid-cols-2 gap-2.5 mb-3">
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Input By ?</label>
-                    <select id="inputByPegawai" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
-                        <option value="">Pilih Nama...</option>
-                        <option value="Fatah">Fatah</option>
-                        <option value="Rio">Rio</option>
-                        <option value="Admin">Admin</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Fokus Tipe Input</label>
-                    <select id="inputTipeHarian" onchange="updateOpsiHarian()" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-blue-50 dark:bg-slate-900 text-blue-700 dark:text-blue-400 font-semibold outline-none focus:border-blue-500">
-                        <option value="semua">Tampilkan Semua</option>
-                        <option value="jadi">📦 Barang Jadi (Setoran)</option>
-                        <option value="bahan">🛍️ Bahan Baku (Ambil)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Container Baris Multi Input -->
-            <div class="space-y-2 mb-3 max-h-[50vh] overflow-y-auto custom-scroll pr-1" id="containerHarianRows">
-                <!-- Baris ditambahkan via JS -->
-            </div>
-
-            <!-- Action Buttons Form -->
-            <div class="flex gap-2 pt-2 border-t border-gray-100 dark:border-slate-700">
-                <button onclick="addRowHarian()" class="bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 text-blue-600 dark:text-blue-300 text-xs font-bold px-3 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center border border-blue-200 dark:border-slate-600">
-                    <i data-feather="plus" class="w-3.5 h-3.5 mr-1"></i> Baris
-                </button>
-                <button id="btnSimpanHarian" onclick="simpanCatatanHarian()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center">
-                    <i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Catatan
+                <button onclick="prosesLogin()" id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-3.5 rounded-xl shadow-md shadow-blue-500/20 transition-all flex justify-center items-center gap-2 mt-2">
+                    <i data-feather="log-in" class="w-4 h-4"></i> Akses Catatan
                 </button>
             </div>
         </div>
+    </div>
 
-        <!-- CARD 2: DAFTAR DRAFT TERSIMPAN -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center">
-                    <i data-feather="archive" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Daftar Draft Tersimpan
-                </h3>
-                <button onclick="fetchListHarian()" class="text-blue-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1">
-                    <i data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan
-                </button>
-            </div>
-            
-            <div class="bg-gray-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-700 space-y-2 mb-3">
-                <div class="flex gap-2">
-                    <input type="date" id="filterTglAwal" class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
-                    <input type="date" id="filterTglAkhir" class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
+    <!-- ==================== AREA DASHBOARD ==================== -->
+    <div id="dashboardArea" class="hidden pb-16">
+        <!-- Mobile Header -->
+        <nav class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-30 px-4 py-3 shadow-sm">
+            <div class="flex justify-between items-center max-w-md mx-auto">
+                <div class="flex items-center space-x-2.5">
+                    <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/677036e078cc7fa6c94788da8482dc53d883e2df/sbr_logo.png" alt="SBR Logo" class="w-8 h-8 object-contain rounded-md border border-gray-100 dark:border-slate-700 bg-white">
+                    <div>
+                        <h1 class="font-bold text-xs leading-tight text-gray-900 dark:text-slate-100">Catatan Harian</h1>
+                        <p id="labelRoleDisplay" class="text-[9px] text-blue-500 font-bold bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded inline-block mt-0.5">SBR Putra Food</p>
+                    </div>
                 </div>
-                <select id="filterDraftAgen" class="w-full text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
-                    <option value="">Semua Agen</option>
-                </select>
+                
+                <div class="flex items-center space-x-1.5">
+                    <!-- Status Connection -->
+                    <div class="flex items-center space-x-1 bg-yellow-50 dark:bg-yellow-900/30 px-2 py-1 rounded-full border border-yellow-100 dark:border-yellow-800/50" id="status-connection">
+                        <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span></span>
+                        <span id="text-connection" class="text-[9px] font-semibold text-yellow-700 dark:text-yellow-500">Loading</span>
+                    </div>
+                    <!-- Tombol Reset PIN Admin (Hanya muncul untuk Admin) -->
+                    <button id="btnAdminResetMenu" onclick="bukaModalResetAdmin()" class="hidden p-2 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 hover:bg-orange-100 transition" title="Reset PIN Pengguna (Admin)">
+                        <i data-feather="user-check" class="w-4 h-4"></i>
+                    </button>
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 transition" title="Ganti Tema">
+                        <i data-feather="moon" id="iconMoon" class="w-4 h-4"></i>
+                        <i data-feather="sun" id="iconSun" class="w-4 h-4 hidden"></i>
+                    </button>
+                    <!-- Ganti PIN Mandiri -->
+                    <button onclick="openFormModal('modalGantiPin')" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 transition" title="Ganti PIN Akun">
+                        <i data-feather="key" class="w-4 h-4"></i>
+                    </button>
+                    <!-- Logout -->
+                    <button onclick="prosesLogout()" class="p-2 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-500 hover:bg-red-100 transition" title="Keluar">
+                        <i data-feather="power" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="max-w-md mx-auto px-3 pt-4 space-y-4">
+            
+            <!-- CARD 1: FORM INPUT HARIAN -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 relative overflow-hidden">
+                <h2 class="text-xs font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center">
+                    <i data-feather="edit-3" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Input Catatan Harian
+                </h2>
+                
+                <div class="grid grid-cols-2 gap-2.5 mb-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Tanggal</label>
+                        <input type="date" id="inputTglHarian" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Agen / Reseller</label>
+                        <select id="inputResellerHarian" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                            <option value="">Pilih...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5 mb-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Input By (Otomatis)</label>
+                        <input type="text" id="inputByPegawai" disabled class="w-full text-xs p-2 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-semibold cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Fokus Tipe Input</label>
+                        <select id="inputTipeHarian" onchange="updateOpsiHarian()" class="w-full text-[11px] p-2 rounded-xl border border-blue-200 dark:border-slate-600 bg-blue-50 dark:bg-slate-900 text-blue-700 dark:text-blue-400 font-semibold outline-none focus:border-blue-500">
+                            <option value="semua">Tampilkan Semua</option>
+                            <option value="jadi">📦 Barang Jadi (Setoran)</option>
+                            <option value="bahan">🛍️ Bahan Baku (Ambil)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Container Baris Multi Input -->
+                <div class="space-y-2 mb-3 max-h-[50vh] overflow-y-auto custom-scroll pr-1" id="containerHarianRows"></div>
+
+                <!-- Action Buttons Form -->
+                <div class="flex gap-2 pt-2 border-t border-gray-100 dark:border-slate-700">
+                    <button onclick="addRowHarian()" class="bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 text-blue-600 dark:text-blue-300 text-xs font-bold px-3 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center border border-blue-200 dark:border-slate-600">
+                        <i data-feather="plus" class="w-3.5 h-3.5 mr-1"></i> Baris
+                    </button>
+                    <button id="btnSimpanHarian" onclick="simpanCatatanHarian()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center justify-center">
+                        <i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Catatan
+                    </button>
+                </div>
             </div>
 
-            <!-- List Draft -->
-            <div class="max-h-[320px] overflow-y-auto custom-scroll pr-1 space-y-2" id="listCatatanHarian">
-                <div class="flex justify-center py-6"><i data-feather="loader" class="w-5 h-5 animate-spin text-blue-500"></i></div>
-            </div>
-        </div>
+            <!-- CARD 2: DAFTAR DRAFT TERSIMPAN -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center">
+                        <i data-feather="archive" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Daftar Catatan (Belum Lunas)
+                    </h3>
+                    <button onclick="fetchListHarian()" class="text-blue-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1">
+                        <i data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan
+                    </button>
+                </div>
+                
+                <div class="bg-gray-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-700 space-y-2 mb-3">
+                    <div class="flex gap-2">
+                        <input type="date" id="filterTglAwal" class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
+                        <input type="date" id="filterTglAkhir" class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
+                    </div>
+                    <select id="filterDraftAgen" class="w-full text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
+                        <option value="">Semua Agen</option>
+                    </select>
+                </div>
 
-    </main>
+                <!-- List Draft (Accordion) -->
+                <div class="max-h-[320px] overflow-y-auto custom-scroll pr-1 space-y-2" id="listCatatanHarian">
+                    <div class="flex justify-center py-6"><i data-feather="loader" class="w-5 h-5 animate-spin text-blue-500"></i></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ==================== MODAL-MODAL ==================== -->
 
     <!-- MODAL POST SAVE (CETAK BLUETOOTH) -->
     <div id="modalPostSave" class="fixed inset-0 z-[120] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
@@ -155,10 +189,10 @@
             <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
                 <i data-feather="check-circle" class="w-6 h-6"></i>
             </div>
-            <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 mb-1">Catatan Tersimpan!</h3>
-            <p class="text-[11px] text-gray-500 dark:text-slate-400 mb-4">Ingin mencetak nota ini langsung ke printer bluetooth thermal 58mm?</p>
+            <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 mb-1" id="postSaveTitle">Catatan Tersimpan!</h3>
+            <p class="text-[11px] text-gray-500 dark:text-slate-400 mb-4" id="postSaveMsg">Ingin mencetak nota ini langsung ke printer bluetooth thermal 58mm?</p>
             <div class="flex flex-col gap-2">
-                <button onclick="cetakDraftTerakhir()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-1.5">
+                <button id="btnPostSavePrint" onclick="cetakDraftTerakhir()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-1.5">
                     <i data-feather="printer" class="w-4 h-4"></i> Cetak via Bluetooth
                 </button>
                 <button onclick="closeFormModal('modalPostSave')" class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-xs font-bold py-2 rounded-xl">
@@ -168,31 +202,37 @@
         </div>
     </div>
 
-    <!-- MODAL DETAIL DRAFT TERSIMPAN -->
-    <div id="modalDetailDraft" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
-            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700">
+    <!-- MODAL DETAIL DRAFT TERSIMPAN (REVIEW & KOREKSI) -->
+    <div id="modalDetailDraft" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-none">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden pointer-events-auto relative">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700 shrink-0">
                 <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center">
-                    <i data-feather="list" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Rincian Draft Tersimpan
+                    <i data-feather="check-square" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Rincian & Validasi
                 </h3>
                 <button onclick="closeFormModal('modalDetailDraft')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
-            <div class="p-4 overflow-y-auto custom-scroll space-y-3 flex-1">
-                <div id="headerDetailDraft" class="mb-2 border-b border-gray-100 dark:border-slate-700 pb-2"></div>
-                <ul id="listDetailDraft" class="space-y-2"></ul>
+            
+            <div class="p-4 overflow-y-auto custom-scroll flex-1 bg-gray-50/50 dark:bg-slate-800/50">
+                <div id="headerDetailDraft" class="mb-3 border-b border-gray-200 dark:border-slate-600 pb-3"></div>
+                <ul id="listDetailDraft" class="space-y-2 pb-2"></ul>
+            </div>
+            
+            <!-- Sticky Bottom Action Bar -->
+            <div id="footerDetailDraft" class="border-t border-gray-100 dark:border-slate-700 p-3 bg-white dark:bg-slate-800 shrink-0 flex gap-2 rounded-b-2xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
+                <!-- Diisi via JavaScript berdasarkan status -->
             </div>
         </div>
     </div>
 
-    <!-- MODAL PIN KEAMANAN -->
-    <div id="modalPin" class="fixed inset-0 z-[100] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
+    <!-- MODAL PIN KEAMANAN (HAPUS) -->
+    <div id="modalPin" class="fixed inset-0 z-[110] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
         <div class="bg-white dark:bg-slate-800 w-full max-w-xs rounded-2xl shadow-2xl flex flex-col p-4">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="lock" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Verifikasi PIN</h3>
+                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="lock" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Otorisasi Admin</h3>
                 <button onclick="closeFormModal('modalPin')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
-            <p class="text-[10px] text-gray-500 dark:text-slate-400 mb-3">Masukkan PIN untuk menghapus rincian draft ini.</p>
-            <input type="password" id="inputPinHapus" placeholder="•••" class="w-full text-center tracking-widest text-base font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500 mb-3">
+            <p class="text-[10px] text-gray-500 dark:text-slate-400 mb-3">Hanya Admin yang bisa menghapus rincian data. Masukkan PIN Admin (942715).</p>
+            <input type="password" id="inputPinHapus" placeholder="6 Angka PIN Admin" inputmode="numeric" maxlength="6" class="w-full text-center tracking-widest text-base font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500 mb-3">
             <div class="flex gap-2">
                 <button onclick="closeFormModal('modalPin')" class="bg-gray-100 dark:bg-slate-700 text-gray-700 text-xs font-bold px-3 py-2 rounded-xl flex-1">Batal</button>
                 <button onclick="prosesHapusCatatanHarian()" class="bg-red-500 hover:bg-red-400 text-white text-xs font-bold px-3 py-2 rounded-xl flex-1 shadow-sm">Hapus</button>
@@ -200,9 +240,74 @@
         </div>
     </div>
 
-    <!-- SCRIPT LOGIKA -->
+    <!-- MODAL GANTI PIN (MANDIRI) -->
+    <div id="modalGantiPin" class="fixed inset-0 z-[105] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-xs rounded-2xl shadow-2xl flex flex-col p-4">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center">
+                    <i data-feather="key" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Ganti PIN Akun
+                </h3>
+                <button onclick="closeFormModal('modalGantiPin')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            <p class="text-[10px] text-gray-500 dark:text-slate-400 mb-3">Masukkan PIN baru (minimal 6 angka) untuk akun Anda.</p>
+            <div class="space-y-3 mb-4">
+                <div>
+                    <label class="block text-[9px] font-bold text-gray-500 dark:text-slate-400 mb-1">PIN Baru (6 Angka)</label>
+                    <input type="password" id="inputPinBaru" placeholder="Minimal 6 angka" inputmode="numeric" maxlength="6" class="w-full text-center tracking-widest text-sm font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-[9px] font-bold text-gray-500 dark:text-slate-400 mb-1">Konfirmasi PIN Baru</label>
+                    <input type="password" id="inputPinKonfirmasi" placeholder="Ulangi 6 angka PIN baru" inputmode="numeric" maxlength="6" class="w-full text-center tracking-widest text-sm font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500">
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeFormModal('modalGantiPin')" class="bg-gray-100 dark:bg-slate-700 text-gray-700 text-xs font-bold px-3 py-2.5 rounded-xl flex-1">Batal</button>
+                <button id="btnSimpanPin" onclick="prosesGantiPIN()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-2.5 rounded-xl flex-1 shadow-sm flex items-center justify-center gap-1">Simpan PIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL RESET PIN OLEH ADMIN -->
+    <div id="modalResetPinAdmin" class="fixed inset-0 z-[115] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-xs rounded-2xl shadow-2xl flex flex-col p-4">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center">
+                    <i data-feather="user-check" class="w-3.5 h-3.5 mr-1.5 text-orange-500"></i> Reset PIN Pengguna
+                </h3>
+                <button onclick="closeFormModal('modalResetPinAdmin')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            <p class="text-[10px] text-gray-500 dark:text-slate-400 mb-3">Pilih karyawan/reseller yang lupa PIN dan masukkan PIN baru.</p>
+            <div class="space-y-3 mb-4">
+                <div>
+                    <label class="block text-[9px] font-bold text-gray-500 dark:text-slate-400 mb-1">Pilih Pengguna</label>
+                    <select id="resetTargetUser" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500">
+                        <option value="">Memuat pengguna...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[9px] font-bold text-gray-500 dark:text-slate-400 mb-1">PIN Baru (6 Angka)</label>
+                    <input type="password" id="resetPinBaru" placeholder="Minimal 6 angka" inputmode="numeric" maxlength="6" class="w-full text-center tracking-widest text-sm font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500">
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeFormModal('modalResetPinAdmin')" class="bg-gray-100 dark:bg-slate-700 text-gray-700 text-xs font-bold px-3 py-2.5 rounded-xl flex-1">Batal</button>
+                <button id="btnAdminResetSubmit" onclick="prosesResetPinAdmin()" class="bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold px-3 py-2.5 rounded-xl flex-1 shadow-sm flex items-center justify-center gap-1">Reset PIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SCRIPT LOGIKA ==================== -->
     <script>
         feather.replace();
+
+        const supabaseUrl = 'https://uocvuddqhviorebinpva.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvY3Z1ZGRxaHZpb3JlYmlucHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2OTQ0NDAsImV4cCI6MjEwMTI3MDQ0MH0.mWGTOTfHG4Q62S3P4LQi-5bGviMPWgMzo2p2AECquL8';
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUserInfo = null;
+        let masterData = { resellers: [], barangJadi: [], bahanBaku: [] };
+        let globalDraftData = {};
+        let lastSavedGroupKey = null;
 
         function toggleTheme() {
             const htmlEl = document.documentElement;
@@ -215,24 +320,6 @@
                 document.getElementById('iconMoon').classList.remove('hidden');
                 document.getElementById('iconSun').classList.add('hidden');
             }
-        }
-
-        function formatTanggalID(dateStr) {
-            if(!dateStr) return '-';
-            const d = new Date(dateStr);
-            const day = String(d.getDate()).padStart(2, '0');
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
-            return `${day}/${months[d.getMonth()]}/${String(d.getFullYear()).slice(-2)}`;
-        }
-
-        function formatHariTanggalID(dateStr) {
-            if(!dateStr) return '-';
-            const d = new Date(dateStr);
-            const listHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const namaHari = listHari[d.getDay()];
-            const day = String(d.getDate()).padStart(2, '0');
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
-            return `${namaHari}, ${day}/${months[d.getMonth()]}/${String(d.getFullYear()).slice(-2)}`;
         }
 
         function showNotification(message, type = 'success') {
@@ -248,14 +335,205 @@
             setTimeout(() => { toast.classList.add('translate-y-10', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3500);
         }
 
-        const supabaseUrl = 'https://uocvuddqhviorebinpva.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvY3Z1ZGRxaHZpb3JlYmlucHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2OTQ0NDAsImV4cCI6MjEwMTI3MDQ0MH0.mWGTOTfHG4Q62S3P4LQi-5bGviMPWgMzo2p2AECquL8';
-        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+        function formatHariTanggalID(dateStr) {
+            if(!dateStr) return '-';
+            const d = new Date(dateStr);
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const day = String(d.getDate()).padStart(2, '0');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+            return `${days[d.getDay()]}, ${day}/${months[d.getMonth()]}/${String(d.getFullYear()).slice(-2)}`;
+        }
 
-        let masterData = { resellers: [], barangJadi: [], bahanBaku: [] };
-        let globalDraftData = {};
-        let lastSavedGroupKey = null;
+        // ================= AUTHENTICATION =================
+        async function checkSession() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                await setupUserDashboard(session.user.id);
+            } else {
+                document.getElementById('loginArea').classList.remove('hidden');
+                document.getElementById('dashboardArea').classList.add('hidden');
+            }
+        }
 
+        async function prosesLogin() {
+            const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+            const pin = document.getElementById('loginPin').value;
+            const btn = document.getElementById('btnLogin');
+
+            if(!username || !pin) return showNotification("Username dan PIN wajib diisi!", "error");
+            if(pin.length < 6) return showNotification("PIN minimal 6 angka!", "error");
+
+            const dummyEmail = `${username}@sbr.app`;
+            btn.innerHTML = `<i data-feather="loader" class="w-4 h-4 animate-spin"></i> Memeriksa...`;
+            btn.disabled = true;
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: dummyEmail,
+                    password: pin
+                });
+                if (error) throw error;
+                
+                await setupUserDashboard(data.user.id);
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPin').value = '';
+            } catch (err) {
+                showNotification("Gagal login! Periksa kembali Username/PIN.", "error");
+            } finally {
+                btn.innerHTML = `<i data-feather="log-in" class="w-4 h-4"></i> Akses Catatan`;
+                btn.disabled = false;
+                feather.replace();
+            }
+        }
+
+        async function prosesLogout() {
+            await supabaseClient.auth.signOut();
+            currentUserInfo = null;
+            document.getElementById('dashboardArea').classList.add('hidden');
+            document.getElementById('loginArea').classList.remove('hidden');
+            showNotification("Berhasil keluar.", "success");
+        }
+
+        async function setupUserDashboard(userId) {
+            try {
+                const { data: profile, error } = await supabaseClient
+                    .from('profil_pengguna')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (error) throw error;
+                currentUserInfo = profile;
+
+                terapkanOtorisasiUI();
+
+                document.getElementById('loginArea').classList.add('hidden');
+                document.getElementById('dashboardArea').classList.remove('hidden');
+                showNotification(`Selamat datang, ${profile.nama_lengkap}`, "success");
+
+                await loadMasterData();
+            } catch (err) {
+                showNotification("Gagal memuat profil pengguna.", "error");
+                await supabaseClient.auth.signOut();
+            }
+        }
+
+        function terapkanOtorisasiUI() {
+            const tipeInput = document.getElementById('inputTipeHarian');
+            const inputBy = document.getElementById('inputByPegawai');
+            const selReseller = document.getElementById('inputResellerHarian');
+            const btnAdminReset = document.getElementById('btnAdminResetMenu');
+            
+            inputBy.value = currentUserInfo.nama_lengkap;
+            document.getElementById('labelRoleDisplay').innerText = `Role: ${currentUserInfo.role.toUpperCase()}`;
+
+            if (currentUserInfo.role === 'admin') {
+                btnAdminReset.classList.remove('hidden');
+            } else {
+                btnAdminReset.classList.add('hidden');
+            }
+
+            if (currentUserInfo.role === 'karyawan') {
+                tipeInput.innerHTML = '<option value="bahan">🛍️ Bahan Baku (Ambil)</option>';
+                tipeInput.value = 'bahan';
+                tipeInput.disabled = true;
+                selReseller.disabled = false;
+            } else if (currentUserInfo.role === 'reseller') {
+                tipeInput.innerHTML = '<option value="jadi">📦 Barang Jadi (Setoran)</option>';
+                tipeInput.value = 'jadi';
+                tipeInput.disabled = true;
+                selReseller.disabled = true; 
+            } else {
+                tipeInput.innerHTML = `
+                    <option value="semua">Tampilkan Semua</option>
+                    <option value="jadi">📦 Barang Jadi (Setoran)</option>
+                    <option value="bahan">🛍️ Bahan Baku (Ambil)</option>
+                `;
+                tipeInput.value = 'semua';
+                tipeInput.disabled = false;
+                selReseller.disabled = false;
+            }
+        }
+
+        async function prosesGantiPIN() {
+            const pinBaru = document.getElementById('inputPinBaru').value;
+            const pinKonfirmasi = document.getElementById('inputPinKonfirmasi').value;
+            const btn = document.getElementById('btnSimpanPin');
+
+            if(!pinBaru || !pinKonfirmasi) return showNotification("Semua kolom PIN wajib diisi!", "error");
+            if(pinBaru.length < 6) return showNotification("PIN baru minimal harus 6 angka!", "error");
+            if(pinBaru !== pinKonfirmasi) return showNotification("Konfirmasi PIN tidak cocok!", "error");
+
+            btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 animate-spin"></i> Menyimpan...`;
+            btn.disabled = true;
+
+            try {
+                const { error } = await supabaseClient.auth.updateUser({ password: pinBaru });
+                if (error) throw error;
+
+                showNotification("PIN berhasil diubah!", "success");
+                closeFormModal('modalGantiPin');
+                document.getElementById('inputPinBaru').value = '';
+                document.getElementById('inputPinKonfirmasi').value = '';
+            } catch (err) {
+                showNotification("Gagal mengubah PIN: " + err.message, "error");
+            } finally {
+                btn.innerHTML = `Simpan PIN`;
+                btn.disabled = false;
+                feather.replace();
+            }
+        }
+
+        async function bukaModalResetAdmin() {
+            try {
+                const { data, error } = await supabaseClient.from('profil_pengguna').select('*');
+                if(error) throw error;
+
+                const sel = document.getElementById('resetTargetUser');
+                sel.innerHTML = '<option value="">Pilih Pengguna...</option>';
+                data.forEach(u => {
+                    sel.innerHTML += `<option value="${u.id}">${u.nama_lengkap} (${u.username} - ${u.role.toUpperCase()})</option>`;
+                });
+
+                openFormModal('modalResetPinAdmin');
+            } catch(err) {
+                showNotification("Gagal memuat daftar pengguna.", "error");
+            }
+        }
+
+        async function prosesResetPinAdmin() {
+            const targetId = document.getElementById('resetTargetUser').value;
+            const newPin = document.getElementById('resetPinBaru').value;
+            const btn = document.getElementById('btnAdminResetSubmit');
+
+            if(!targetId || !newPin) return showNotification("Pilih pengguna dan masukkan PIN baru!", "error");
+            if(newPin.length < 6) return showNotification("PIN baru minimal harus 6 angka!", "error");
+
+            btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 animate-spin"></i> Memproses...`;
+            btn.disabled = true;
+
+            try {
+                const { error } = await supabaseClient.rpc('admin_reset_user_pin', {
+                    target_user_id: targetId,
+                    new_pin: newPin
+                });
+
+                if(error) throw error;
+
+                showNotification("PIN pengguna berhasil direset!", "success");
+                closeFormModal('modalResetPinAdmin');
+                document.getElementById('resetPinBaru').value = '';
+                document.getElementById('resetTargetUser').value = '';
+            } catch(err) {
+                showNotification("Gagal reset PIN: " + err.message, "error");
+            } finally {
+                btn.innerHTML = `Reset PIN`;
+                btn.disabled = false;
+                feather.replace();
+            }
+        }
+
+        // ================= DATA LOGIC =================
         async function loadMasterData() {
             try {
                 const [resellersData, barangData] = await Promise.all([
@@ -279,17 +557,14 @@
                 statusConn.classList.replace('border-yellow-100', 'border-green-100');
                 if(statusConn.querySelector('.animate-ping')) statusConn.querySelector('.animate-ping').classList.replace('bg-yellow-400', 'bg-green-400');
                 if(statusConn.querySelector('.relative.inline-flex')) statusConn.querySelector('.relative.inline-flex').classList.replace('bg-yellow-500', 'bg-green-500');
-                
                 document.getElementById('text-connection').innerText = 'Online';
                 document.getElementById('text-connection').className = 'text-[9px] font-semibold text-green-700 dark:text-green-400';
 
                 initDefaults();
             } catch (error) {
-                const statusConn = document.getElementById('status-connection');
-                statusConn.classList.replace('bg-yellow-50', 'bg-red-50');
                 document.getElementById('text-connection').innerText = 'Offline';
                 document.getElementById('text-connection').className = 'text-[9px] font-semibold text-red-700 dark:text-red-400';
-                showNotification("Gagal terhubung ke Database Supabase.", "error");
+                showNotification("Gagal memuat master data.", "error");
             }
         }
 
@@ -298,26 +573,30 @@
             selRes.innerHTML = '<option value="">Pilih...</option>';
             masterData.resellers.forEach(r => selRes.innerHTML += `<option value="${r.id}">${r.nama}</option>`);
 
+            if (currentUserInfo && currentUserInfo.role === 'reseller' && currentUserInfo.reseller_id) {
+                selRes.value = currentUserInfo.reseller_id;
+            }
+
             const tzOffset = (new Date()).getTimezoneOffset() * 60000;
             document.getElementById('inputTglHarian').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
 
             document.getElementById('containerHarianRows').innerHTML = '';
-            for(let i=0; i<5; i++) {
-                addRowHarian();
-            }
+            for(let i=0; i<3; i++) { addRowHarian(); }
+            
+            updateOpsiHarian();
             fetchListHarian();
         }
 
-        function getOptionsHarianHtml(tipeFokus = 'semua') {
+        function getOptionsHarianHtmlWithSelected(selectedId = null, tipeFokus = 'semua') {
             let html = '<option value="">Pilih Barang / Bahan...</option>';
             if (tipeFokus === 'semua' || tipeFokus === 'jadi') {
                 html += '<optgroup label="📦 BARANG JADI">';
-                masterData.barangJadi.forEach(b => html += `<option value="${b.id}">${b.nama}</option>`);
+                masterData.barangJadi.forEach(b => html += `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.nama}</option>`);
                 html += '</optgroup>';
             }
             if (tipeFokus === 'semua' || tipeFokus === 'bahan') {
                 html += '<optgroup label="🛍️ BAHAN BAKU">';
-                masterData.bahanBaku.forEach(b => html += `<option value="${b.id}">${b.nama}</option>`);
+                masterData.bahanBaku.forEach(b => html += `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.nama}</option>`);
                 html += '</optgroup>';
             }
             return html;
@@ -325,7 +604,7 @@
 
         function updateOpsiHarian() {
             const tipeFokus = document.getElementById('inputTipeHarian').value;
-            const newHtml = getOptionsHarianHtml(tipeFokus);
+            const newHtml = getOptionsHarianHtmlWithSelected(null, tipeFokus);
             document.querySelectorAll('.item-harian').forEach(select => {
                 const currentVal = select.value;
                 select.innerHTML = newHtml;
@@ -343,11 +622,11 @@
                 <div class="flex gap-2 items-center">
                     <div class="w-7/12">
                         <select class="item-harian w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
-                            ${getOptionsHarianHtml(tipeFokus)}
+                            ${getOptionsHarianHtmlWithSelected(null, tipeFokus)}
                         </select>
                     </div>
                     <div class="w-3/12">
-                        <input type="number" placeholder="Qty" min="1" class="qty-harian w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 text-center">
+                        <input type="number" placeholder="Qty" min="1" class="qty-harian w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 text-center font-bold">
                     </div>
                     <div class="w-2/12 flex justify-end gap-1">
                         <button type="button" onclick="this.closest('.row-input-harian').querySelector('.keterangan-container').classList.toggle('hidden')" class="text-blue-400 hover:text-blue-600 p-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg transition" title="Catatan"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>
@@ -362,211 +641,16 @@
             feather.replace();
         }
 
-        async function fetchListHarian() {
-            const container = document.getElementById('listCatatanHarian');
-            container.innerHTML = `<div class="flex justify-center py-4"><i data-feather="loader" class="w-5 h-5 animate-spin text-blue-500"></i></div>`;
-            feather.replace();
-            try {
-                const { data, error } = await supabaseClient.from('buku_harian').select('*').eq('is_paid', false).order('tanggal_setor', { ascending: false });
-                if(error) throw error;
-                
-                globalDraftData = {};
-                if(data && data.length > 0) {
-                    data.forEach(d => {
-                        let key = `${d.tanggal_setor}_${d.reseller_id}`;
-                        if(!globalDraftData[key]) {
-                            globalDraftData[key] = { tgl: d.tanggal_setor, reseller_id: d.reseller_id, input_by: d.input_by, items: [] };
-                        }
-                        globalDraftData[key].items.push(d);
-                    });
-                }
-                
-                const selDraftAgen = document.getElementById('filterDraftAgen');
-                const currVal = selDraftAgen.value;
-                selDraftAgen.innerHTML = '<option value="">Semua Agen</option>';
-                masterData.resellers.forEach(r => selDraftAgen.innerHTML += `<option value="${r.id}">${r.nama}</option>`);
-                selDraftAgen.value = currVal; 
-
-                renderFilteredDrafts();
-            } catch (err) {
-                container.innerHTML = `<div class="text-center text-red-500 text-xs py-4">Gagal memuat: ${err.message}</div>`;
-            }
-        }
-
-        function renderFilteredDrafts() {
-            const container = document.getElementById('listCatatanHarian');
-            const filterAgen = document.getElementById('filterDraftAgen').value;
-            const filterTglAwal = document.getElementById('filterTglAwal').value;
-            const filterTglAkhir = document.getElementById('filterTglAkhir').value;
-
-            if(Object.keys(globalDraftData).length === 0) {
-                container.innerHTML = '<div class="text-center text-gray-400 text-xs py-6 italic">Belum ada catatan harian tersimpan.</div>';
-                return;
-            }
-
-            let html = '';
-            Object.keys(globalDraftData).forEach(key => {
-                let group = globalDraftData[key];
-                
-                if (filterAgen && group.reseller_id !== filterAgen) return;
-                if (filterTglAwal && group.tgl < filterTglAwal) return;
-                if (filterTglAkhir && group.tgl > filterTglAkhir) return;
-
-                let reseller = masterData.resellers.find(r => r.id === group.reseller_id);
-                let rName = reseller ? reseller.nama : 'Unknown';
-                let formattedDate = formatHariTanggalID(group.tgl); 
-                let totalItems = group.items.length;
-                let inputByName = group.input_by || '-';
-
-                html += `
-                <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 shadow-sm text-xs transition flex justify-between items-center group">
-                    <div onclick="bukaDetailDraft('${key}')" class="flex-1 cursor-pointer flex flex-col justify-center truncate pr-2">
-                        <div class="font-bold text-gray-800 dark:text-slate-200 flex items-center gap-1.5">
-                            <i data-feather="user" class="w-3.5 h-3.5 text-blue-500 shrink-0"></i>
-                            <span class="truncate">${rName}</span> <span class="text-gray-400 font-medium text-[10px]">(${totalItems})</span>
-                        </div>
-                        <div class="text-[9px] text-gray-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
-                            <i data-feather="edit-2" class="w-2.5 h-2.5"></i> Disiapkan oleh: <span class="font-semibold">${inputByName}</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <button onclick="cetakDraftKhusus('${key}')" class="text-blue-500 bg-blue-50 dark:bg-blue-900/30 p-1.5 rounded-lg hover:bg-blue-100 transition" title="Cetak Bluetooth">
-                            <i data-feather="printer" class="w-3.5 h-3.5"></i>
-                        </button>
-                        <button onclick="bukaDetailDraft('${key}')" class="text-pink-500 bg-pink-50 dark:bg-pink-900/30 p-1.5 rounded-lg hover:bg-pink-100 transition" title="Rincian">
-                            <i data-feather="file-text" class="w-3.5 h-3.5"></i>
-                        </button>
-                        <span class="font-semibold text-gray-500 dark:text-slate-400 text-[10px] ml-1">${formattedDate}</span>
-                    </div>
-                </div>`;
-            });
-
-            container.innerHTML = html || '<div class="text-center text-gray-400 text-xs py-6 italic">Data tidak ditemukan.</div>';
-            feather.replace();
-        }
-
-        function bukaDetailDraft(key) {
-            const group = globalDraftData[key];
-            if(!group) return;
-
-            let reseller = masterData.resellers.find(r => r.id === group.reseller_id);
-            let rName = reseller ? reseller.nama : 'Unknown';
-
-            document.getElementById('headerDetailDraft').innerHTML = `
-                <div class="flex justify-between items-start">
-                    <div class="flex flex-col">
-                        <span class="font-black text-gray-800 dark:text-slate-200 text-xs">${rName}</span>
-                        <div class="text-[10px] text-gray-500 dark:text-slate-400 mt-1 flex items-center gap-1">
-                            <i data-feather="edit-2" class="w-2.5 h-2.5"></i> Disiapkan oleh: ${group.input_by || '-'}
-                        </div>
-                    </div>
-                    <span class="text-xs font-semibold text-gray-500 dark:text-slate-400 text-right">${formatHariTanggalID(group.tgl)}</span>
-                </div>
-            `;
-
-            let htmlList = '';
-            group.items.forEach(item => {
-                let barang = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
-                let bName = barang ? barang.nama : 'Barang Dihapus';
-                let badgeColor = item.tipe === 'bahan' ? 'bg-red-50 text-red-600 border-red-100 dark:bg-red-900/30 dark:border-red-800' : 'bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-900/30 dark:border-blue-800';
-                let textKet = item.keterangan ? `<div class="w-full mt-1 pt-1 border-t border-gray-200/60 text-[10px] text-gray-500 italic">Catatan: ${item.keterangan}</div>` : '';
-
-                htmlList += `
-                <li id="draft-item-${item.id}" class="flex flex-col bg-gray-50 dark:bg-slate-700/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-600 text-xs transition-all duration-300 origin-top overflow-hidden">
-                    <div class="flex justify-between items-center w-full">
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor}">${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}</span>
-                            <span class="font-semibold text-gray-700 dark:text-slate-300">${bName}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-black text-blue-600 dark:text-blue-400">Qty: ${item.qty}</span>
-                            <button onclick="hapusCatatanHarian('${item.id}', '${key}')" class="text-red-400 hover:text-red-600 p-1 bg-white dark:bg-slate-800 rounded-lg border border-red-100 shadow-sm"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
-                        </div>
-                    </div>
-                    ${textKet}
-                </li>`;
-            });
-
-            document.getElementById('listDetailDraft').innerHTML = htmlList;
-            openFormModal('modalDetailDraft');
-            feather.replace();
-        }
-
-        let draftToDelete = null;
-
-        function hapusCatatanHarian(id, groupKey = null) {
-            draftToDelete = { id, groupKey };
-            document.getElementById('inputPinHapus').value = '';
-            openFormModal('modalPin');
-        }
-
-        async function prosesHapusCatatanHarian() {
-            const pin = document.getElementById('inputPinHapus').value;
-            if (pin !== "942715") {
-                showNotification("PIN Salah!", "error");
-                return;
-            }
-
-            if(!draftToDelete) return;
-            const { id, groupKey } = draftToDelete;
-
-            // 1. TUTUP MODAL PIN LANGSUNG AGAR TERASA INSTAN
-            closeFormModal('modalPin');
-
-            // 2. MANIPULASI DOM LANGSUNG UNTUK ANIMASI HILANG (SUPER REALTIME)
-            const itemEl = document.getElementById(`draft-item-${id}`);
-            if (itemEl) {
-                itemEl.style.opacity = '0';
-                itemEl.style.transform = 'scale(0.95)';
-                itemEl.style.height = '0px';
-                itemEl.style.padding = '0px';
-                itemEl.style.marginBottom = '0px';
-                itemEl.style.borderWidth = '0px';
-            }
-
-            // 3. UPDATE STATE DATA
-            let isGroupEmpty = false;
-            if (groupKey && globalDraftData[groupKey]) {
-                globalDraftData[groupKey].items = globalDraftData[groupKey].items.filter(item => item.id !== id);
-                if (globalDraftData[groupKey].items.length === 0) {
-                    delete globalDraftData[groupKey];
-                    isGroupEmpty = true;
-                }
-            }
-
-            // 4. UPDATE BACKGROUND LIST & TUTUP MODAL JIKA KOSONG
-            setTimeout(() => {
-                if (isGroupEmpty) {
-                    closeFormModal('modalDetailDraft');
-                } else if (groupKey && globalDraftData[groupKey]) {
-                    bukaDetailDraft(groupKey);
-                }
-                renderFilteredDrafts(); 
-            }, 250);
-
-            // 5. PROSES BACKEND (Berjalan diam-diam di latar belakang)
-            try {
-                const { error } = await supabaseClient.from('buku_harian').delete().eq('id', id);
-                if(error) throw error;
-                showNotification("Catatan dihapus!", "success");
-            } catch (err) { 
-                showNotification("Gagal menghapus: " + err.message, "error"); 
-                fetchListHarian(); 
-            } finally {
-                draftToDelete = null;
-            }
-        }
-
         async function simpanCatatanHarian() {
             const tgl = document.getElementById('inputTglHarian').value;
             const rId = document.getElementById('inputResellerHarian').value;
             const inputBy = document.getElementById('inputByPegawai').value;
             
             if(!tgl || !rId) return showNotification("Lengkapi Tanggal dan Agen!", "error");
-            if(!inputBy) return showNotification("Mohon pilih Input By (Nama Pegawai) terlebih dahulu!", "error");
             
             const rows = document.querySelectorAll('.row-input-harian');
             let dataToInsert = [];
+            let statusInput = (currentUserInfo.role === 'reseller') ? 'pending' : 'approved';
             
             rows.forEach(row => {
                 const bId = row.querySelector('.item-harian').value;
@@ -583,7 +667,8 @@
                         tipe: tipeOtomatis,
                         keterangan: ket,
                         is_paid: false,
-                        input_by: inputBy
+                        input_by: inputBy,
+                        status: statusInput
                     });
                 }
             });
@@ -599,22 +684,25 @@
                 if(error) throw error;
                 
                 showNotification(`${dataToInsert.length} catatan disimpan!`, "success");
-                
-                lastSavedGroupKey = `${tgl}_${rId}`;
+                lastSavedGroupKey = { rId: rId, tgl: tgl };
 
                 const tzOffset = (new Date()).getTimezoneOffset() * 60000;
                 document.getElementById('inputTglHarian').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
-                document.getElementById('inputResellerHarian').value = '';
-                document.getElementById('inputByPegawai').value = '';
-                document.getElementById('inputTipeHarian').value = 'semua';
-                updateOpsiHarian();
-                
                 document.getElementById('containerHarianRows').innerHTML = '';
-                for(let i=0; i<5; i++) {
-                    addRowHarian();
-                }
+                for(let i=0; i<3; i++) { addRowHarian(); }
                 
                 await fetchListHarian();
+
+                if (currentUserInfo.role === 'reseller') {
+                    document.getElementById('postSaveTitle').innerText = "Setoran Menunggu Validasi";
+                    document.getElementById('postSaveMsg').innerText = "Data berhasil dikirim dan menunggu validasi Admin SBR.";
+                    document.getElementById('btnPostSavePrint').classList.add('hidden');
+                } else {
+                    document.getElementById('postSaveTitle').innerText = "Catatan Tersimpan!";
+                    document.getElementById('postSaveMsg').innerText = "Ingin mencetak nota ini langsung ke printer bluetooth thermal 58mm?";
+                    document.getElementById('btnPostSavePrint').classList.remove('hidden');
+                }
+
                 openFormModal('modalPostSave');
             } catch (err) {
                 showNotification("Gagal menyimpan: " + err.message, "error");
@@ -625,31 +713,418 @@
             }
         }
 
-        // ================= BLUETOOTH THERMAL PRINT (58MM) =================
-        async function cetakDraftTerakhir() {
-            if (!lastSavedGroupKey || !globalDraftData[lastSavedGroupKey]) {
-                showNotification("Data draft tidak ditemukan untuk dicetak.", "error");
+        // ================= FETCH & RENDER (NESTED ACCORDION) =================
+        async function fetchListHarian() {
+            const container = document.getElementById('listCatatanHarian');
+            container.innerHTML = `<div class="flex justify-center py-4"><i data-feather="loader" class="w-5 h-5 animate-spin text-blue-500"></i></div>`;
+            feather.replace();
+            
+            try {
+                let query = supabaseClient.from('buku_harian').select('*').eq('is_paid', false).order('tanggal_setor', { ascending: false });
+                
+                if (currentUserInfo.role === 'reseller' && currentUserInfo.reseller_id) {
+                    query = query.eq('reseller_id', currentUserInfo.reseller_id);
+                }
+
+                const { data, error } = await query;
+                if(error) throw error;
+                
+                // Grouping baru: Berdasarkan Reseller -> lalu Tanggal
+                globalDraftData = {};
+                if(data && data.length > 0) {
+                    data.forEach(d => {
+                        let rId = d.reseller_id;
+                        let tgl = d.tanggal_setor;
+                        if(!globalDraftData[rId]) {
+                            let rObj = masterData.resellers.find(r => r.id === rId);
+                            globalDraftData[rId] = { reseller_id: rId, reseller_name: rObj ? rObj.nama : 'Unknown Reseller', dates: {} };
+                        }
+                        if(!globalDraftData[rId].dates[tgl]) {
+                            globalDraftData[rId].dates[tgl] = [];
+                        }
+                        globalDraftData[rId].dates[tgl].push(d);
+                    });
+                }
+                
+                const selDraftAgen = document.getElementById('filterDraftAgen');
+                const currVal = selDraftAgen.value;
+                selDraftAgen.innerHTML = '<option value="">Semua Agen</option>';
+                
+                if (currentUserInfo.role === 'reseller') {
+                    let r = masterData.resellers.find(x => x.id === currentUserInfo.reseller_id);
+                    if(r) selDraftAgen.innerHTML += `<option value="${r.id}">${r.nama}</option>`;
+                    selDraftAgen.disabled = true;
+                } else {
+                    masterData.resellers.forEach(r => selDraftAgen.innerHTML += `<option value="${r.id}">${r.nama}</option>`);
+                    selDraftAgen.disabled = false;
+                }
+                
+                selDraftAgen.value = currVal; 
+                renderFilteredDrafts();
+            } catch (err) {
+                container.innerHTML = `<div class="text-center text-red-500 text-xs py-4">Gagal memuat: ${err.message}</div>`;
+            }
+        }
+
+        function toggleResellerAccordion(rId) {
+            const content = document.getElementById(`accContent_${rId}`);
+            const icon = document.getElementById(`iconAcc_${rId}`);
+            if (content.classList.contains('hidden')) { 
+                content.classList.remove('hidden'); 
+                icon.classList.add('rotate-180'); 
+            } else { 
+                content.classList.add('hidden'); 
+                icon.classList.remove('rotate-180'); 
+            }
+        }
+
+        function renderFilteredDrafts() {
+            const container = document.getElementById('listCatatanHarian');
+            const filterAgen = document.getElementById('filterDraftAgen').value;
+            const filterTglAwal = document.getElementById('filterTglAwal').value;
+            const filterTglAkhir = document.getElementById('filterTglAkhir').value;
+
+            if(Object.keys(globalDraftData).length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 text-xs py-6 italic">Belum ada catatan harian tersimpan.</div>';
                 return;
             }
-            await prosesCetakBluetooth(globalDraftData[lastSavedGroupKey]);
+
+            let html = '';
+            
+            Object.keys(globalDraftData).forEach(rId => {
+                const groupReseller = globalDraftData[rId];
+                if (filterAgen && rId !== filterAgen) return;
+
+                let validDates = {};
+                Object.keys(groupReseller.dates).forEach(tgl => {
+                    if (filterTglAwal && tgl < filterTglAwal) return;
+                    if (filterTglAkhir && tgl > filterTglAkhir) return;
+                    validDates[tgl] = groupReseller.dates[tgl];
+                });
+
+                const totalHari = Object.keys(validDates).length;
+                if(totalHari === 0) return;
+
+                let isResellerHasPending = false;
+                Object.values(validDates).forEach(items => { if(items.some(i => i.status === 'pending')) isResellerHasPending = true; });
+
+                const resBadgeColor = isResellerHasPending ? 'bg-orange-100 text-orange-600 border border-orange-200' : 'bg-blue-50 text-blue-600 border border-blue-100';
+
+                html += `
+                <div class="border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-800 shadow-sm mb-2">
+                    <button onclick="toggleResellerAccordion('${rId}')" class="w-full p-3 flex justify-between items-center bg-gray-50/80 dark:bg-slate-700/50 hover:bg-gray-100 dark:hover:bg-slate-700 transition text-left">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">
+                                <i data-feather="user" class="w-4 h-4"></i>
+                            </div>
+                            <div class="truncate">
+                                <span class="font-bold text-xs text-gray-800 dark:text-slate-100 block truncate">${groupReseller.reseller_name}</span>
+                                <span class="text-[10px] text-gray-500 font-medium">${totalHari} Hari Tersimpan</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-[9px] font-black px-1.5 py-0.5 rounded-md ${resBadgeColor}">
+                                ${isResellerHasPending ? 'Pending' : totalHari + ' Hari'}
+                            </span>
+                            <i data-feather="chevron-down" id="iconAcc_${rId}" class="w-4 h-4 text-gray-400 transition-transform duration-200"></i>
+                        </div>
+                    </button>
+                    
+                    <div id="accContent_${rId}" class="hidden border-t border-gray-100 dark:border-slate-700 p-2 space-y-1.5 bg-white dark:bg-slate-800">
+                `;
+
+                Object.keys(validDates).sort((a,b) => new Date(b) - new Date(a)).forEach(tgl => {
+                    const itemsOnDate = validDates[tgl];
+                    const countItems = itemsOnDate.length;
+                    const countPending = itemsOnDate.filter(i => i.status === 'pending').length;
+                    
+                    const statusBadge = countPending > 0 
+                        ? `<span class="bg-orange-100 text-orange-600 text-[9px] font-bold px-1.5 py-0.5 rounded border border-orange-200">${countPending} Pending</span>`
+                        : `<span class="bg-emerald-100 text-emerald-600 text-[9px] font-bold px-1.5 py-0.5 rounded border border-emerald-200"><i data-feather="check" class="w-2 h-2 inline"></i> OK</span>`;
+
+                    html += `
+                        <div class="flex justify-between items-center p-2 rounded-lg bg-gray-50/50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600">
+                            <div onclick="bukaDetailDraft('${rId}', '${tgl}')" class="flex-1 flex items-center gap-2 cursor-pointer">
+                                <i data-feather="calendar" class="w-3.5 h-3.5 text-blue-500 shrink-0"></i>
+                                <div>
+                                    <span class="text-[11px] font-semibold text-gray-700 dark:text-slate-200 block">${formatHariTanggalID(tgl)}</span>
+                                    <span class="text-[9px] text-gray-500 dark:text-slate-400">${countItems} barang</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                ${statusBadge}
+                                ${currentUserInfo.role !== 'reseller' ? `
+                                <button onclick="cetakDraftKhusus('${rId}', '${tgl}')" class="text-blue-500 bg-blue-100 dark:bg-blue-900/50 p-1.5 rounded-md hover:bg-blue-200 transition shadow-sm" title="Cetak Bluetooth">
+                                    <i data-feather="printer" class="w-3 h-3"></i>
+                                </button>` : ''}
+                                <button onclick="bukaDetailDraft('${rId}', '${tgl}')" class="text-gray-400 hover:text-blue-500 p-1">
+                                    <i data-feather="chevron-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html || '<div class="text-center text-gray-400 text-xs py-6 italic">Data tidak ditemukan pada rentang filter ini.</div>';
+            feather.replace();
+        }
+
+        // ================= FUNGSI REVIEW & KOREKSI INLINE =================
+        function toggleEditRow(btn) {
+            const li = btn.closest('.draft-edit-row');
+            const viewMode = li.querySelector('.view-mode');
+            const editMode = li.querySelector('.edit-mode');
+            
+            if (viewMode.classList.contains('hidden')) {
+                viewMode.classList.remove('hidden');
+                editMode.classList.add('hidden');
+            } else {
+                viewMode.classList.add('hidden');
+                editMode.classList.remove('hidden');
+            }
+        }
+
+        function bukaDetailDraft(rId, tgl) {
+            if(!globalDraftData[rId] || !globalDraftData[rId].dates[tgl]) return;
+
+            const resellerName = globalDraftData[rId].reseller_name;
+            const items = globalDraftData[rId].dates[tgl];
+            const inputBy = items[0]?.input_by || '-';
+            const isGroupPending = items.some(i => i.status === 'pending');
+            
+            // Hak akses sepenuhnya HANYA untuk Admin
+            const isAdmin = currentUserInfo.role === 'admin';
+
+            document.getElementById('headerDetailDraft').innerHTML = `
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="font-black text-gray-800 dark:text-slate-200 text-sm block">${resellerName}</span>
+                            <span class="text-[10px] text-gray-500 dark:text-slate-400">Oleh: <b>${inputBy}</b></span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-slate-700 px-1.5 py-0.5 rounded block mb-1">${formatHariTanggalID(tgl)}</span>
+                            ${isGroupPending 
+                                ? `<span class="text-[9px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-bold border border-orange-200">Menunggu Review</span>` 
+                                : `<span class="text-[9px] bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded font-bold border border-emerald-200">Disetujui</span>`}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            let htmlList = '';
+            items.forEach(item => {
+                let badgeColor = item.tipe === 'bahan' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-blue-50 text-blue-600 border-blue-100';
+                let isPending = item.status === 'pending';
+                let barang = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
+                let bName = barang ? barang.nama : 'Barang Dihapus';
+                
+                // UI View (Tampilan Ringkas)
+                // Jika Admin dan status Pending, akan default membuka menu Edit, selain itu (non-admin atau approved) tetap Read-Only View
+                let hideViewDefault = (isAdmin && isPending);
+                let viewModeHtml = `
+                    <div class="view-mode flex flex-col w-full ${hideViewDefault ? 'hidden' : ''}">
+                        <div class="flex justify-between items-center w-full">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor} dark:bg-opacity-20">${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}</span>
+                                <span class="font-semibold text-gray-700 dark:text-slate-300 text-xs">${bName}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-blue-600 dark:text-blue-400 text-xs bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-800">Qty: ${item.qty}</span>
+                                ${isAdmin ? `<button onclick="toggleEditRow(this)" class="text-amber-500 hover:text-amber-600 p-1 rounded-lg transition bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800/50 shadow-sm" title="Koreksi Data"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>` : ''}
+                            </div>
+                        </div>
+                        ${item.keterangan ? `<div class="w-full mt-1.5 pt-1.5 border-t border-gray-200/60 dark:border-slate-600 text-[10px] text-gray-500 dark:text-slate-400 italic">Ket: ${item.keterangan}</div>` : ''}
+                    </div>
+                `;
+
+                // UI Edit (Tampilan Kolom Lengkap) HANYA di render untuk Admin
+                let editModeHtml = '';
+                if (isAdmin) {
+                    editModeHtml = `
+                        <div class="edit-mode flex flex-col w-full gap-1.5 ${isPending ? '' : 'hidden'}">
+                            <div class="flex justify-between items-center gap-2 w-full">
+                                <div class="w-8/12 flex flex-col">
+                                    <span class="text-[9px] font-bold px-1.5 py-0.5 mb-1 rounded border self-start ${badgeColor} dark:bg-opacity-20">${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}</span>
+                                    <select class="edit-brg w-full text-[11px] p-1.5 border border-gray-300 dark:border-slate-500 rounded focus:border-blue-500 bg-gray-50 dark:bg-slate-800 font-semibold text-gray-800 dark:text-slate-100">
+                                        ${getOptionsHarianHtmlWithSelected(item.barang_id)}
+                                    </select>
+                                </div>
+                                <div class="w-3/12">
+                                    <label class="block text-[9px] font-bold text-gray-500 mb-0.5 text-center">Qty</label>
+                                    <input type="number" class="edit-qty w-full text-xs p-1.5 border border-gray-300 dark:border-slate-500 rounded text-center font-black bg-gray-50 dark:bg-slate-800 text-blue-600 focus:border-blue-500" value="${item.qty}">
+                                </div>
+                                <div class="w-1/12 flex justify-end self-end mb-0.5 gap-1">
+                                    <button onclick="hapusCatatanHarian('${item.id}', '${rId}', '${tgl}', this)" class="text-gray-400 hover:text-red-500 bg-gray-100 dark:bg-slate-700 hover:bg-red-50 p-1.5 rounded border border-gray-200 dark:border-slate-600 transition" title="Hapus"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
+                                </div>
+                            </div>
+                            <div class="w-full flex gap-1.5 mt-0.5">
+                                <input type="text" class="edit-ket flex-1 text-[10px] p-1.5 border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-800 rounded placeholder-gray-400 text-gray-600 dark:text-gray-300 focus:border-blue-400" placeholder="Ketik keterangan opsional..." value="${item.keterangan || ''}">
+                                ${!isPending ? `<button onclick="toggleEditRow(this)" class="bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-300 px-2 rounded transition text-[10px] font-bold border border-gray-200 dark:border-slate-600 flex items-center gap-1" title="Batal Koreksi"><i data-feather="x" class="w-3 h-3"></i> Batal</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                htmlList += `
+                <li class="draft-edit-row flex flex-col bg-white dark:bg-slate-700/50 p-2.5 rounded-xl border border-gray-200 dark:border-slate-600 shadow-sm" data-id="${item.id}">
+                    ${viewModeHtml}
+                    ${editModeHtml}
+                </li>`;
+            });
+
+            document.getElementById('listDetailDraft').innerHTML = htmlList;
+            
+            const footer = document.getElementById('footerDetailDraft');
+            
+            if (isAdmin) {
+                // Tampilan Action Footer khusus Admin
+                if (isGroupPending) {
+                    footer.innerHTML = `
+                        <button onclick="closeFormModal('modalDetailDraft')" class="flex-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-[11px] font-bold py-2.5 rounded-xl border border-gray-200 dark:border-slate-600">Batal Review</button>
+                        <button onclick="setujuiDanSimpanDraft('${rId}', '${tgl}')" class="w-2/3 bg-orange-500 hover:bg-orange-400 text-white text-[11px] font-bold py-2.5 rounded-xl flex items-center justify-center gap-1 shadow-sm"><i data-feather="check-circle" class="w-3.5 h-3.5"></i> Setujui & Simpan Semua</button>
+                    `;
+                } else {
+                    footer.innerHTML = `
+                        <button onclick="closeFormModal('modalDetailDraft')" class="flex-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-[11px] font-bold py-2.5 rounded-xl border border-gray-200 dark:border-slate-600">Tutup</button>
+                        <button onclick="setujuiDanSimpanDraft('${rId}', '${tgl}')" class="w-2/3 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold py-2.5 rounded-xl flex items-center justify-center gap-1 shadow-sm"><i data-feather="save" class="w-3.5 h-3.5"></i> Simpan Perubahan</button>
+                    `;
+                }
+            } else {
+                // Tampilan Action Footer Read-Only untuk Reseller dan Karyawan
+                footer.innerHTML = `
+                    <button onclick="closeFormModal('modalDetailDraft')" class="w-full bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-[11px] font-bold py-2.5 rounded-xl border border-gray-200 dark:border-slate-600">Tutup Rincian</button>
+                `;
+            }
+
+            openFormModal('modalDetailDraft');
+        }
+
+        async function setujuiDanSimpanDraft(rId, tgl) {
+            const rows = document.querySelectorAll('.draft-edit-row');
+            let updates = [];
+            let hasError = false;
+
+            rows.forEach(row => {
+                const id = row.dataset.id;
+                const bId = row.querySelector('.edit-brg').value;
+                const qty = parseFloat(row.querySelector('.edit-qty').value) || 0;
+                const ket = row.querySelector('.edit-ket').value;
+
+                if (!bId || qty <= 0) hasError = true;
+
+                const tipe = masterData.bahanBaku.some(b => b.id === bId) ? 'bahan' : 'jadi';
+                let newStatus = (currentUserInfo.role === 'admin') ? 'approved' : 'pending';
+                
+                updates.push({ 
+                    id: id,
+                    reseller_id: rId,
+                    tanggal_setor: tgl,
+                    barang_id: bId, 
+                    qty: qty, 
+                    keterangan: ket, 
+                    tipe: tipe, 
+                    status: newStatus,
+                    is_paid: false
+                });
+            });
+
+            if (hasError) return showNotification("Pastikan semua form terisi dengan Qty > 0!", "error");
+            if (updates.length === 0) return showNotification("Tidak ada data untuk disimpan.", "error");
+
+            try {
+                // Upsert untuk update masal
+                const { error } = await supabaseClient.from('buku_harian').upsert(updates);
+                if (error) throw error;
+
+                if(currentUserInfo.role === 'admin') {
+                    showNotification("Draf harian disetujui & diperbarui!", "success");
+                } else {
+                    showNotification("Perubahan draf berhasil disimpan!", "success");
+                }
+
+                closeFormModal('modalDetailDraft');
+                await fetchListHarian();
+            } catch(e) {
+                showNotification("Gagal memproses persetujuan: " + e.message, "error");
+            }
+        }
+
+        let draftToDelete = null;
+
+        function hapusCatatanHarian(id, rId = null, tgl = null, btnElement = null) {
+            draftToDelete = { id, rId, tgl, btnElement };
+            
+            // Validasi ketat, murni hanya admin yang bisa masuk ke modal PIN Hapus
+            if(currentUserInfo.role !== 'admin') {
+                showNotification("Hanya Admin yang memiliki izin menghapus rincian!", "error");
+                return;
+            }
+
+            document.getElementById('inputPinHapus').value = '';
+            openFormModal('modalPin');
+        }
+
+        async function prosesHapusCatatanHarian() {
+            const pin = document.getElementById('inputPinHapus').value;
+            
+            if (pin !== "942715") {
+                showNotification("PIN Admin Salah!", "error");
+                return;
+            }
+            if(!draftToDelete) return;
+            
+            const { id, rId, tgl, btnElement } = draftToDelete;
+            closeFormModal('modalPin');
+
+            const itemEl = document.getElementById(`draft-item-${id}`) || btnElement?.closest('li');
+            if (itemEl) itemEl.style.display = 'none';
+
+            try {
+                const { error } = await supabaseClient.from('buku_harian').delete().eq('id', id);
+                if(error) throw error;
+                
+                showNotification("Catatan dihapus!", "success");
+                
+                if (rId && tgl && globalDraftData[rId] && globalDraftData[rId].dates[tgl]) {
+                    globalDraftData[rId].dates[tgl] = globalDraftData[rId].dates[tgl].filter(item => String(item.id) !== String(id));
+                    
+                    if (globalDraftData[rId].dates[tgl].length === 0) {
+                        delete globalDraftData[rId].dates[tgl];
+                        closeFormModal('modalDetailDraft');
+                    }
+                    if (Object.keys(globalDraftData[rId].dates).length === 0) {
+                        delete globalDraftData[rId];
+                    }
+                }
+                
+                renderFilteredDrafts();
+            } catch (err) { 
+                showNotification("Gagal: " + err.message, "error"); 
+            } finally {
+                draftToDelete = null;
+            }
+        }
+
+        // ================= BLUETOOTH PRINT (58MM) =================
+        async function cetakDraftTerakhir() {
+            if (!lastSavedGroupKey || !globalDraftData[lastSavedGroupKey.rId] || !globalDraftData[lastSavedGroupKey.rId].dates[lastSavedGroupKey.tgl]) return showNotification("Data tidak ditemukan.", "error");
+            await prosesCetakBluetooth(globalDraftData[lastSavedGroupKey.rId].dates[lastSavedGroupKey.tgl], lastSavedGroupKey.rId, lastSavedGroupKey.tgl); 
             closeFormModal('modalPostSave');
         }
 
-        async function cetakDraftKhusus(key) {
-            if (!globalDraftData[key]) {
-                showNotification("Data draft tidak ditemukan.", "error");
-                return;
-            }
-            await prosesCetakBluetooth(globalDraftData[key]);
+        async function cetakDraftKhusus(rId, tgl) {
+            if (!globalDraftData[rId] || !globalDraftData[rId].dates[tgl]) return showNotification("Data tidak ditemukan.", "error");
+            await prosesCetakBluetooth(globalDraftData[rId].dates[tgl], rId, tgl);
         }
 
-        async function prosesCetakBluetooth(groupData) {
+        async function prosesCetakBluetooth(items, rId, tgl) {
             try {
-                if (!navigator.bluetooth) {
-                    showNotification("Web Bluetooth tidak didukung di perangkat/browser Anda.", "error");
-                    return;
-                }
-                showNotification("Menghubungkan ke printer thermal...", "info");
+                if (!navigator.bluetooth) throw new Error("Web Bluetooth tidak didukung browser ini.");
+                showNotification("Menghubungkan ke printer...", "info");
                 
                 const device = await navigator.bluetooth.requestDevice({
                     acceptAllDevices: true,
@@ -658,98 +1133,58 @@
                 
                 const server = await device.gatt.connect();
                 const services = await server.getPrimaryServices();
-                let targetCharacteristic = null;
+                let targetChar = null;
                 
                 for (let s of services) {
-                    const characteristics = await s.getCharacteristics();
-                    for (let c of characteristics) {
-                        if (c.properties.write || c.properties.writeWithoutResponse) {
-                            targetCharacteristic = c;
-                            break;
-                        }
+                    for (let c of await s.getCharacteristics()) {
+                        if (c.properties.write || c.properties.writeWithoutResponse) { targetChar = c; break; }
                     }
-                    if (targetCharacteristic) break;
+                    if (targetChar) break;
                 }
 
-                if (!targetCharacteristic) {
-                    throw new Error("Karakteristik write printer bluetooth tidak ditemukan.");
-                }
+                if (!targetChar) throw new Error("Karakteristik write printer tidak ditemukan.");
 
-                let encoder = new TextEncoder();
-                let commands = [];
+                let enc = new TextEncoder(); let cmd = [];
+                cmd.push(0x1B, 0x40); 
+                cmd.push(0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01); 
+                cmd.push(...enc.encode("SBR PUTRA FOOD\n"));
+                cmd.push(0x1B, 0x45, 0x00); 
+                cmd.push(...enc.encode("NOTA CATATAN HARIAN\n--------------------------------\n"));
                 
-                // ESC/POS Command: Inisialisasi
-                commands.push(0x1B, 0x40);
-                
-                // Header (Center, Bold)
-                commands.push(0x1B, 0x61, 0x01); 
-                commands.push(0x1B, 0x45, 0x01); 
-                commands.push(...encoder.encode("SBR RESELLER\n"));
-                commands.push(0x1B, 0x45, 0x00); 
-                commands.push(...encoder.encode("CATATAN PENGAMBILAN BAHAN BAKU\n"));
-                commands.push(...encoder.encode("--------------------------------\n"));
-                
-                // Detail Reseller & Tanggal (Left)
-                commands.push(0x1B, 0x61, 0x00);
-                let reseller = masterData.resellers.find(r => r.id === groupData.reseller_id);
-                let rName = reseller ? reseller.nama : 'Reseller';
-                commands.push(...encoder.encode(`Reseller : ${rName}\n`));
-                
-                // Nama Hari
-                const listHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-                const namaHari = listHari[new Date(groupData.tgl).getDay()];
+                cmd.push(0x1B, 0x61, 0x00);
+                let res = masterData.resellers.find(r => r.id === rId);
+                cmd.push(...enc.encode(`Agen/Reseller : ${res ? res.nama : '-'}\n`));
+                cmd.push(...enc.encode(`Tgl Transaksi : ${formatHariTanggalID(tgl)}\n`));
+                cmd.push(...enc.encode("--------------------------------\nQTY | NAMA BARANG\n--------------------------------\n\n"));
 
-                commands.push(...encoder.encode(`Hari/tgl : ${namaHari}, ${formatTanggalID(groupData.tgl)}\n`));
-                commands.push(...encoder.encode("--------------------------------\n"));
-                commands.push(...encoder.encode("QTY | NAMA BARANG\n"));
-                commands.push(...encoder.encode("--------------------------------\n\n"));
-
-                groupData.items.forEach(item => {
-                    let barang = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
-                    let bName = barang ? barang.nama : 'Item';
-                    commands.push(...encoder.encode(`${`${item.qty}x`.padEnd(4, ' ')}| ${bName}\n`));
-                    if(item.keterangan) {
-                        commands.push(...encoder.encode(`        Ket: ${item.keterangan}\n`));
-                    }
+                items.forEach(item => {
+                    let brg = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
+                    cmd.push(...enc.encode(`${`${item.qty}x`.padEnd(4, ' ')}| ${brg ? brg.nama : 'Item'}\n`));
+                    if(item.keterangan) cmd.push(...enc.encode(`        Ket: ${item.keterangan}\n`));
                 });
                 
-                commands.push(...encoder.encode("\n"));
-                commands.push(0x1B, 0x61, 0x01); // Center
-                commands.push(...encoder.encode(`Dibuat/disiapkan oleh : ${groupData.input_by || '-'}\n`));
-                commands.push(...encoder.encode("--------------------------------\n"));
-                commands.push(0x1B, 0x61, 0x01); // Center
-                commands.push(...encoder.encode("MOHON CEK KEMBALI\n\n\n\n"));
-                commands.push(0x1D, 0x56, 0x41, 0x03); // Cut
+                cmd.push(...enc.encode("\n"));
+                cmd.push(0x1B, 0x61, 0x01);
+                cmd.push(...enc.encode(`Disiapkan oleh: ${items[0]?.input_by || '-'}\n`));
+                cmd.push(...enc.encode("--------------------------------\nMOHON CEK KEMBALI\n\n\n\n"));
+                cmd.push(0x1D, 0x56, 0x41, 0x03);
 
-                // --- MODIFIKASI TRANSFER DATA BERTAHAP (CHUNKING) ---
-                const rawData = new Uint8Array(commands);
-                const CHUNK_SIZE = 64; 
-                
-                for (let i = 0; i < rawData.length; i += CHUNK_SIZE) {
-                    const chunk = rawData.slice(i, i + CHUNK_SIZE);
-                    await targetCharacteristic.writeValue(chunk);
-                    await new Promise(resolve => setTimeout(resolve, 50)); 
+                const rawData = new Uint8Array(cmd);
+                for (let i = 0; i < rawData.length; i += 64) {
+                    await targetChar.writeValue(rawData.slice(i, i + 64));
+                    await new Promise(r => setTimeout(r, 50)); 
                 }
-                // ---------------------------------------------------
-
-                showNotification("Berhasil mencetak nota ke printer!", "success");
+                showNotification("Berhasil mencetak!", "success");
             } catch (err) {
-                console.error(err);
-                showNotification("Gagal cetak bluetooth: " + err.message, "error");
+                showNotification("Gagal cetak: " + err.message, "error");
             }
         }
 
-        function openFormModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-            feather.replace();
-        }
-
-        function closeFormModal(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
+        function openFormModal(id) { document.getElementById(id).classList.remove('hidden'); feather.replace(); }
+        function closeFormModal(id) { document.getElementById(id).classList.add('hidden'); }
 
         window.onload = () => {
-            loadMasterData();
+            checkSession();
         };
     </script>
 </body>
