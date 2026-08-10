@@ -215,15 +215,21 @@
                             <span id="summaryKasbon" class="text-xs font-bold text-red-500"> - Rp 0</span>
                         </div>
                         
-                        <div class="bg-gray-50 dark:bg-slate-900/50 py-2 px-2.5 rounded border border-gray-100 dark:border-slate-700">
-                            <div class="flex justify-between items-center">
+                        <div class="bg-gray-50 dark:bg-slate-900/50 py-2 px-2.5 rounded border border-gray-100 dark:border-slate-700 relative overflow-hidden group">
+                            
+                            <div class="flex justify-between items-center relative z-10">
                                 <span class="text-[11px] text-gray-600 dark:text-slate-300 font-bold flex items-center gap-1.5">
                                     <i data-feather="dollar-sign" class="w-3 h-3 text-red-500"></i> Kasbon Lain/Uang
+                                    <!-- Indikator Notifikasi Titik Oranye -->
+                                    <span class="flex h-2.5 w-2.5 relative ml-1" title="Jangan lupa cek kasbon reseller/agen!">
+                                        <span class="animate-ping [animation-duration:2s] absolute inset-0 rounded-full bg-orange-400 opacity-70 z-0 scale-[2.7]"></span>
+                                        <span class="absolute inset-0 rounded-full bg-orange-400 opacity-80 z-0"></span>
+                                    </span>
                                 </span>
                                 <span id="summaryManual" class="text-xs font-bold text-red-500"> - Rp 0</span>
                             </div>
-                            <div id="listKasbonManual" class="mt-2 pt-2 border-t border-gray-200 dark:border-slate-700"></div>
-                            <button onclick="addKasbonManual()" class="mt-2 text-[10px] bg-white dark:bg-slate-800 border border-gray-200 text-gray-600 hover:text-blue-600 py-1 px-2 rounded flex items-center gap-1 w-full justify-center transition">
+                            <div id="listKasbonManual" class="mt-2 pt-2 border-t border-gray-200 dark:border-slate-700 relative z-10"></div>
+                            <button onclick="addKasbonManual()" class="mt-2 text-[10px] bg-white dark:bg-slate-800 border border-gray-200 text-gray-600 hover:text-blue-600 py-1 px-2 rounded flex items-center gap-1 w-full justify-center transition relative z-10">
                                 <i data-feather="plus" class="w-3 h-3"></i> Tambah Kolom Kasbon
                             </button>
                         </div>
@@ -267,6 +273,7 @@
                 <div class="flex gap-2">
                     <button id="btnSimpanPratinjau" onclick="simpanTransaksi()" class="bg-emerald-600 text-white hover:bg-emerald-500 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"><i data-feather="check-circle" class="w-3 h-3 mr-1"></i> Simpan Data</button>
                     <button id="btnEditRiwayat" onclick="" class="hidden bg-amber-500 text-white hover:bg-amber-400 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"><i data-feather="edit" class="w-3 h-3 mr-1"></i> Edit Data</button>
+                    <button id="btnHapusRiwayat" onclick="" class="hidden bg-red-500 text-white hover:bg-red-400 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"><i data-feather="trash-2" class="w-3 h-3 mr-1"></i> Hapus Riwayat</button>
                     <button onclick="simpanPNG()" class="bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="image" class="w-3 h-3 mr-1"></i> Simpan PNG</button>
                     <button onclick="window.print()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i data-feather="printer" class="w-3 h-3 mr-1"></i> Cetak A4</button>
                     <button onclick="closeModal('modalPratinjau')" class="bg-gray-50 text-gray-500 hover:bg-gray-200 border border-gray-200 p-1.5 rounded transition"><i data-feather="x" class="w-4 h-4"></i></button>
@@ -516,11 +523,11 @@
                 <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="lock" class="w-4 h-4 mr-2 text-blue-500"></i> Verifikasi Keamanan</h3>
                 <button onclick="closeFormModal('modalPin')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
-            <p class="text-[11px] text-gray-500 dark:text-slate-400 mb-3">Masukkan PIN untuk menghapus rincian draft ini.</p>
+            <p class="text-[11px] text-gray-500 dark:text-slate-400 mb-3">Masukkan PIN untuk menghapus rincian data ini.</p>
             <input type="password" id="inputPinHapus" placeholder="•••" class="w-full text-center tracking-widest text-lg font-bold p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500 mb-4">
             <div class="flex gap-2">
                 <button onclick="closeFormModal('modalPin')" class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-xs font-bold px-4 py-2 rounded-lg flex-1">Batal</button>
-                <button onclick="prosesHapusCatatanHarian()" class="bg-red-500 hover:bg-red-400 text-white text-xs font-bold px-4 py-2 rounded-lg flex-1 shadow-sm">Hapus</button>
+                <button onclick="prosesHapusDenganPin()" class="bg-red-500 hover:bg-red-400 text-white text-xs font-bold px-4 py-2 rounded-lg flex-1 shadow-sm">Hapus</button>
             </div>
         </div>
     </div>
@@ -832,6 +839,11 @@
         let currentDraftIds = [];
         let currentViewTrxId = null; 
 
+        // VARIABEL STATE UNTUK HAPUS PIN
+        let targetHapusType = ''; // 'harian' atau 'riwayat'
+        let targetHapusId = null;
+        let draftToDelete = null;
+
         async function cekNotifikasiPending() {
             try {
                 const { count, error } = await supabaseClient.from('buku_harian')
@@ -959,11 +971,12 @@
             kalkulasiSemua();
         }
 
+        // FULL UPDATE ADD ROW WITH DARK MODE CLASSES
         const addRow = (tipe, defaultItemId = '', defaultQty = '') => {
             const container = document.getElementById(tipe === 'barangJadi' ? 'containerBarangJadi' : 'containerBahanBaku');
             const items = tipe === 'barangJadi' ? masterData.barangJadi : masterData.bahanBaku;
-            const focusClass = tipe === 'barangJadi' ? 'focus:border-blue-400' : 'focus:border-red-400';
-            const bgClass = tipe === 'barangJadi' ? 'hover:bg-blue-50/40' : 'hover:bg-red-50/40';
+            const focusClass = tipe === 'barangJadi' ? 'focus:border-blue-400 dark:focus:border-blue-500' : 'focus:border-red-400 dark:focus:border-red-500';
+            const bgClass = tipe === 'barangJadi' ? 'hover:bg-blue-50/40 dark:hover:bg-blue-900/20' : 'hover:bg-red-50/40 dark:hover:bg-red-900/20';
             
             const div = document.createElement('div');
             div.className = `flex items-center gap-1 group p-1 rounded-md border border-transparent ${bgClass} transition-colors row-item relative`;
@@ -973,13 +986,13 @@
 
             div.innerHTML = `
                 <div class="w-2/12 relative flex items-center">
-                    <input type="number" min="0" placeholder="0" value="${defaultQty}" class="qty-input w-full rounded border border-gray-200 py-1.5 pl-1.5 pr-6 text-xs text-center bg-white shadow-sm outline-none ${focusClass}" oninput="kalkulasiSemua()">
+                    <input type="number" min="0" placeholder="0" value="${defaultQty}" class="qty-input w-full rounded border border-gray-200 dark:border-slate-600 py-1.5 pl-1.5 pr-6 text-xs text-center bg-white dark:bg-slate-700 dark:text-white shadow-sm outline-none ${focusClass}" oninput="kalkulasiSemua()">
                     <button type="button" onclick="bukaKotretan(this)" class="absolute right-0.5 text-blue-400 hover:text-blue-600 p-1 rounded transition opacity-50 hover:opacity-100" title="Buka Rincian Kotretan"><i data-feather="grid" class="w-3 h-3"></i></button>
                 </div>
-                <div class="w-4/12"><select class="item-select w-full rounded border border-gray-200 p-1.5 text-xs bg-white shadow-sm outline-none ${focusClass}">${optionsHtml}</select></div>
-                <div class="w-3/12"><input type="text" class="harga-input w-full p-1 text-xs bg-transparent text-right text-gray-500 font-medium focus:outline-none" readonly value="Rp 0"></div>
-                <div class="w-3/12"><input type="text" class="subtotal-input w-full p-1 text-xs bg-transparent text-right text-gray-800 font-bold focus:outline-none pr-2" readonly value="Rp 0"></div>
-                <button type="button" onclick="this.parentElement.remove(); kalkulasiSemua();" class="absolute -right-2 -top-2 bg-red-50 rounded p-1 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-10 border border-red-200"><i data-feather="x" class="w-3 h-3"></i></button>
+                <div class="w-4/12"><select class="item-select w-full rounded border border-gray-200 dark:border-slate-600 p-1.5 text-xs bg-white dark:bg-slate-700 dark:text-white shadow-sm outline-none ${focusClass}">${optionsHtml}</select></div>
+                <div class="w-3/12"><input type="text" class="harga-input w-full p-1 text-xs bg-transparent text-right text-gray-500 dark:text-slate-400 font-medium focus:outline-none" readonly value="Rp 0"></div>
+                <div class="w-3/12"><input type="text" class="subtotal-input w-full p-1 text-xs bg-transparent text-right text-gray-800 dark:text-slate-200 font-bold focus:outline-none pr-2" readonly value="Rp 0"></div>
+                <button type="button" onclick="this.parentElement.remove(); kalkulasiSemua();" class="absolute -right-2 -top-2 bg-red-50 dark:bg-red-900/40 rounded p-1 text-red-400 hover:text-red-600 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity z-10 border border-red-200 dark:border-red-800/50"><i data-feather="x" class="w-3 h-3"></i></button>
             `;
             container.appendChild(div); feather.replace();
             
@@ -1032,15 +1045,17 @@
             activeQtyInput.dispatchEvent(new Event('input'));
         }
 
+        // FULL UPDATE KASBON MANUAL WITH DARK MODE CLASSES
         const addKasbonManual = (defaultKet = '', defaultNom = '') => {
             const container = document.getElementById('listKasbonManual');
             const div = document.createElement('div');
             const strNom = defaultNom ? new Intl.NumberFormat('id-ID').format(defaultNom) : '';
             div.className = 'flex gap-1.5 items-center row-kasbon-manual mb-1.5 group';
+            
             div.innerHTML = `
-                <div class="w-7/12"><input type="text" placeholder="Ket (Misal: Kasbon Rabu)" value="${defaultKet}" class="ket-manual w-full text-[10px] p-1.5 rounded border border-gray-300 outline-none"></div>
-                <div class="w-4/12"><input type="text" placeholder="Rp" value="${strNom}" oninput="formatInputRibuan(this); kalkulasiSemua()" class="nom-manual w-full text-[10px] p-1.5 rounded border border-gray-300 outline-none text-right font-medium"></div>
-                <div class="w-1/12 text-right"><button onclick="this.parentElement.parentElement.remove(); kalkulasiSemua();" class="text-gray-400 hover:text-red-500 p-1"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button></div>
+                <div class="w-7/12"><input type="text" placeholder="Ket (Misal: Kasbon Rabu)" value="${defaultKet}" class="ket-manual w-full text-[10px] p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500"></div>
+                <div class="w-4/12"><input type="text" placeholder="Rp" value="${strNom}" oninput="formatInputRibuan(this); kalkulasiSemua()" class="nom-manual w-full text-[10px] p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500 text-right font-medium"></div>
+                <div class="w-1/12 text-right"><button onclick="this.parentElement.parentElement.remove(); kalkulasiSemua();" class="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-1 transition"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button></div>
             `;
             container.appendChild(div); feather.replace();
         };
@@ -1619,17 +1634,33 @@
             }
         }
 
-        let draftToDelete = null;
-
+        // FITUR HAPUS CATATAN HARIAN & HAPUS RIWAYAT DENGAN PIN
         function hapusCatatanHarian(id, rId = null, tgl = null, btnElement = null) {
             draftToDelete = { id, rId, tgl, btnElement };
+            targetHapusType = 'harian';
             document.getElementById('inputPinHapus').value = '';
             openFormModal('modalPin');
         }
 
-        async function prosesHapusCatatanHarian() {
+        function hapusRiwayatTransaksi(trxId) {
+            targetHapusId = trxId;
+            targetHapusType = 'riwayat';
+            document.getElementById('inputPinHapus').value = '';
+            openFormModal('modalPin');
+        }
+
+        async function prosesHapusDenganPin() {
             const pin = document.getElementById('inputPinHapus').value;
             if (pin !== "942715") { showNotification("PIN Salah! Aksi dibatalkan.", "error"); return; }
+            
+            if (targetHapusType === 'harian') {
+                await prosesHapusCatatanHarianExecute();
+            } else if (targetHapusType === 'riwayat') {
+                await prosesHapusRiwayatExecute();
+            }
+        }
+
+        async function prosesHapusCatatanHarianExecute() {
             if(!draftToDelete) return;
             const { id, rId, tgl, btnElement } = draftToDelete;
 
@@ -1667,6 +1698,33 @@
                 showNotification("Gagal menghapus: " + err.message, "error");
             } finally {
                 draftToDelete = null;
+                targetHapusType = '';
+                btnHapus.innerText = textAwal;
+            }
+        }
+
+        async function prosesHapusRiwayatExecute() {
+            const btnHapus = document.querySelector('#modalPin button.bg-red-500');
+            const textAwal = btnHapus.innerText;
+            btnHapus.innerHTML = `<i data-feather="loader" class="w-4 h-4 animate-spin"></i>`;
+            feather.replace();
+
+            try {
+                // Delete from transaksi detail first (unless you use cascade in DB)
+                await supabaseClient.from('transaksi_detail').delete().eq('transaksi_id', targetHapusId);
+                const { error } = await supabaseClient.from('transaksi').delete().eq('id', targetHapusId);
+                if(error) throw error;
+                
+                showNotification("Riwayat transaksi berhasil dihapus!", "success");
+                
+                closeFormModal('modalPin');
+                closeModal('modalPratinjau');
+                fetchRiwayatData();
+            } catch (err) {
+                showNotification("Gagal menghapus riwayat: " + err.message, "error");
+            } finally {
+                targetHapusId = null;
+                targetHapusType = '';
                 btnHapus.innerText = textAwal;
             }
         }
@@ -2014,6 +2072,9 @@
             document.getElementById('btnEditRiwayat').classList.remove('hidden');
             document.getElementById('btnEditRiwayat').setAttribute('onclick', `siapkanEditTransaksi('${trxId}')`);
 
+            document.getElementById('btnHapusRiwayat').classList.remove('hidden');
+            document.getElementById('btnHapusRiwayat').setAttribute('onclick', `hapusRiwayatTransaksi('${trxId}')`);
+
             document.getElementById('btnHistoryBahan').classList.remove('hidden');
             document.getElementById('btnHistoryJadi').classList.remove('hidden');
 
@@ -2034,12 +2095,29 @@
                 document.getElementById('notaSummarySetoran').innerText = formatRupiah(trx.total_setoran);
                 document.getElementById('notaSummaryKasbon').innerText = "- " + formatRupiah(Math.abs(trx.total_kasbon_bahan));
                 
-                let manualKasbon = Math.round(trx.total_setoran - Math.abs(trx.total_kasbon_bahan) - trx.net_pembayaran);
+                // Load Manual Kasbon from JSON if exists, else fallback to difference calculation
+                let manualHtml = '';
+                let manualTotal = 0;
+                
+                if (trx.detail_kasbon_manual) {
+                    let parsed = [];
+                    try { parsed = JSON.parse(trx.detail_kasbon_manual); } catch(e){}
+                    parsed.forEach(item => {
+                        manualTotal += item.nominal;
+                        manualHtml += `<tr><td class="py-1">${item.ket}</td><td class="text-right font-medium">${formatRupiah(item.nominal)}</td></tr>`;
+                    });
+                } else {
+                    manualTotal = Math.round(trx.total_setoran - Math.abs(trx.total_kasbon_bahan) - trx.net_pembayaran);
+                    if (manualTotal > 0) {
+                        manualHtml = `<tr><td class="py-1">Pinjaman/Kasbon Lainnya</td><td class="text-right font-medium">${formatRupiah(manualTotal)}</td></tr>`;
+                    }
+                }
+
                 const notaContainerManual = document.getElementById('notaContainerManual');
-                if (manualKasbon > 0) {
+                if (manualTotal > 0) {
                     notaContainerManual.style.display = 'block';
-                    document.getElementById('notaListManual').innerHTML = `<tr><td class="py-1">Pinjaman/Kasbon Lainnya</td><td class="text-right font-medium">${formatRupiah(manualKasbon)}</td></tr>`;
-                    document.getElementById('notaSubManual').innerText = "- " + formatRupiah(manualKasbon);
+                    document.getElementById('notaListManual').innerHTML = manualHtml;
+                    document.getElementById('notaSubManual').innerText = "- " + formatRupiah(manualTotal);
                 } else {
                     notaContainerManual.style.display = 'none';
                 }
@@ -2061,6 +2139,7 @@
             document.getElementById('tglTransaksi').value = trx.tanggal_transaksi;
             updateTglDisplay();
             document.getElementById('containerBarangJadi').innerHTML = ''; document.getElementById('containerBahanBaku').innerHTML = '';
+            document.getElementById('listKasbonManual').innerHTML = '';
 
             try {
                 const { data: details } = await supabaseClient.from('transaksi_detail').select('*').eq('transaksi_id', trx.id);
@@ -2068,6 +2147,21 @@
                     const isBahan = masterData.bahanBaku.some(b => String(b.id) === String(d.barang_id));
                     if(isBahan) addRow('bahanBaku', d.barang_id, d.qty); else addRow('barangJadi', d.barang_id, d.qty);
                 });
+                
+                if (trx.detail_kasbon_manual) {
+                    let parsed = [];
+                    try { parsed = JSON.parse(trx.detail_kasbon_manual); } catch(e){}
+                    parsed.forEach(item => addKasbonManual(item.ket, item.nominal));
+                    if(parsed.length === 0) addKasbonManual();
+                } else {
+                    let manualTotal = Math.round(trx.total_setoran - Math.abs(trx.total_kasbon_bahan) - trx.net_pembayaran);
+                    if(manualTotal > 0) {
+                         addKasbonManual('Kasbon Sebelumnya', manualTotal);
+                    } else {
+                         addKasbonManual();
+                    }
+                }
+
                 kalkulasiSemua();
                 document.getElementById('btnSubmit').innerHTML = `<i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Update Data`;
                 document.getElementById('btnSubmit').classList.replace('bg-blue-600', 'bg-amber-500');
@@ -2093,6 +2187,7 @@
             document.getElementById('notaNama').innerText = reseller ? reseller.nama : '-';
             document.getElementById('notaTgl').innerText = formatHariTanggalID(document.getElementById('tglTransaksi').value);
             document.getElementById('btnEditRiwayat').classList.add('hidden');
+            document.getElementById('btnHapusRiwayat').classList.add('hidden');
             document.getElementById('btnSimpanPratinjau').style.display = 'flex';
 
             let htmlSetoran = ''; let htmlBahan = '';
@@ -2226,19 +2321,50 @@
 
         async function simpanTransaksi() {
             if (!selectedResellerId) return showNotification("Pilih Reseller!", "error");
+            
             const tgl = document.getElementById('tglTransaksi').value;
             const totalSetoran = parseFloat(document.getElementById('summarySetoran').innerText.replace(/[^0-9,-]+/g,"")) || 0;
             const totalKasbon = Math.abs(parseFloat(document.getElementById('summaryKasbon').innerText.replace(/[^0-9,-]+/g,""))) || 0;
-            const net = totalSetoran - totalKasbon;
+
+            // Kumpulkan keterangan Kasbon Manual DAN hitung total nominalnya
+            let manualTotal = 0;
+            let arrKasbonManual = [];
+            document.querySelectorAll('.row-kasbon-manual').forEach(row => {
+                let val = parseFloat(row.querySelector('.nom-manual').value.replace(/[^0-9]/g, '')) || 0;
+                let ket = row.querySelector('.ket-manual').value || 'Kasbon';
+                if(val > 0) {
+                    arrKasbonManual.push({ket: ket, nominal: val});
+                    manualTotal += val; // Menambahkan nominal kasbon manual ke variabel perhitungan
+                }
+            });
+            const strKasbonManual = JSON.stringify(arrKasbonManual);
+            
+            // PERBAIKAN: Net pembayaran kini dikurangi juga dengan total Kasbon Manual (manualTotal)
+            const net = totalSetoran - totalKasbon - manualTotal;
 
             try {
                 let trxId;
                 if (modeEditTrxId) {
-                    await supabaseClient.from('transaksi').update({ reseller_id: selectedResellerId, tanggal_transaksi: tgl, total_setoran: totalSetoran, total_kasbon_bahan: totalKasbon, net_pembayaran: net }).eq('id', modeEditTrxId);
+                    await supabaseClient.from('transaksi').update({ 
+                        reseller_id: selectedResellerId, 
+                        tanggal_transaksi: tgl, 
+                        total_setoran: totalSetoran, 
+                        total_kasbon_bahan: totalKasbon, 
+                        net_pembayaran: net,
+                        detail_kasbon_manual: strKasbonManual 
+                    }).eq('id', modeEditTrxId);
+                    
                     trxId = modeEditTrxId;
                     await supabaseClient.from('transaksi_detail').delete().eq('transaksi_id', trxId);
                 } else {
-                    const { data: trxData, error } = await supabaseClient.from('transaksi').insert([{ reseller_id: selectedResellerId, tanggal_transaksi: tgl, total_setoran: totalSetoran, total_kasbon_bahan: totalKasbon, net_pembayaran: net }]).select();
+                    const { data: trxData, error } = await supabaseClient.from('transaksi').insert([{ 
+                        reseller_id: selectedResellerId, 
+                        tanggal_transaksi: tgl, 
+                        total_setoran: totalSetoran, 
+                        total_kasbon_bahan: totalKasbon, 
+                        net_pembayaran: net,
+                        detail_kasbon_manual: strKasbonManual 
+                    }]).select();
                     if (error) throw error;
                     trxId = trxData[0].id;
                 }
@@ -2264,8 +2390,18 @@
                 }
 
                 showNotification("Transaksi Berhasil Disimpan!", "success");
-                modeEditTrxId = null; document.getElementById('btnGroupEdit').classList.add('hidden');
-                jalankanReset(); closeModal('modalPratinjau'); 
+                
+                // PERBAIKAN: Kembalikan state tombol ke "Simpan" setelah berhasil di-update
+                const btnSubmit = document.getElementById('btnSubmit');
+                btnSubmit.innerHTML = `<i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan`;
+                btnSubmit.classList.replace('bg-amber-500', 'bg-blue-600');
+                
+                modeEditTrxId = null; 
+                document.getElementById('btnGroupEdit').classList.add('hidden');
+                
+                jalankanReset(); 
+                closeModal('modalPratinjau'); 
+                feather.replace(); // Refresh ikon feather di tombol
             } catch (error) {
                 showNotification("Gagal menyimpan: " + error.message, "error");
             }
