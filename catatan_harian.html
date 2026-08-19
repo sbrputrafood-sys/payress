@@ -380,6 +380,7 @@
         let masterData = { resellers: [], barangJadi: [], bahanBaku: [] };
         let globalDraftData = {};
         let lastSavedGroupKey = null;
+        let lastSavedItems = null; // Variabel penampung khusus untuk item yang baru diinput
 
         function toggleTheme() {
             const htmlEl = document.documentElement;
@@ -695,38 +696,47 @@
         }
 
         async function loadMasterData() {
-            try {
-                const [resellersData, barangData] = await Promise.all([
-                    supabaseClient.from('reseller').select('*'),
-                    supabaseClient.from('barang').select('*')
-                ]);
+    try {
+        const [resellersData, barangData] = await Promise.all([
+            supabaseClient.from('reseller').select('*'),
+            supabaseClient.from('barang').select('*')
+        ]);
 
-                if (resellersData.error) throw resellersData.error;
-                if (barangData.error) throw barangData.error;
+        if (resellersData.error) throw resellersData.error;
+        if (barangData.error) throw barangData.error;
 
-                masterData.resellers = resellersData.data.map(r => ({ id: r.id, nama: r.nama_reseller }));
-                masterData.barangJadi = []; masterData.bahanBaku = [];
+        // Diurutkan secara alfabetis (A-Z) dengan aman
+        masterData.resellers = (resellersData.data || [])
+            .map(r => ({ id: r.id, nama: r.nama_reseller }))
+            .sort((a, b) => a.nama.localeCompare(b.nama));
 
-                barangData.data.forEach(b => {
-                    if (b.tipe === 'jadi') masterData.barangJadi.push({ id: b.id, nama: b.nama_barang });
-                    else masterData.bahanBaku.push({ id: b.id, nama: b.nama_barang });
-                });
+        masterData.barangJadi = []; 
+        masterData.bahanBaku = [];
 
-                const statusConn = document.getElementById('status-connection');
-                statusConn.classList.replace('bg-yellow-50', 'bg-green-50');
-                statusConn.classList.replace('border-yellow-100', 'border-green-100');
-                if(statusConn.querySelector('.animate-ping')) statusConn.querySelector('.animate-ping').classList.replace('bg-yellow-400', 'bg-green-400');
-                if(statusConn.querySelector('.relative.inline-flex')) statusConn.querySelector('.relative.inline-flex').classList.replace('bg-yellow-500', 'bg-green-500');
-                document.getElementById('text-connection').innerText = 'Online';
-                document.getElementById('text-connection').className = 'text-[9px] font-semibold text-green-700 dark:text-green-400';
+        barangData.data.forEach(b => {
+            if (b.tipe === 'jadi') masterData.barangJadi.push({ id: b.id, nama: b.nama_barang });
+            else masterData.bahanBaku.push({ id: b.id, nama: b.nama_barang });
+        });
+		
+		// Barang Jadi & Bahan Baku sekarang diurutkan berdasarkan ID-nya
+        masterData.barangJadi.sort((a, b) => String(a.id).localeCompare(String(b.id)));
+        masterData.bahanBaku.sort((a, b) => String(a.id).localeCompare(String(b.id)));
 
-                initDefaults();
-            } catch (error) {
-                document.getElementById('text-connection').innerText = 'Offline';
-                document.getElementById('text-connection').className = 'text-[9px] font-semibold text-red-700 dark:text-red-400';
-                showNotification("Gagal memuat master data.", "error");
-            }
-        }
+        const statusConn = document.getElementById('status-connection');
+        statusConn.classList.replace('bg-yellow-50', 'bg-green-50');
+        statusConn.classList.replace('border-yellow-100', 'border-green-100');
+        if(statusConn.querySelector('.animate-ping')) statusConn.querySelector('.animate-ping').classList.replace('bg-yellow-400', 'bg-green-400');
+        if(statusConn.querySelector('.relative.inline-flex')) statusConn.querySelector('.relative.inline-flex').classList.replace('bg-yellow-500', 'bg-green-500');
+        document.getElementById('text-connection').innerText = 'Online';
+        document.getElementById('text-connection').className = 'text-[9px] font-semibold text-green-700 dark:text-green-400';
+
+        initDefaults();
+    } catch (error) {
+        document.getElementById('text-connection').innerText = 'Offline';
+        document.getElementById('text-connection').className = 'text-[9px] font-semibold text-red-700 dark:text-red-400';
+        showNotification("Gagal memuat master data.", "error");
+    }
+}
 
         function initDefaults() {
             const selRes = document.getElementById('inputResellerHarian');
@@ -849,11 +859,15 @@
             btn.disabled = true;
 
             try {
-                const { error } = await supabaseClient.from('buku_harian').insert(dataToInsert);
+                // Menambahkan .select() agar Supabase mengembalikan data yang baru saja berhasil di-insert
+                const { data: savedData, error } = await supabaseClient.from('buku_harian').insert(dataToInsert).select();
                 if(error) throw error;
                 
                 showNotification(`${dataToInsert.length} catatan disimpan!`, "success");
+                
                 lastSavedGroupKey = { rId: rId, tgl: tgl };
+                // Menyimpan data terbaru ke variabel khusus untuk diprint
+                lastSavedItems = savedData; 
 
                 const tzOffset = (new Date()).getTimezoneOffset() * 60000;
                 document.getElementById('inputTglHarian').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
@@ -888,7 +902,8 @@
             feather.replace();
             
             try {
-                let query = supabaseClient.from('buku_harian').select('*').eq('is_paid', false).order('tanggal_setor', { ascending: false });
+                // Menambahkan pengurutan berdasarkan waktu pembuatan (.order('id', { ascending: true })) agar input terlama ada di atas
+                let query = supabaseClient.from('buku_harian').select('*').eq('is_paid', false).order('tanggal_setor', { ascending: false }).order('id', { ascending: true });
                 
                 if (currentUserInfo.role === 'reseller' && currentUserInfo.reseller_id) {
                     query = query.eq('reseller_id', currentUserInfo.reseller_id);
@@ -1311,9 +1326,10 @@
             }
         }
 
+        // Fungsi mencetak hanya untuk inputan yang baru saja ditambahkan
         async function cetakDraftTerakhir() {
-            if (!lastSavedGroupKey || !globalDraftData[lastSavedGroupKey.rId] || !globalDraftData[lastSavedGroupKey.rId].dates[lastSavedGroupKey.tgl]) return showNotification("Data tidak ditemukan.", "error");
-            await prosesCetakBluetooth(globalDraftData[lastSavedGroupKey.rId].dates[lastSavedGroupKey.tgl], lastSavedGroupKey.rId, lastSavedGroupKey.tgl); 
+            if (!lastSavedItems || lastSavedItems.length === 0) return showNotification("Data tidak ditemukan.", "error");
+            await prosesCetakBluetooth(lastSavedItems, lastSavedGroupKey.rId, lastSavedGroupKey.tgl); 
             closeFormModal('modalPostSave');
         }
 
