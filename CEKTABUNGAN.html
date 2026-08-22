@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SBR Putra Food - Tabungan</title>
+    
+    <!-- SCRIPT CDN SUPABASE & FONTAWESOME -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- PWA META TAGS STANDALONE -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SBR Tabungan">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#E1C4FF">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/sbrputrafood-sys/payress/3e98b9797affc74211878c59439be66c3e99d5bc/sbr_logo.png">
+    <link rel="manifest" id="pwa-manifest">
+
+    <style>
+        :root {
+            --primary: #E1C4FF;
+            --primary-dark: #C293FF;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937; 
+            --text-muted: #6b7280;
+            --danger: #ef4444;
+            --success: #10b981; 
+            --text-on-primary: #1f2937; 
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            color: var(--text-main);
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--card-bg);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            overflow-x: hidden;
+        }
+
+        .hidden { display: none !important; }
+
+        /* --- HALAMAN LOGIN --- */
+        #login-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .logo-img {
+            width: 110px;
+            height: auto;
+            margin-bottom: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .login-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+            text-align: center;
+        }
+
+        input:focus { border-color: var(--primary-dark); }
+
+        button.btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary);
+            color: var(--text-on-primary); 
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button.btn-primary:active { background-color: var(--primary-dark); }
+        button:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* --- HALAMAN DASHBOARD --- */
+        .header {
+            background-color: var(--primary);
+            color: var(--text-on-primary); 
+            padding: 2rem 1.5rem 3rem 1.5rem;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .logout-btn {
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            color: var(--text-on-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .saldo-title {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .saldo-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 0 1.25rem; /* Sedikit dilebarkan untuk ruang teks */
+            margin-top: -1.5rem;
+            padding-bottom: 2rem;
+        }
+
+        .card-riwayat {
+            background-color: white;
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .riwayat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .riwayat-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        /* --- STYLING DAFTAR RIWAYAT YANG LEBIH COMPACT --- */
+        .list-riwayat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem; /* Jarak antar baris dirapatkan */
+        }
+
+        .item-riwayat {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .item-riwayat:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            overflow: hidden; /* Cegah teks panjang merusak layout */
+            flex-grow: 1; /* Biarkan area kiri mengambil sisa ruang */
+        }
+
+        .icon-jenis {
+            width: 36px; /* Ikon diperkecil sedikit */
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            flex-shrink: 0; /* Pastikan bentuk ikon tidak gepeng */
+        }
+
+        .icon-masuk { background-color: #d1fae5; color: var(--success); }
+        .icon-keluar { background-color: #fee2e2; color: var(--danger); }
+
+        .item-info {
+            overflow: hidden; /* Wajib untuk efek ellipsis (titik-titik) */
+        }
+
+        .item-info h4 {
+            font-size: 0.85rem; /* Ukuran font ideal yang rapi */
+            margin-bottom: 0.15rem;
+            color: var(--text-main);
+            white-space: nowrap; /* Teks tidak turun ke bawah */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Beri titik-titik jika terlalu panjang */
+        }
+
+        .item-info p {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .item-nominal {
+            font-weight: 600;
+            font-size: 0.85rem; /* Font size ideal */
+            white-space: nowrap; /* KUNCI: Angka tidak boleh terpotong ke bawah */
+            flex-shrink: 0; /* KUNCI: Kotak nominal tidak akan menyusut */
+            text-align: right;
+            margin-left: 0.5rem; /* Beri jarak dengan teks keterangan */
+        }
+
+        .nominal-masuk { color: var(--success); } 
+        .nominal-keluar { color: var(--text-main); }
+        
+        .loading-text { text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    
+    <!-- LAYAR LOGIN -->
+    <div id="login-screen">
+        <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/3e98b9797affc74211878c59439be66c3e99d5bc/sbr_logo.png" alt="SBR Putra Food Logo" class="logo-img">
+        
+        <h1 class="login-title">SBR Putra Food</h1>
+        <p class="login-subtitle">Portal Tabungan Karyawan</p>
+        
+        <div class="input-group">
+            <input type="text" id="inputIdKaryawan" placeholder="ID Karyawan / Nama" autocomplete="off">
+        </div>
+        <div class="input-group">
+            <input type="password" id="inputPassword" placeholder="Masukkan Password / PIN" autocomplete="off">
+        </div>
+        <button id="btnLogin" class="btn-primary" onclick="prosesLogin()">Masuk</button>
+    </div>
+
+    <!-- LAYAR DASHBOARD -->
+    <div id="dashboard-screen" class="hidden">
+        <div class="header">
+            <div class="header-top">
+                <div>
+                    <p style="font-size: 0.8rem; opacity: 0.8;">Halo,</p>
+                    <h3 id="namaKaryawan">Nama Karyawan</h3>
+                </div>
+                <button class="logout-btn" onclick="prosesLogout()">Keluar</button>
+            </div>
+            <p class="saldo-title">Total Tabungan Anda</p>
+            <h1 class="saldo-amount" id="totalSaldo">Rp 0</h1>
+        </div>
+
+        <div class="content">
+            <div class="card-riwayat">
+                <div class="riwayat-header">
+                    <span class="riwayat-title">Riwayat Terakhir</span>
+                </div>
+                <div class="list-riwayat" id="listRiwayat">
+                    <!-- Data riwayat dari Supabase akan muncul di sini -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ==========================================
+    // 0. SCRIPT STANDALONE PWA (Virtual Manifest & Service Worker)
+    // ==========================================
+    const pwaManifest = {
+      name: "SBR Putra Food",
+      short_name: "SBR Tabungan",
+      start_url: window.location.href,
+      display: "standalone",
+      background_color: "#f3f4f6",
+      theme_color: "#E1C4FF",
+      icons: [{
+        src: "https://raw.githubusercontent.com/sbrputrafood-sys/payress/3e98b9797affc74211878c59439be66c3e99d5bc/sbr_logo.png",
+        sizes: "192x192",
+        type: "image/png"
+      }]
+    };
+    
+    const manifestBlob = new Blob([JSON.stringify(pwaManifest)], {type: 'application/manifest+json'});
+    document.querySelector('#pwa-manifest').setAttribute('href', URL.createObjectURL(manifestBlob));
+
+    if ('serviceWorker' in navigator) {
+        const swCode = `
+            self.addEventListener('install', (e) => { self.skipWaiting(); });
+            self.addEventListener('fetch', (e) => { });
+        `;
+        const swBlob = new Blob([swCode], {type: 'application/javascript'});
+        navigator.serviceWorker.register(URL.createObjectURL(swBlob))
+            .catch(err => console.log('PWA Service Worker Gagal:', err));
+    }
+
+    // ==========================================
+    // 1. KONFIGURASI SUPABASE
+    // ==========================================
+    const SUPABASE_URL = 'https://ephcczlqvtihmbowqxdt.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwaGNjemxxdnRpaG1ib3dxeGR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwOTgxNTMsImV4cCI6MjA5OTY3NDE1M30.Ky9XSDmsqVBrOrWOMJaMY6gzE8Z32eXxZ6cqdACp_2M';
+    
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let dataKaryawanAktif = null;
+
+    function formatRupiah(angka) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
+    }
+
+    function formatTanggal(isoString) {
+        if (!isoString) return '-';
+        const date = new Date(isoString);
+        return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+    }
+
+    // ==========================================
+    // 2. FUNGSI LOGIN & CEK PASSWORD
+    // ==========================================
+    async function prosesLogin() {
+        const inputId = document.getElementById('inputIdKaryawan').value.trim();
+        const inputPass = document.getElementById('inputPassword').value.trim();
+        const btnLogin = document.getElementById('btnLogin');
+        
+        if(!inputId || !inputPass) {
+            alert("Harap masukkan ID/Nama dan Password!");
+            return;
+        }
+
+        btnLogin.disabled = true;
+        btnLogin.innerText = "Memeriksa...";
+
+        try {
+            let query = db.from('karyawan').select('*');
+            
+            if (/^\d+$/.test(inputId)) {
+                query = query.eq('id', inputId);
+            } else {
+                query = query.ilike('nama', `%${inputId}%`);
+            }
+
+            const { data, error } = await query.maybeSingle();
+
+            if (error || !data) {
+                alert("Data Karyawan tidak ditemukan!");
+                resetBtn(); 
+                return;
+            }
+
+            if (String(data.password) !== String(inputPass)) {
+                alert("Password salah, silakan coba lagi!");
+                resetBtn(); 
+                return;
+            }
+
+            dataKaryawanAktif = data;
+            tampilkanDashboard();
+
+        } catch (err) {
+            alert("Terjadi kesalahan sistem saat mencoba terhubung ke database.");
+            console.error(err);
+            resetBtn();
+        }
+    }
+
+    function resetBtn() {
+        const btnLogin = document.getElementById('btnLogin');
+        btnLogin.disabled = false;
+        btnLogin.innerText = "Masuk";
+    }
+
+    // ==========================================
+    // 3. MENAMPILKAN DASHBOARD & MENARIK TABUNGAN
+    // ==========================================
+    async function tampilkanDashboard() {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('dashboard-screen').classList.remove('hidden');
+        
+        document.getElementById('namaKaryawan').innerText = dataKaryawanAktif.nama;
+        document.getElementById('totalSaldo').innerText = formatRupiah(dataKaryawanAktif.saldo_tabungan);
+        
+        const container = document.getElementById('listRiwayat');
+        container.innerHTML = `<p class="loading-text">Memuat riwayat...</p>`;
+
+        const { data: riwayat, error } = await db
+            .from('riwayat_tabungan')
+            .select('*')
+            .eq('id_kar', dataKaryawanAktif.id)
+            .order('tgl', { ascending: false });
+
+        container.innerHTML = "";
+
+        if (error || !riwayat || riwayat.length === 0) {
+            container.innerHTML = `<p class="loading-text">Belum ada riwayat transaksi.</p>`;
+            return;
+        }
+
+        riwayat.forEach(row => {
+            const isMasuk = row.jenis === 'masuk';
+            const iconClass = isMasuk ? 'icon-masuk' : 'icon-keluar';
+            const iconSymbol = isMasuk ? '<i class="fa-solid fa-dollar-sign"></i>' : '<i class="fa-solid fa-money-bill-transfer"></i>';
+            const nominalClass = isMasuk ? 'nominal-masuk' : 'nominal-keluar';
+            const nominalPrefix = isMasuk ? '+' : '-';
+
+            const itemHTML = `
+                <div class="item-riwayat">
+                    <div class="item-left">
+                        <div class="icon-jenis ${iconClass}">${iconSymbol}</div>
+                        <div class="item-info">
+                            <h4>${row.keterangan || (isMasuk ? 'Setoran' : 'Penarikan')}</h4>
+                            <p>${formatTanggal(row.tgl)}</p>
+                        </div>
+                    </div>
+                    <div class="item-nominal ${nominalClass}">
+                        ${nominalPrefix} ${formatRupiah(row.nominal).replace('Rp', '').trim()}
+                    </div>
+                </div>
+            `;
+            container.innerHTML += itemHTML;
+        });
+        
+        resetBtn();
+    }
+
+    function prosesLogout() {
+        dataKaryawanAktif = null;
+        document.getElementById('inputIdKaryawan').value = "";
+        document.getElementById('inputPassword').value = "";
+        document.getElementById('dashboard-screen').classList.add('hidden');
+        document.getElementById('login-screen').classList.remove('hidden');
+    }
+</script>
+
+</body>
+</html>
