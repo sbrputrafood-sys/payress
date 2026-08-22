@@ -746,6 +746,27 @@
         </div>
     </div>
 
+    <!-- MODAL PILIH DATA TARIKAN -->
+    <div id="modalTarikData" class="fixed inset-0 z-[120] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="closeFormModal('modalTarikData')"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-2xl shadow-2xl relative z-10 flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700 shrink-0">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center">
+                    <i data-feather="download-cloud" class="w-4 h-4 mr-2 text-blue-500"></i> Pilih Data <span id="labelTipeTarik" class="ml-1"></span>
+                </h3>
+                <button onclick="closeFormModal('modalTarikData')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg transition"><i data-feather="x" class="w-4 h-4"></i></button>
+            </div>
+            
+            <div class="p-4 overflow-y-auto custom-scroll flex-1 bg-gray-50 dark:bg-slate-800/50 space-y-3" id="listDataTarik">
+            </div>
+            
+            <div class="border-t border-gray-100 dark:border-slate-700 p-4 bg-white dark:bg-slate-800 shrink-0 flex gap-2 rounded-b-2xl">
+                <button onclick="closeFormModal('modalTarikData')" class="flex-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-xs font-bold py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 transition hover:bg-gray-200">Batal</button>
+                <button onclick="prosesTarikData()" class="w-2/3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-1 shadow-sm transition"><i data-feather="check-square" class="w-4 h-4"></i> Tarik Terpilih</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT LOGIKA -->
     <script>
         feather.replace();
@@ -834,10 +855,14 @@
 
         let masterData = { resellers: [], barangJadi: [], bahanBaku: [], hargaDefault: {}, hargaKhusus: {}, rawHargaKhusus: [] };
         let selectedResellerId = '';
+        
         let riwayatTransactions = []; 
         let modeEditTrxId = null;
         let currentDraftIds = [];
         let currentViewTrxId = null; 
+
+        let tempTarikData = [];
+        let currentTargetTipe = '';
 
         // VARIABEL STATE UNTUK HAPUS PIN
         let targetHapusType = ''; // 'harian' atau 'riwayat'
@@ -1749,51 +1774,134 @@
                     return;
                 }
 
-                // Tarik hanya yang approved (atau null/lama)
+                // Ambil hanya yang approved
                 const approvedItems = data.filter(d => d.status === 'approved' || !d.status);
+                if (approvedItems.length === 0) return showNotification(`Tidak ada data ${targetTipe} yang tervalidasi siap ditarik.`, "warning-flash");
+
+                // Simpan ke memori sementara untuk diproses setelah konfirmasi
+                tempTarikData = approvedItems;
+                currentTargetTipe = targetTipe;
                 
-                let aggregated = {};
-                let pulledIds = [];
+                document.getElementById('labelTipeTarik').innerText = targetTipe === 'bahan' ? 'Bahan Baku' : 'Barang Jadi';
+                
+                // Grouping berdasarkan tanggal agar user enak memilahnya
+                let grouped = {};
                 approvedItems.forEach(d => {
-                    if(!aggregated[d.barang_id]) aggregated[d.barang_id] = 0;
-                    aggregated[d.barang_id] += parseFloat(d.qty);
-                    pulledIds.push(d.id);
+                    if(!grouped[d.tanggal_setor]) grouped[d.tanggal_setor] = [];
+                    grouped[d.tanggal_setor].push(d);
                 });
 
-                if (pulledIds.length === 0) return showNotification(`Tidak ada data ${targetTipe} yang tervalidasi siap ditarik.`, "warning-flash");
-
-                const containerId = targetTipe === 'bahan' ? 'containerBahanBaku' : 'containerBarangJadi';
-                const container = document.getElementById(containerId);
-
-                Object.keys(aggregated).forEach(bId => {
-                    const qtyVal = aggregated[bId];
-                    let placed = false;
+                let html = '';
+                Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)).forEach(tgl => {
+                    // Header Tanggal (Master Checkbox per Hari)
+                    html += `
+                    <div class="bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl overflow-hidden shadow-sm mb-3">
+                        <div class="bg-gray-100 dark:bg-slate-700 px-3 py-2 border-b border-gray-200 dark:border-slate-600 flex justify-between items-center">
+                            <label class="flex items-center gap-2 cursor-pointer font-bold text-xs text-gray-700 dark:text-slate-200 select-none w-full">
+                                <input type="checkbox" class="cb-tgl w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" checked onchange="toggleTglCheckboxes(this, '${tgl}')">
+                                <i data-feather="calendar" class="w-3.5 h-3.5 text-blue-500"></i> ${formatHariTanggalID(tgl)}
+                            </label>
+                        </div>
+                        <div class="p-2 space-y-1" id="group_${tgl}">`;
                     
-                    const existingRows = container.querySelectorAll('.row-item');
-                    for (let i = 0; i < existingRows.length; i++) {
-                        const row = existingRows[i];
-                        const selectEl = row.querySelector('.item-select');
-                        const qtyEl = row.querySelector('.qty-input');
+                    // Detail per Barang di hari tersebut
+                    grouped[tgl].forEach(item => {
+                        let barang = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
+                        let bName = barang ? barang.nama : 'Barang Dihapus';
+                        let ketHtml = item.keterangan ? `<p class="text-[10px] text-gray-500 dark:text-slate-400 italic">Catatan: ${item.keterangan}</p>` : '';
                         
-                        if (!selectEl.value && (!qtyEl.value || qtyEl.value === "0")) {
-                            selectEl.value = bId;
-                            qtyEl.value = qtyVal;
-                            selectEl.dispatchEvent(new Event('change')); 
-                            placed = true;
-                            break;
-                        }
-                    }
+                        html += `
+                            <label class="flex items-start gap-2 p-2 hover:bg-gray-50 dark:hover:bg-slate-600 rounded-lg cursor-pointer transition select-none">
+                                <input type="checkbox" value="${item.id}" class="cb-item cb-item-${tgl} w-4 h-4 mt-0.5 text-blue-600 rounded border-gray-300 focus:ring-blue-500" checked onchange="kalkulasiOtomatisCheckboxTgl('${tgl}')">
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-semibold text-xs text-gray-800 dark:text-slate-200">${bName}</span>
+                                        <span class="font-black text-blue-600 dark:text-blue-400 text-[11px] bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-800/50">Qty: ${item.qty}</span>
+                                    </div>
+                                    ${ketHtml}
+                                </div>
+                            </label>
+                        `;
+                    });
                     
-                    if (!placed) {
-                        addRow(targetTipe === 'bahan' ? 'bahanBaku' : 'barangJadi', bId, qtyVal);
-                    }
+                    html += `</div></div>`;
                 });
-                
-                currentDraftIds = [...new Set([...currentDraftIds, ...pulledIds])];
-                showNotification(`Berhasil menarik data ${targetTipe} yang tervalidasi (Approved) ke nota!`, "success");
+
+                document.getElementById('listDataTarik').innerHTML = html;
+                openFormModal('modalTarikData');
+                feather.replace();
+
             } catch (err) {
                 showNotification("Gagal menarik data: " + err.message, "error");
             }
+        }
+
+        // Fungsi untuk Select/Deselect All berdasarkan satu hari
+        function toggleTglCheckboxes(tglCheckbox, tgl) {
+            const isChecked = tglCheckbox.checked;
+            document.querySelectorAll(`.cb-item-${tgl}`).forEach(cb => {
+                cb.checked = isChecked;
+            });
+        }
+        
+        // Fungsi untuk melepas centang hari jika ada barang yang tidak dicentang di hari itu
+        function kalkulasiOtomatisCheckboxTgl(tgl) {
+            const allItems = document.querySelectorAll(`.cb-item-${tgl}`);
+            const checkedItems = document.querySelectorAll(`.cb-item-${tgl}:checked`);
+            const cbTgl = document.querySelector(`.cb-tgl[onchange*="${tgl}"]`);
+            if (cbTgl) cbTgl.checked = (allItems.length === checkedItems.length);
+        }
+
+        // Fungsi Eksekusi Utama
+        function prosesTarikData() {
+            const checkedBoxes = document.querySelectorAll('.cb-item:checked');
+            if(checkedBoxes.length === 0) return showNotification("Pilih minimal 1 rincian barang/hari untuk ditarik!", "error");
+            
+            let selectedIds = Array.from(checkedBoxes).map(cb => String(cb.value));
+            
+            // Filter hanya data yang dicentang oleh user
+            const itemsToProcess = tempTarikData.filter(d => selectedIds.includes(String(d.id)));
+            
+            let aggregated = {};
+            let pulledIds = [];
+            itemsToProcess.forEach(d => {
+                if(!aggregated[d.barang_id]) aggregated[d.barang_id] = 0;
+                aggregated[d.barang_id] += parseFloat(d.qty);
+                pulledIds.push(d.id);
+            });
+
+            const containerId = currentTargetTipe === 'bahan' ? 'containerBahanBaku' : 'containerBarangJadi';
+            const container = document.getElementById(containerId);
+
+            // Masukkan ke Dashboard (Sama dengan fungsi ori)
+            Object.keys(aggregated).forEach(bId => {
+                const qtyVal = aggregated[bId];
+                let placed = false;
+                
+                const existingRows = container.querySelectorAll('.row-item');
+                for (let i = 0; i < existingRows.length; i++) {
+                    const row = existingRows[i];
+                    const selectEl = row.querySelector('.item-select');
+                    const qtyEl = row.querySelector('.qty-input');
+                    
+                    if (!selectEl.value && (!qtyEl.value || qtyEl.value === "0")) {
+                        selectEl.value = bId;
+                        qtyEl.value = qtyVal;
+                        selectEl.dispatchEvent(new Event('change')); 
+                        placed = true;
+                        break;
+                    }
+                }
+                
+                if (!placed) {
+                    addRow(currentTargetTipe === 'bahan' ? 'bahanBaku' : 'barangJadi', bId, qtyVal);
+                }
+            });
+            
+            currentDraftIds = [...new Set([...currentDraftIds, ...pulledIds])];
+            showNotification(`Berhasil menarik ${pulledIds.length} rincian data ke nota!`, "success");
+            
+            closeFormModal('modalTarikData');
         }
 
         async function bukaHistoryHarian(tipe) {
