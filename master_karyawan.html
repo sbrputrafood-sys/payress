@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Master Data Karyawan</title>
+    
+    <!-- SCRIPT CDN SUPABASE & FONTAWESOME -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- PWA META TAGS STANDALONE -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Data Karyawan">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="manifest" id="pwa-manifest">
+
+    <style>
+        /* ================= TEMA WARNA ================= */
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --danger: #ef4444;
+            --input-bg: #ffffff;
+            --modal-overlay: rgba(0, 0, 0, 0.5);
+        }
+
+        [data-theme="dark"] {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #111827;
+            --card-bg: #1f2937;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+            --input-bg: #374151;
+            --modal-overlay: rgba(0, 0, 0, 0.75);
+        }
+
+        * {
+            box-sizing: border-box; margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; }
+        .hidden { display: none !important; }
+
+        /* ================= CONTAINER UTAMA ================= */
+        #app-container {
+            width: 100%; max-width: 480px; background-color: var(--bg-color); min-height: 100vh; position: relative;
+        }
+
+        /* ================= HEADER ================= */
+        .header {
+            background-color: var(--card-bg); padding: 1rem 1.25rem;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .header-title { font-size: 1.15rem; font-weight: 700; color: var(--primary); }
+        .theme-toggle {
+            background: none; border: none; font-size: 1.1rem; color: var(--text-muted); cursor: pointer;
+            padding: 0.4rem; border-radius: 50%;
+        }
+
+        /* ================= FILTER & LIST ================= */
+        .content { padding: 1rem; padding-bottom: 80px; }
+        
+        .filter-container {
+            display: flex; gap: 0.5rem; margin-bottom: 1rem;
+        }
+        
+        .search-box {
+            flex: 1; padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            background-color: var(--input-bg); color: var(--text-main); font-size: 0.9rem; outline: none;
+        }
+        
+        .filter-divisi {
+            width: 130px; padding: 0.6rem;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            background-color: var(--input-bg); color: var(--text-main); font-size: 0.85rem; outline: none;
+            cursor: pointer;
+        }
+
+        .search-box:focus, .filter-divisi:focus { border-color: var(--primary); }
+
+        .karyawan-list { display: flex; flex-direction: column; gap: 0.6rem; }
+        .karyawan-card {
+            background-color: var(--card-bg); border-radius: 10px; padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .karyawan-info h3 { font-size: 0.95rem; margin-bottom: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;}
+        .karyawan-info p { font-size: 0.75rem; color: var(--text-muted); }
+        .karyawan-action { color: var(--text-muted); font-size: 1rem; opacity: 0.6;}
+
+        /* ================= FAB (FLOATING ACTION BUTTON) ================= */
+        .fab {
+            position: fixed; bottom: 1.5rem; right: max(1.25rem, calc(50% - 240px + 1.25rem)); 
+            width: 50px; height: 50px; border-radius: 50%; background-color: var(--primary);
+            color: white; border: none; font-size: 1.25rem; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
+            cursor: pointer; display: flex; justify-content: center; align-items: center; z-index: 20;
+        }
+
+        /* ================= MODAL FORM KARYAWAN ================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--modal-overlay); z-index: 100;
+            display: flex; justify-content: center; align-items: flex-end;
+        }
+        .modal-content {
+            background-color: var(--bg-color); width: 100%; max-width: 480px; height: 92vh;
+            border-top-left-radius: 16px; border-top-right-radius: 16px;
+            display: flex; flex-direction: column; overflow: hidden;
+            animation: slideUp 0.3s ease-out forwards;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .modal-header {
+            padding: 1rem 1.25rem; background-color: var(--card-bg); border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 1rem; font-weight: 600; }
+        .btn-close { background: none; border: none; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; }
+
+        .modal-body {
+            padding: 1.25rem; overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 0.75rem;
+        }
+
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 500; margin-bottom: 0.25rem; color: var(--text-muted); }
+        .form-control {
+            width: 100%; padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color);
+            background-color: var(--input-bg); color: var(--text-main); outline: none; font-size: 0.9rem;
+        }
+        .form-control:focus { border-color: var(--primary); }
+        
+        .form-row { display: flex; gap: 0.75rem; }
+        .form-row > .form-group { flex: 1; }
+
+        hr { border: 0; border-top: 1px dashed var(--border-color); margin: 0.2rem 0; }
+
+        .checkbox-group {
+            display: flex; align-items: center; gap: 0.4rem; padding: 0.6rem;
+            background-color: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color);
+        }
+        .checkbox-group input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); }
+        .checkbox-group label { margin-bottom: 0; font-size: 0.85rem; font-weight: normal; color: var(--text-main); }
+
+        .modal-footer {
+            padding: 1rem 1.25rem; background-color: var(--card-bg); border-top: 1px solid var(--border-color);
+            display: flex; gap: 0.75rem; justify-content: space-between;
+        }
+
+        .btn {
+            flex: 1; padding: 0.75rem; border-radius: 8px; border: none; font-weight: 600; font-size: 0.95rem; cursor: pointer;
+        }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-danger { background-color: transparent; color: var(--danger); border: 1px solid var(--danger); flex: 0.25; }
+        
+        .empty-state { text-align: center; padding: 2rem 1rem; color: var(--text-muted); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-title">Master Karyawan</div>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+    </div>
+
+    <!-- FILTER & LIST KARYAWAN -->
+    <div class="content">
+        <div class="filter-container">
+            <input type="text" class="search-box" id="searchInput" placeholder="Cari nama / ID..." oninput="filterKaryawan()">
+            <select class="filter-divisi" id="filterDivisi" onchange="filterKaryawan()">
+                <option value="ALL">Semua Divisi</option>
+                <option value="1">Aromanis</option>
+                <option value="2">Simping</option>
+                <option value="3">Goreng</option>
+                <option value="4">Distribusi</option>
+                <option value="5">Lainnya</option>
+            </select>
+        </div>
+        
+        <div class="karyawan-list" id="karyawanList">
+            <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data...</div>
+        </div>
+    </div>
+
+    <!-- TOMBOL TAMBAH -->
+    <button class="fab" onclick="bukaModalForm()">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- MODAL FORM KARYAWAN -->
+    <div class="modal-overlay hidden" id="karyawanModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Tambah Karyawan</h3>
+                <button class="btn-close" onclick="tutupModalForm()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="modal-body">
+                <input type="hidden" id="formId">
+                
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="fNama" class="form-control" autocomplete="off" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Divisi</label>
+                        <select id="fDivId" class="form-control">
+                            <option value="">-- Pilih Divisi --</option>
+                            <option value="1">Aromanis</option>
+                            <option value="2">Simping</option>
+                            <option value="3">Goreng</option>
+                            <option value="4">Distribusi</option>
+                            <option value="5">Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Password / PIN</label>
+                        <input type="text" id="fPassword" class="form-control" autocomplete="off">
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tarif Reguler</label>
+                        <input type="number" id="fTarifReg" class="form-control" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Tarif Lembur 1</label>
+                        <input type="number" id="fTarifLem" class="form-control" value="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tarif Lembur 2</label>
+                        <input type="number" id="fTarifLem2" class="form-control" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Tarif Lembur 3</label>
+                        <input type="number" id="fTarifLem3" class="form-control" value="0">
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Saldo Tabungan</label>
+                        <input type="number" id="fSaldoTabungan" class="form-control" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Saldo Kasbon</label>
+                        <input type="number" id="fSaldoKasbon" class="form-control" value="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="checkbox-group" style="flex:1;">
+                        <input type="checkbox" id="fPotKas">
+                        <label for="fPotKas">Potong Kas</label>
+                    </div>
+                    <div class="checkbox-group" style="flex:1;">
+                        <input type="checkbox" id="fPotListrik">
+                        <label for="fPotListrik">Potong Listrik</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-danger hidden" id="btnHapus" onclick="hapusKaryawan()"><i class="fa-solid fa-trash"></i></button>
+                <button class="btn btn-primary" id="btnSimpan" onclick="simpanKaryawan()">Simpan Data</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ==========================================
+    // 0. PENGATURAN TEMA & PWA
+    // ==========================================
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+        const icon = document.getElementById('theme-icon');
+        if(theme === 'dark') { icon.classList.replace('fa-moon', 'fa-sun'); } 
+        else { icon.classList.replace('fa-sun', 'fa-moon'); }
+    }
+
+    const pwaManifest = {
+      name: "Master Karyawan SBR", short_name: "Master Data",
+      start_url: window.location.href, display: "standalone",
+      background_color: "#f3f4f6", theme_color: "#4f46e5",
+      icons: [{ src: "https://raw.githubusercontent.com/sbrputrafood-sys/payress/3e98b9797affc74211878c59439be66c3e99d5bc/sbr_logo.png", sizes: "192x192", type: "image/png" }]
+    };
+    const manifestBlob = new Blob([JSON.stringify(pwaManifest)], {type: 'application/manifest+json'});
+    document.querySelector('#pwa-manifest').setAttribute('href', URL.createObjectURL(manifestBlob));
+
+    if ('serviceWorker' in navigator) {
+        const swBlob = new Blob([`self.addEventListener('install', e => self.skipWaiting());`], {type: 'application/javascript'});
+        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+    }
+
+    // ==========================================
+    // 1. KONFIGURASI SUPABASE
+    // ==========================================
+    const SUPABASE_URL = 'https://ephcczlqvtihmbowqxdt.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwaGNjemxxdnRpaG1ib3dxeGR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwOTgxNTMsImV4cCI6MjA5OTY3NDE1M30.Ky9XSDmsqVBrOrWOMJaMY6gzE8Z32eXxZ6cqdACp_2M';
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allKaryawan = [];
+
+    // Peta Nama Divisi
+    const namaDivisi = {
+        1: "Aromanis",
+        2: "Simping",
+        3: "Goreng",
+        4: "Distribusi",
+        5: "Lainnya"
+    };
+
+    // ==========================================
+    // 2. FUNGSI LOAD, FILTER, & RENDER DATA
+    // ==========================================
+    async function loadDataKaryawan() {
+        const { data, error } = await db.from('karyawan').select('*').order('id', { ascending: true });
+        
+        if (error) {
+            document.getElementById('karyawanList').innerHTML = `<div class="empty-state">Gagal memuat data.</div>`;
+            return;
+        }
+
+        allKaryawan = data;
+        renderList(allKaryawan);
+    }
+
+    function renderList(data) {
+        const container = document.getElementById('karyawanList');
+        container.innerHTML = "";
+
+        if (data.length === 0) {
+            container.innerHTML = `<div class="empty-state">Data tidak ditemukan.</div>`;
+            return;
+        }
+
+        data.forEach(kar => {
+            const labelDivisi = namaDivisi[kar.div_id] || '-';
+            const html = `
+                <div class="karyawan-card" onclick='bukaModalForm(${JSON.stringify(kar).replace(/'/g, "&#39;")})'>
+                    <div class="karyawan-info">
+                        <h3>${kar.nama || '-'}</h3>
+                        <p>ID: ${kar.id} | Div: ${labelDivisi}</p>
+                    </div>
+                    <div class="karyawan-action"><i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+            `;
+            container.innerHTML += html;
+        });
+    }
+
+    function filterKaryawan() {
+        const keyword = document.getElementById('searchInput').value.toLowerCase();
+        const filterDiv = document.getElementById('filterDivisi').value;
+
+        const filtered = allKaryawan.filter(kar => {
+            const cocokNama = (kar.nama && kar.nama.toLowerCase().includes(keyword)) || String(kar.id).includes(keyword);
+            const cocokDivisi = filterDiv === "ALL" || String(kar.div_id) === filterDiv;
+            return cocokNama && cocokDivisi;
+        });
+        
+        renderList(filtered);
+    }
+
+    // ==========================================
+    // 3. FUNGSI FORM MODAL
+    // ==========================================
+    function bukaModalForm(dataKaryawan = null) {
+        document.getElementById('karyawanModal').classList.remove('hidden');
+        
+        if (dataKaryawan) {
+            document.getElementById('modalTitle').innerText = "Edit Karyawan";
+            document.getElementById('btnHapus').classList.remove('hidden');
+            
+            document.getElementById('formId').value = dataKaryawan.id;
+            document.getElementById('fNama').value = dataKaryawan.nama || '';
+            document.getElementById('fDivId').value = dataKaryawan.div_id || '';
+            document.getElementById('fPassword').value = dataKaryawan.password || '';
+            
+            document.getElementById('fTarifReg').value = dataKaryawan.tarif_reg || 0;
+            document.getElementById('fTarifLem').value = dataKaryawan.tarif_lem || 0;
+            document.getElementById('fTarifLem2').value = dataKaryawan.tarif_lem_2 || 0;
+            document.getElementById('fTarifLem3').value = dataKaryawan.tarif_lem_3 || 0;
+            
+            document.getElementById('fSaldoTabungan').value = dataKaryawan.saldo_tabungan || 0;
+            document.getElementById('fSaldoKasbon').value = dataKaryawan.saldo_kasbon || 0;
+            
+            document.getElementById('fPotKas').checked = dataKaryawan.pot_kas === true;
+            document.getElementById('fPotListrik').checked = dataKaryawan.pot_listrik === true;
+        } else {
+            document.getElementById('modalTitle').innerText = "Tambah Karyawan Baru";
+            document.getElementById('btnHapus').classList.add('hidden');
+            
+            document.getElementById('formId').value = "";
+            document.getElementById('fNama').value = "";
+            document.getElementById('fDivId').value = "";
+            document.getElementById('fPassword').value = "";
+            
+            document.getElementById('fTarifReg').value = 0;
+            document.getElementById('fTarifLem').value = 0;
+            document.getElementById('fTarifLem2').value = 0;
+            document.getElementById('fTarifLem3').value = 0;
+            document.getElementById('fSaldoTabungan').value = 0;
+            document.getElementById('fSaldoKasbon').value = 0;
+            
+            document.getElementById('fPotKas').checked = false;
+            document.getElementById('fPotListrik').checked = false;
+        }
+    }
+
+    function tutupModalForm() { document.getElementById('karyawanModal').classList.add('hidden'); }
+
+    async function simpanKaryawan() {
+        const id = document.getElementById('formId').value;
+        const btnSimpan = document.getElementById('btnSimpan');
+        
+        const payload = {
+            nama: document.getElementById('fNama').value,
+            div_id: document.getElementById('fDivId').value ? Number(document.getElementById('fDivId').value) : null,
+            password: document.getElementById('fPassword').value || null,
+            tarif_reg: Number(document.getElementById('fTarifReg').value),
+            tarif_lem: Number(document.getElementById('fTarifLem').value),
+            tarif_lem_2: Number(document.getElementById('fTarifLem2').value),
+            tarif_lem_3: Number(document.getElementById('fTarifLem3').value),
+            saldo_tabungan: Number(document.getElementById('fSaldoTabungan').value),
+            saldo_kasbon: Number(document.getElementById('fSaldoKasbon').value),
+            pot_kas: document.getElementById('fPotKas').checked,
+            pot_listrik: document.getElementById('fPotListrik').checked,
+        };
+
+        if(!payload.nama) { alert("Nama karyawan wajib diisi!"); return; }
+
+        btnSimpan.innerText = "Proses..."; btnSimpan.disabled = true;
+
+        try {
+            if (id) {
+                const { error } = await db.from('karyawan').update(payload).eq('id', id);
+                if(error) throw error;
+            } else {
+                const { error } = await db.from('karyawan').insert([payload]);
+                if(error) throw error;
+            }
+            tutupModalForm();
+            loadDataKaryawan(); 
+        } catch (error) { alert("Gagal menyimpan data: " + error.message); }
+
+        btnSimpan.innerText = "Simpan Data"; btnSimpan.disabled = false;
+    }
+
+    async function hapusKaryawan() {
+        const id = document.getElementById('formId').value;
+        if(!id) return;
+        if(!confirm("Yakin ingin menghapus karyawan ini?")) return;
+
+        const btnHapus = document.getElementById('btnHapus'); btnHapus.disabled = true;
+
+        try {
+            const { error } = await db.from('karyawan').delete().eq('id', id);
+            if(error) throw error;
+            tutupModalForm();
+            loadDataKaryawan();
+        } catch (error) { alert("Gagal menghapus: " + error.message); }
+        
+        btnHapus.disabled = false;
+    }
+
+    window.onload = loadDataKaryawan;
+</script>
+
+</body>
+</html>
