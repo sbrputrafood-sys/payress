@@ -121,7 +121,7 @@
         button.btn-primary:active { background-color: var(--primary-dark); }
         button:disabled { opacity: 0.7; cursor: not-allowed; }
 
-        /* --- HALAMAN DASHBOARD --- */
+        /* --- HALAMAN DASHBOARD & ADMIN --- */
         .header {
             background-color: var(--primary);
             color: var(--text-on-primary); 
@@ -137,7 +137,19 @@
             margin-bottom: 1.5rem;
         }
 
-        .logout-btn {
+        .header-top-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-top-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn {
             background: rgba(0, 0, 0, 0.05);
             border: none;
             color: var(--text-on-primary);
@@ -146,6 +158,18 @@
             font-size: 0.8rem;
             cursor: pointer;
             font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .action-btn:hover { background: rgba(0, 0, 0, 0.1); }
+
+        .action-btn-icon {
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
         }
 
         .saldo-title {
@@ -160,7 +184,7 @@
         }
 
         .content {
-            padding: 0 1.25rem; /* Sedikit dilebarkan untuk ruang teks */
+            padding: 0 1.25rem; 
             margin-top: -1.5rem;
             padding-bottom: 2rem;
         }
@@ -184,11 +208,11 @@
             font-size: 1rem;
         }
 
-        /* --- STYLING DAFTAR RIWAYAT YANG LEBIH COMPACT --- */
+        /* --- STYLING DAFTAR --- */
         .list-riwayat {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem; /* Jarak antar baris dirapatkan */
+            gap: 0.75rem; 
         }
 
         .item-riwayat {
@@ -204,59 +228,147 @@
             padding-bottom: 0;
         }
 
+        .item-clickable {
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin: -0.5rem; 
+        }
+        .item-clickable:hover { background-color: #f9fafb; }
+
         .item-left {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            overflow: hidden; /* Cegah teks panjang merusak layout */
-            flex-grow: 1; /* Biarkan area kiri mengambil sisa ruang */
+            overflow: hidden; 
+            flex-grow: 1; 
         }
 
         .icon-jenis {
-            width: 36px; /* Ikon diperkecil sedikit */
+            width: 36px; 
             height: 36px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.95rem;
-            flex-shrink: 0; /* Pastikan bentuk ikon tidak gepeng */
+            flex-shrink: 0; 
         }
 
         .icon-masuk { background-color: #d1fae5; color: var(--success); }
         .icon-keluar { background-color: #fee2e2; color: var(--danger); }
+        .icon-user { background-color: #e0f2fe; color: #0284c7; }
+        .icon-key { background-color: #fef3c7; color: #d97706; }
 
-        .item-info {
-            overflow: hidden; /* Wajib untuk efek ellipsis (titik-titik) */
-        }
-
+        .item-info { overflow: hidden; }
         .item-info h4 {
-            font-size: 0.85rem; /* Ukuran font ideal yang rapi */
+            font-size: 0.85rem; 
             margin-bottom: 0.15rem;
             color: var(--text-main);
-            white-space: nowrap; /* Teks tidak turun ke bawah */
+            white-space: nowrap; 
             overflow: hidden;
-            text-overflow: ellipsis; /* Beri titik-titik jika terlalu panjang */
+            text-overflow: ellipsis; 
         }
 
-        .item-info p {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
+        .item-info p { font-size: 0.7rem; color: var(--text-muted); }
 
         .item-nominal {
             font-weight: 600;
-            font-size: 0.85rem; /* Font size ideal */
-            white-space: nowrap; /* KUNCI: Angka tidak boleh terpotong ke bawah */
-            flex-shrink: 0; /* KUNCI: Kotak nominal tidak akan menyusut */
+            font-size: 0.85rem; 
+            white-space: nowrap; 
+            flex-shrink: 0; 
             text-align: right;
-            margin-left: 0.5rem; /* Beri jarak dengan teks keterangan */
+            margin-left: 0.5rem; 
         }
 
         .nominal-masuk { color: var(--success); } 
         .nominal-keluar { color: var(--text-main); }
+        .nominal-netral { color: var(--text-main); }
         
         .loading-text { text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+        /* --- MODAL EDIT PIN --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); 
+            display: flex; align-items: center; justify-content: center;
+            z-index: 50;
+            opacity: 1; transition: opacity 0.2s;
+        }
+        .modal-overlay.hidden { display: none !important; opacity: 0; pointer-events: none; }
+        .modal-box {
+            background: var(--card-bg); padding: 1.5rem; border-radius: 16px; 
+            width: 90%; max-width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .modal-box h3 { margin-bottom: 0.25rem; font-size: 1.1rem; }
+        .modal-box p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.25rem; }
+        .modal-box input { margin-bottom: 1.25rem; width: 100%; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
+        
+        .btn-batal { 
+            background: #f3f4f6; color: var(--text-main); padding: 0.6rem 1rem; 
+            border-radius: 8px; border: none; font-weight: 600; cursor: pointer; 
+        }
+        .btn-simpan { 
+            background: var(--primary); color: var(--text-main); padding: 0.6rem 1rem; 
+            border-radius: 8px; border: none; font-weight: 600; cursor: pointer; 
+        }
+        .btn-batal:hover { background: #e5e7eb; }
+        .btn-simpan:hover { background: var(--primary-dark); }
+        .btn-simpan:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* --- MODERN BOTTOM SHEET ALERT (MODERN BOTTOM BAR) --- */
+        .bottom-alert-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(2px);
+            display: flex; align-items: flex-end; justify-content: center;
+            z-index: 100;
+            opacity: 1; transition: opacity 0.3s ease;
+        }
+        .bottom-alert-overlay.hidden {
+            display: none !important; opacity: 0; pointer-events: none;
+        }
+        .bottom-alert-sheet {
+            background: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            padding: 1.5rem 1.25rem 2rem 1.25rem;
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: slideUpSheet 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes slideUpSheet {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .bottom-alert-icon {
+            width: 52px; height: 52px; border-radius: 50%;
+            background-color: #fee2e2; color: var(--danger);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+        .bottom-alert-content h4 {
+            font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem;
+        }
+        .bottom-alert-content p {
+            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.4;
+        }
+        .bottom-alert-btn {
+            width: 100%; padding: 0.9rem;
+            background-color: var(--text-main); color: #ffffff;
+            border: none; border-radius: 14px; font-weight: 600;
+            font-size: 0.95rem; cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .bottom-alert-btn:active { opacity: 0.85; }
     </style>
 </head>
 <body>
@@ -279,17 +391,78 @@
         <button id="btnLogin" class="btn-primary" onclick="prosesLogin()">Masuk</button>
     </div>
 
-    <!-- LAYAR DASHBOARD -->
+    <!-- LAYAR ADMIN -->
+    <div id="admin-screen" class="hidden">
+        <div class="header">
+            <div class="header-top">
+                <div class="header-top-left">
+                    <div>
+                        <p style="font-size: 0.8rem; opacity: 0.8;">Halo Super Admin,</p>
+                        <h3 id="namaAdmin">Nama Admin</h3>
+                    </div>
+                </div>
+                <div class="header-top-right">
+                    <button class="action-btn action-btn-icon" onclick="bukaLayarPin()" title="Manajemen PIN Karyawan">
+                        <i class="fa-solid fa-key"></i>
+                    </button>
+                    <button class="action-btn" onclick="prosesLogout()">Keluar</button>
+                </div>
+            </div>
+            <p class="saldo-title">Total Seluruh Tabungan</p>
+            <h1 class="saldo-amount" id="totalSaldoAdmin">Rp 0</h1>
+        </div>
+
+        <div class="content">
+            <div class="card-riwayat">
+                <div class="riwayat-header">
+                    <span class="riwayat-title">Daftar Karyawan</span>
+                </div>
+                <div class="list-riwayat" id="listKaryawanAdmin"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LAYAR MANAJEMEN PIN KARYAWAN -->
+    <div id="pin-screen" class="hidden">
+        <div class="header" style="padding-bottom: 2rem;">
+            <div class="header-top">
+                <div class="header-top-left">
+                    <button class="action-btn action-btn-icon" onclick="tutupLayarPin()">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h3 style="margin-left: 10px;">Akses & PIN</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="card-riwayat">
+                <div class="riwayat-header">
+                    <span class="riwayat-title">Daftar PIN Karyawan</span>
+                </div>
+                <div class="list-riwayat" id="listKaryawanPin"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LAYAR DASHBOARD / DETAIL KARYAWAN -->
     <div id="dashboard-screen" class="hidden">
         <div class="header">
             <div class="header-top">
-                <div>
-                    <p style="font-size: 0.8rem; opacity: 0.8;">Halo,</p>
-                    <h3 id="namaKaryawan">Nama Karyawan</h3>
+                <div class="header-top-left">
+                    <button id="btnBackAdmin" class="action-btn action-btn-icon hidden" onclick="kembaliKeAdmin()">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <p id="labelSapaan" style="font-size: 0.8rem; opacity: 0.8;">Halo,</p>
+                        <h3 id="namaKaryawan">Nama Karyawan</h3>
+                    </div>
                 </div>
-                <button class="logout-btn" onclick="prosesLogout()">Keluar</button>
+                <button id="btnLogout" class="action-btn" onclick="prosesLogout()">Keluar</button>
             </div>
-            <p class="saldo-title">Total Tabungan Anda</p>
+            <p class="saldo-title">Total Tabungan</p>
             <h1 class="saldo-amount" id="totalSaldo">Rp 0</h1>
         </div>
 
@@ -298,10 +471,33 @@
                 <div class="riwayat-header">
                     <span class="riwayat-title">Riwayat Terakhir</span>
                 </div>
-                <div class="list-riwayat" id="listRiwayat">
-                    <!-- Data riwayat dari Supabase akan muncul di sini -->
-                </div>
+                <div class="list-riwayat" id="listRiwayat"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT PIN -->
+    <div id="modalPin" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3>Atur PIN Login</h3>
+            <p id="modalNamaKaryawan">Nama Karyawan</p>
+            <input type="text" id="inputPinBaru" placeholder="Masukkan PIN baru" autocomplete="off">
+            <div class="modal-actions">
+                <button class="btn-batal" onclick="tutupModalPin()">Batal</button>
+                <button class="btn-simpan" id="btnSimpanPin" onclick="simpanPinBaru()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODERN BOTTOM SHEET ALERT -->
+    <div id="bottomAlertOverlay" class="bottom-alert-overlay hidden">
+        <div class="bottom-alert-sheet">
+            <div class="bottom-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="bottom-alert-content">
+                <h4 id="bottomAlertTitle">Perhatian</h4>
+                <p id="bottomAlertMessage">Pesan informasi error di sini...</p>
+            </div>
+            <button class="bottom-alert-btn" onclick="tutupBottomAlert()">Mengerti</button>
         </div>
     </div>
 
@@ -309,7 +505,7 @@
 
 <script>
     // ==========================================
-    // 0. SCRIPT STANDALONE PWA (Virtual Manifest & Service Worker)
+    // 0. SCRIPT STANDALONE PWA
     // ==========================================
     const pwaManifest = {
       name: "SBR Putra Food",
@@ -346,6 +542,7 @@
     
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let dataKaryawanAktif = null;
+    let targetKaryawanEditId = null;
 
     function formatRupiah(angka) {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
@@ -357,6 +554,17 @@
         return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
     }
 
+    // --- HELPER BOTTOM SHEET ALERT ---
+    function showBottomAlert(title, message) {
+        document.getElementById('bottomAlertTitle').innerText = title;
+        document.getElementById('bottomAlertMessage').innerText = message;
+        document.getElementById('bottomAlertOverlay').classList.remove('hidden');
+    }
+
+    function tutupBottomAlert() {
+        document.getElementById('bottomAlertOverlay').classList.add('hidden');
+    }
+
     // ==========================================
     // 2. FUNGSI LOGIN & CEK PASSWORD
     // ==========================================
@@ -366,7 +574,7 @@
         const btnLogin = document.getElementById('btnLogin');
         
         if(!inputId || !inputPass) {
-            alert("Harap masukkan ID/Nama dan Password!");
+            showBottomAlert("Form Belum Lengkap", "Harap masukkan ID/Nama dan Password terlebih dahulu.");
             return;
         }
 
@@ -385,22 +593,28 @@
             const { data, error } = await query.maybeSingle();
 
             if (error || !data) {
-                alert("Data Karyawan tidak ditemukan!");
+                showBottomAlert("Gagal Masuk", "Data Karyawan tidak ditemukan!");
                 resetBtn(); 
                 return;
             }
 
             if (String(data.password) !== String(inputPass)) {
-                alert("Password salah, silakan coba lagi!");
+                showBottomAlert("Gagal Masuk", "Password salah, silakan coba lagi!");
                 resetBtn(); 
                 return;
             }
 
             dataKaryawanAktif = data;
-            tampilkanDashboard();
+            
+            // --- LOGIKA SUPER ADMIN (ID = 1, PIN = 749947) ---
+            if (String(data.id) === "1" && String(inputPass) === "749947") {
+                tampilkanLayarAdmin(data);
+            } else {
+                loadDashboardView(data, false);
+            }
 
         } catch (err) {
-            alert("Terjadi kesalahan sistem saat mencoba terhubung ke database.");
+            showBottomAlert("Kesalahan Sistem", "Terjadi kesalahan saat mencoba terhubung ke database.");
             console.error(err);
             resetBtn();
         }
@@ -413,14 +627,182 @@
     }
 
     // ==========================================
-    // 3. MENAMPILKAN DASHBOARD & MENARIK TABUNGAN
+    // 3. FUNGSI LAYAR ADMIN UTAMA
     // ==========================================
-    async function tampilkanDashboard() {
+    async function tampilkanLayarAdmin(adminData) {
         document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('dashboard-screen').classList.add('hidden');
+        document.getElementById('pin-screen').classList.add('hidden');
+        document.getElementById('admin-screen').classList.remove('hidden');
+
+        document.getElementById('namaAdmin').innerText = adminData.nama;
+
+        const container = document.getElementById('listKaryawanAdmin');
+        container.innerHTML = `<p class="loading-text">Memuat data karyawan...</p>`;
+
+        const { data: karyawanList, error } = await db
+            .from('karyawan')
+            .select('*')
+            .order('nama', { ascending: true });
+
+        if (error || !karyawanList) {
+            container.innerHTML = `<p class="loading-text">Gagal memuat data karyawan.</p>`;
+            return;
+        }
+
+        container.innerHTML = "";
+        let totalSeluruh = 0;
+
+        karyawanList.forEach(k => {
+            const saldo = k.saldo_tabungan || 0;
+            totalSeluruh += saldo;
+
+            if (saldo > 0) {
+                const itemHTML = `
+                    <div class="item-riwayat item-clickable" onclick='lihatRincianKaryawan(${JSON.stringify(k)})'>
+                        <div class="item-left">
+                            <div class="icon-jenis icon-user"><i class="fa-solid fa-user"></i></div>
+                            <div class="item-info">
+                                <h4>${k.nama}</h4>
+                                <p>ID: ${k.id}</p>
+                            </div>
+                        </div>
+                        <div class="item-nominal nominal-netral">
+                            ${formatRupiah(saldo)}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += itemHTML;
+            }
+        });
+
+        if (container.innerHTML === "") {
+            container.innerHTML = `<p class="loading-text">Belum ada data tabungan karyawan.</p>`;
+        }
+
+        document.getElementById('totalSaldoAdmin').innerText = formatRupiah(totalSeluruh);
+        resetBtn();
+    }
+
+    // ==========================================
+    // 4. MANAJEMEN PIN KARYAWAN
+    // ==========================================
+    async function bukaLayarPin() {
+        document.getElementById('admin-screen').classList.add('hidden');
+        document.getElementById('pin-screen').classList.remove('hidden');
+        
+        const container = document.getElementById('listKaryawanPin');
+        container.innerHTML = `<p class="loading-text">Memuat data akses...</p>`;
+
+        const { data: karyawanList, error } = await db
+            .from('karyawan')
+            .select('id, nama, password')
+            .order('nama', { ascending: true });
+
+        if (error || !karyawanList) {
+            container.innerHTML = `<p class="loading-text">Gagal memuat data akses.</p>`;
+            return;
+        }
+
+        container.innerHTML = "";
+        
+        karyawanList.forEach(k => {
+            const currentPin = k.password ? k.password : 'Belum diatur';
+            const itemHTML = `
+                <div class="item-riwayat">
+                    <div class="item-left">
+                        <div class="icon-jenis icon-key"><i class="fa-solid fa-lock"></i></div>
+                        <div class="item-info">
+                            <h4>${k.nama}</h4>
+                            <p>ID: ${k.id} &nbsp;|&nbsp; PIN: <strong style="color:var(--text-main);">${currentPin}</strong></p>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="action-btn" style="background:var(--primary); color:var(--text-main);" onclick="bukaModalPin('${k.id}', '${k.nama}', '${k.password || ''}')">Edit</button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += itemHTML;
+        });
+    }
+
+    function tutupLayarPin() {
+        document.getElementById('pin-screen').classList.add('hidden');
+        document.getElementById('admin-screen').classList.remove('hidden');
+    }
+
+    function bukaModalPin(id, nama, pinSekarang) {
+        targetKaryawanEditId = id;
+        document.getElementById('modalNamaKaryawan').innerText = `ID: ${id} - ${nama}`;
+        document.getElementById('inputPinBaru').value = pinSekarang;
+        document.getElementById('modalPin').classList.remove('hidden');
+    }
+
+    function tutupModalPin() {
+        document.getElementById('modalPin').classList.add('hidden');
+        targetKaryawanEditId = null;
+        document.getElementById('inputPinBaru').value = "";
+    }
+
+    async function simpanPinBaru() {
+        if (!targetKaryawanEditId) return;
+        
+        const inputPin = document.getElementById('inputPinBaru').value.trim();
+        if (!inputPin) {
+            showBottomAlert("Peringatan", "PIN tidak boleh kosong!");
+            return;
+        }
+
+        const btnSimpan = document.getElementById('btnSimpanPin');
+        btnSimpan.innerText = "Proses...";
+        btnSimpan.disabled = true;
+
+        const { error } = await db
+            .from('karyawan')
+            .update({ password: inputPin })
+            .eq('id', targetKaryawanEditId);
+
+        btnSimpan.innerText = "Simpan";
+        btnSimpan.disabled = false;
+
+        if (error) {
+            showBottomAlert("Gagal", "Terjadi kesalahan saat menyimpan PIN!");
+            console.error(error);
+        } else {
+            tutupModalPin();
+            bukaLayarPin();
+        }
+    }
+
+    // ==========================================
+    // 5. DETAIL TABUNGAN & LOGOUT
+    // ==========================================
+    function lihatRincianKaryawan(userData) {
+        loadDashboardView(userData, true);
+    }
+
+    function kembaliKeAdmin() {
+        tampilkanLayarAdmin(dataKaryawanAktif);
+    }
+
+    async function loadDashboardView(userObj, isAdminView = false) {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('admin-screen').classList.add('hidden');
+        document.getElementById('pin-screen').classList.add('hidden');
         document.getElementById('dashboard-screen').classList.remove('hidden');
         
-        document.getElementById('namaKaryawan').innerText = dataKaryawanAktif.nama;
-        document.getElementById('totalSaldo').innerText = formatRupiah(dataKaryawanAktif.saldo_tabungan);
+        if (isAdminView) {
+            document.getElementById('btnBackAdmin').classList.remove('hidden');
+            document.getElementById('btnLogout').classList.add('hidden');
+            document.getElementById('labelSapaan').innerText = "Rincian Tabungan:";
+        } else {
+            document.getElementById('btnBackAdmin').classList.add('hidden');
+            document.getElementById('btnLogout').classList.remove('hidden');
+            document.getElementById('labelSapaan').innerText = "Halo,";
+        }
+
+        document.getElementById('namaKaryawan').innerText = userObj.nama;
+        document.getElementById('totalSaldo').innerText = formatRupiah(userObj.saldo_tabungan);
         
         const container = document.getElementById('listRiwayat');
         container.innerHTML = `<p class="loading-text">Memuat riwayat...</p>`;
@@ -428,13 +810,14 @@
         const { data: riwayat, error } = await db
             .from('riwayat_tabungan')
             .select('*')
-            .eq('id_kar', dataKaryawanAktif.id)
+            .eq('id_kar', userObj.id)
             .order('tgl', { ascending: false });
 
         container.innerHTML = "";
 
         if (error || !riwayat || riwayat.length === 0) {
             container.innerHTML = `<p class="loading-text">Belum ada riwayat transaksi.</p>`;
+            resetBtn();
             return;
         }
 
@@ -469,7 +852,10 @@
         dataKaryawanAktif = null;
         document.getElementById('inputIdKaryawan').value = "";
         document.getElementById('inputPassword').value = "";
+        
         document.getElementById('dashboard-screen').classList.add('hidden');
+        document.getElementById('admin-screen').classList.add('hidden');
+        document.getElementById('pin-screen').classList.add('hidden');
         document.getElementById('login-screen').classList.remove('hidden');
     }
 </script>
