@@ -494,12 +494,58 @@
             transition: opacity 0.2s;
         }
         .btn-tutup-slip:active { opacity: 0.85; }
+		
+		/* --- STYLING INPUT PASSWORD HIDEABLE --- */
+        .input-password-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 1.25rem;
+        }
+        .input-password-wrapper input {
+            margin-bottom: 0 !important; /* Timpa margin bawaan */
+            padding-right: 2.5rem; /* Beri ruang agar teks tidak tertutup ikon */
+        }
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: color 0.2s;
+        }
+        .toggle-password:hover {
+            color: var(--primary-dark);
+        }
+		
     </style>
 </head>
 <body>
 
 <div id="app-container">
-    
+	<!-- MODAL TEMA WARNA -->
+    <div id="modalTema" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3>Pilih Warna Tema</h3>
+            <p>Ubah warna dasar tampilan aplikasi.</p>
+            <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center;">
+                <!-- Ungu (Default) -->
+                <div style="background-color: #E1C4FF; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#E1C4FF', '#C293FF')"></div>
+                <!-- Biru -->
+                <div style="background-color: #93C5FD; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#93C5FD', '#60A5FA')"></div>
+                <!-- Hijau -->
+                <div style="background-color: #6EE7B7; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#6EE7B7', '#34D399')"></div>
+                <!-- Merah Muda -->
+                <div style="background-color: #FCA5A5; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#FCA5A5', '#F87171')"></div>
+                <!-- Kuning Emas -->
+                <div style="background-color: #FDE047; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#FDE047', '#FACC15')"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-batal" style="width: 100%;" onclick="tutupModalTema()">Tutup</button>
+            </div>
+        </div>
+    </div>    
     <!-- LAYAR LOGIN -->
     <div id="login-screen">
         <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/3e98b9797affc74211878c59439be66c3e99d5bc/sbr_logo.png" alt="SBR Putra Food Logo" class="logo-img">
@@ -527,6 +573,10 @@
                     </div>
                 </div>
                 <div class="header-top-right">
+                    <!-- Tombol Setting Tema Warna -->
+                    <button class="action-btn action-btn-icon" onclick="bukaModalTema()" title="Pengaturan Tema">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
                     <button class="action-btn action-btn-icon" onclick="bukaLayarPin()" title="Manajemen PIN Karyawan">
                         <i class="fa-solid fa-key"></i>
                     </button>
@@ -585,7 +635,13 @@
                         <h3 id="namaKaryawan">Nama Karyawan</h3>
                     </div>
                 </div>
-                <button id="btnLogout" class="action-btn" onclick="prosesLogout()">Keluar</button>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <!-- Tombol Ganti PIN Pribadi -->
+                    <button id="btnGantiPinPribadi" class="action-btn action-btn-icon hidden" style="color: #fbbf24; background: rgba(251, 191, 36, 0.15);" onclick="bukaModalPinPribadi()" title="Ganti PIN Saya">
+                        <i class="fa-solid fa-key"></i>
+                    </button>
+                    <button id="btnLogout" class="action-btn" onclick="prosesLogout()">Keluar</button>
+                </div>
             </div>
             <p class="saldo-title">Total Tabungan</p>
             <h1 class="saldo-amount" id="totalSaldo">Rp 0</h1>
@@ -623,7 +679,17 @@
         <div class="modal-box">
             <h3>Atur PIN Login</h3>
             <p id="modalNamaKaryawan">Nama Karyawan</p>
-            <input type="text" id="inputPinBaru" placeholder="Masukkan PIN baru" autocomplete="off">
+            
+            <div class="input-password-wrapper">
+                <input type="password" id="inputPinBaru" placeholder="Masukkan PIN baru" autocomplete="off">
+                <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility('inputPinBaru', this)"></i>
+            </div>
+
+            <div class="input-password-wrapper" style="margin-bottom: 1.5rem;">
+                <input type="password" id="inputPinVerifikasi" placeholder="Konfirmasi PIN baru" autocomplete="off">
+                <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility('inputPinVerifikasi', this)"></i>
+            </div>
+
             <div class="modal-actions">
                 <button class="btn-batal" onclick="tutupModalPin()">Batal</button>
                 <button class="btn-simpan" id="btnSimpanPin" onclick="simpanPinBaru()">Simpan</button>
@@ -688,6 +754,12 @@
                 <span>DITERIMA</span>
                 <strong id="slipTerimaBersih">Rp 0</strong>
             </div>
+			
+			<!-- TAMBAHAN: Kotak Catatan Sisa Kasbon -->
+            <div id="slipSisaKasbonContainer" class="hidden" style="background-color: #fffbeb; color: #b45309; padding: 1rem; border-radius: 12px; margin-bottom: 1.25rem; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid #fde68a;">
+                <span><i class="fa-solid fa-circle-info" style="margin-right: 5px;"></i> Catatan Sisa Kasbon</span>
+                <strong id="slipSisaKasbon">Rp 0</strong>
+            </div>
 
             <button class="btn-tutup-slip" onclick="tutupSlipModern()">Tutup Pratinjau</button>
         </div>
@@ -735,6 +807,41 @@
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let dataKaryawanAktif = null;
     let targetKaryawanEditId = null;
+	
+	// Muat tema yang tersimpan saat aplikasi dibuka
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedPrimary = localStorage.getItem('sbrThemePrimary');
+        const savedDark = localStorage.getItem('sbrThemeDark');
+        if (savedPrimary && savedDark) {
+            document.documentElement.style.setProperty('--primary', savedPrimary);
+            document.documentElement.style.setProperty('--primary-dark', savedDark);
+        }
+    });
+	
+	function bukaModalPinPribadi() {
+        targetKaryawanEditId = dataKaryawanAktif.id;
+        document.getElementById('modalNamaKaryawan').innerText = `Ganti PIN Anda (${dataKaryawanAktif.nama})`;
+        // Kosongkan kolom setiap dibuka agar aman
+		document.getElementById('inputPinBaru').value = "";
+        document.getElementById('inputPinVerifikasi').value = "";
+        document.getElementById('modalPin').classList.remove('hidden');
+    }
+
+    function bukaModalTema() {
+        document.getElementById('modalTema').classList.remove('hidden');
+    }
+    
+    function tutupModalTema() {
+        document.getElementById('modalTema').classList.add('hidden');
+    }
+    
+    function ubahTema(primary, primaryDark) {
+        document.documentElement.style.setProperty('--primary', primary);
+        document.documentElement.style.setProperty('--primary-dark', primaryDark);
+        // Simpan ke penyimpanan peramban (browser)
+        localStorage.setItem('sbrThemePrimary', primary);
+        localStorage.setItem('sbrThemeDark', primaryDark);
+    }
 
     function formatRupiah(angka) {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
@@ -924,7 +1031,9 @@
     function bukaModalPin(id, nama, pinSekarang) {
         targetKaryawanEditId = id;
         document.getElementById('modalNamaKaryawan').innerText = `ID: ${id} - ${nama}`;
-        document.getElementById('inputPinBaru').value = pinSekarang;
+		// Kosongkan kolom setiap dibuka agar aman
+		document.getElementById('inputPinBaru').value = ""; 
+        document.getElementById('inputPinVerifikasi').value = "";
         document.getElementById('modalPin').classList.remove('hidden');
     }
 
@@ -932,14 +1041,28 @@
         document.getElementById('modalPin').classList.add('hidden');
         targetKaryawanEditId = null;
         document.getElementById('inputPinBaru').value = "";
+		document.getElementById('inputPinVerifikasi').value = "";
+		// Kembalikan ke mode password tersembunyi tiap modal ditutup
+        document.getElementById('inputPinBaru').type = "password";
+        document.getElementById('inputPinVerifikasi').type = "password";
+        document.querySelectorAll('.toggle-password').forEach(icon => {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+		});
     }
 
     async function simpanPinBaru() {
         if (!targetKaryawanEditId) return;
         
         const inputPin = document.getElementById('inputPinBaru').value.trim();
+		const inputVerifikasi = document.getElementById('inputPinVerifikasi').value.trim();
         if (!inputPin) {
-            showBottomAlert("Peringatan", "PIN tidak boleh kosong!");
+            showBottomAlert("Peringatan", "Kedua kolom PIN tidak boleh kosong!");
+            return;
+        }
+		
+		if (inputPin !== inputVerifikasi) {
+            showBottomAlert("Peringatan", "PIN baru dan Konfirmasi PIN tidak cocok!");
             return;
         }
 
@@ -960,7 +1083,15 @@
             console.error(error);
         } else {
             tutupModalPin();
-            bukaLayarPin();
+            
+            if (dataKaryawanAktif && dataKaryawanAktif.id === "1" && !document.getElementById('pin-screen').classList.contains('hidden')) {
+                bukaLayarPin();
+            } else {
+                showBottomAlert("Berhasil", "PIN berhasil diperbarui!");
+                if (dataKaryawanAktif && targetKaryawanEditId === dataKaryawanAktif.id) {
+                    dataKaryawanAktif.password = inputPin;
+                }
+            }
         }
     }
 
@@ -980,6 +1111,17 @@
         document.getElementById('admin-screen').classList.add('hidden');
         document.getElementById('pin-screen').classList.add('hidden');
         document.getElementById('dashboard-screen').classList.remove('hidden');
+		if (isAdminView) {
+            document.getElementById('btnBackAdmin').classList.remove('hidden');
+            document.getElementById('btnLogout').classList.add('hidden');
+            document.getElementById('btnGantiPinPribadi').classList.add('hidden'); // Sembunyikan ikon ganti PIN
+            document.getElementById('labelSapaan').innerText = "Rincian Tabungan:";
+        } else {
+            document.getElementById('btnBackAdmin').classList.add('hidden');
+            document.getElementById('btnLogout').classList.remove('hidden');
+            document.getElementById('btnGantiPinPribadi').classList.remove('hidden'); // Tampilkan ikon ganti PIN
+            document.getElementById('labelSapaan').innerText = "Halo,";
+        }
         
         switchTab('tabungan');
         
@@ -1151,7 +1293,7 @@
     function getPotonganLabel(key) {
         const k = key.toLowerCase().trim();
         const labels = {
-            'nomkas': 'Potongan Kas / Kasbon',
+            'nomkas': 'Potongan Kas',
             'kasbon': 'Potongan Kasbon',
             'potrutin': 'Potongan Rutin',
             'potlain': 'Potongan Lain-lain',
@@ -1284,10 +1426,19 @@
         // 3. Susun Potongan
         let htmlPotongan = '';
         let totalPotongan = 0;
+		let sisaKasbonVal = 0; // Variabel baru untuk menampung sisa kasbon
 
         for (const [rawKey, rawVal] of Object.entries(d)) {
             const key = rawKey.toLowerCase().trim();
             const valNum = parseNum(rawVal);
+			
+			// TAHAP BARU: Pisahkan SISAKASBON agar tidak dihitung sebagai potongan
+            if (key === 'sisakasbon') {
+                if (valNum > 0) {
+                    sisaKasbonVal = valNum;
+                }
+                continue; // Lompati proses ke bawah, lanjut ke baris data berikutnya
+            }
 
             const isPotonganKey = key.includes('pot') || key.includes('kas') || key.includes('listrik') || key.includes('tabungan');
             
@@ -1319,12 +1470,34 @@
         const diterima = totalPendapatan - totalPotongan;
         document.getElementById('slipTerimaBersih').innerText = 'Rp ' + formatNum(diterima);
 
+		// 5. Tampilkan Catatan Sisa Kasbon di bawah (Tanpa tanda minus)
+        const sisaKasbonContainer = document.getElementById('slipSisaKasbonContainer');
+        if (sisaKasbonVal > 0) {
+            document.getElementById('slipSisaKasbon').innerText = 'Rp ' + formatNum(sisaKasbonVal);
+            sisaKasbonContainer.classList.remove('hidden');
+        } else {
+            sisaKasbonContainer.classList.add('hidden');
+        }
+		
         document.getElementById('modalSlipModern').classList.remove('hidden');
     }
 
     function tutupSlipModern() {
         document.getElementById('modalSlipModern').classList.add('hidden');
     }
+	
+	function togglePasswordVisibility(inputId, iconElement) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            iconElement.classList.remove("fa-eye");
+            iconElement.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            iconElement.classList.remove("fa-eye-slash");
+            iconElement.classList.add("fa-eye");
+        }
+    }	
 </script>
 
 </body>
