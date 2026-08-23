@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SBR Putra Food - Tabungan</title>
+    <title>SBR Putra Food - Tabungan & Gaji</title>
     
     <!-- SCRIPT CDN SUPABASE & FONTAWESOME -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -288,6 +288,35 @@
         
         .loading-text { text-align: center; color: var(--text-muted); font-size: 0.85rem; }
 
+        /* --- STYLING TABS GAJI & TABUNGAN --- */
+        .tab-container {
+            display: flex;
+            background: #f3f4f6;
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+            padding: 0.3rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            text-align: center;
+            padding: 0.6rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            background: transparent;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--text-main);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
         /* --- MODAL EDIT PIN --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -318,7 +347,7 @@
         .btn-simpan:hover { background: var(--primary-dark); }
         .btn-simpan:disabled { opacity: 0.7; cursor: not-allowed; }
 
-        /* --- MODERN BOTTOM SHEET ALERT (MODERN BOTTOM BAR) --- */
+        /* --- MODERN BOTTOM SHEET ALERT --- */
         .bottom-alert-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.45);
@@ -369,6 +398,102 @@
             transition: opacity 0.2s;
         }
         .bottom-alert-btn:active { opacity: 0.85; }
+
+        /* --- MODAL SLIP GAJI MODERN --- */
+        .slip-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+            opacity: 1; transition: opacity 0.2s;
+        }
+        .slip-overlay.hidden { display: none !important; opacity: 0; pointer-events: none; }
+        
+        .slip-card {
+            background: #ffffff;
+            width: 92%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .slip-header {
+            text-align: center;
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        .slip-header h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 0.2rem;
+            letter-spacing: 0.5px;
+        }
+        .slip-header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .slip-info {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+        }
+        .info-row:last-child { margin-bottom: 0; }
+        .info-row span { color: var(--text-muted); }
+        .info-row strong { color: var(--text-main); text-align: right; }
+        
+        .slip-section {
+            margin-bottom: 1.25rem;
+        }
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #8b5cf6;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+            color: var(--text-main);
+        }
+        .slip-grand-total {
+            background: var(--primary);
+            color: var(--text-on-primary);
+            padding: 1.25rem;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+        .btn-tutup-slip {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--text-main);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-tutup-slip:active { opacity: 0.85; }
     </style>
 </head>
 <body>
@@ -380,7 +505,7 @@
         <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/3e98b9797affc74211878c59439be66c3e99d5bc/sbr_logo.png" alt="SBR Putra Food Logo" class="logo-img">
         
         <h1 class="login-title">SBR Putra Food</h1>
-        <p class="login-subtitle">Portal Tabungan Karyawan</p>
+        <p class="login-subtitle">Portal Tabungan & Gaji Karyawan</p>
         
         <div class="input-group">
             <input type="text" id="inputIdKaryawan" placeholder="ID Karyawan / Nama" autocomplete="off">
@@ -468,10 +593,27 @@
 
         <div class="content">
             <div class="card-riwayat">
-                <div class="riwayat-header">
-                    <span class="riwayat-title">Riwayat Terakhir</span>
+                <!-- Tab Switcher -->
+                <div class="tab-container">
+                    <button class="tab-btn active" id="tabTabungan" onclick="switchTab('tabungan')">Tabungan</button>
+                    <button class="tab-btn" id="tabGaji" onclick="switchTab('gaji')">Slip Gaji</button>
                 </div>
-                <div class="list-riwayat" id="listRiwayat"></div>
+
+                <!-- Daftar Riwayat Tabungan -->
+                <div id="sectionTabungan">
+                    <div class="riwayat-header">
+                        <span class="riwayat-title">Riwayat Terakhir</span>
+                    </div>
+                    <div class="list-riwayat" id="listRiwayat"></div>
+                </div>
+
+                <!-- Daftar Riwayat Gaji -->
+                <div id="sectionGaji" class="hidden">
+                    <div class="riwayat-header">
+                        <span class="riwayat-title">Daftar Slip Gaji</span>
+                    </div>
+                    <div class="list-riwayat" id="listGaji"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -498,6 +640,56 @@
                 <p id="bottomAlertMessage">Pesan informasi error di sini...</p>
             </div>
             <button class="bottom-alert-btn" onclick="tutupBottomAlert()">Mengerti</button>
+        </div>
+    </div>
+
+    <!-- MODAL SLIP GAJI MODERN -->
+    <div id="modalSlipModern" class="slip-overlay hidden">
+        <div class="slip-card">
+            <div class="slip-header">
+                <h2>SBR SYSTEMS PAYROLL</h2>
+                <p>Slip Gaji Karyawan</p>
+            </div>
+            
+            <div class="slip-info">
+                <div class="info-row"><span>Nama</span><strong id="slipNama"></strong></div>
+                <div class="info-row"><span>Periode</span><strong id="slipPeriode"></strong></div>
+            </div>
+
+            <!-- Rincian Upah & Tarif -->
+            <div class="slip-section" id="sectionQtyContainer">
+                <div class="section-title">RINCIAN UPAH</div>
+                <div id="slipListQty">
+                    <!-- Dinamis by JS -->
+                </div>
+                <hr style="border: none; border-top: 1px dashed #e5e7eb; margin: 10px 0 0 0;">
+            </div>
+
+            <!-- Total Pendapatan Kalkulasi Otomatis -->
+            <div class="slip-section">
+                <div class="data-row" style="font-size: 1rem; font-weight: 700;">
+                    <span>Total Pendapatan</span>
+                    <span id="slipTotalPendapatan" style="color: var(--success);">Rp 0</span>
+                </div>
+            </div>
+
+            <hr style="border: none; border-top: 1px dashed #e5e7eb; margin: 5px 0 15px 0;">
+
+            <!-- Bagian Potongan -->
+            <div class="slip-section">
+                <div class="section-title">DIKURANGI:</div>
+                <div id="slipListPotongan">
+                    <!-- Dinamis by JS -->
+                </div>
+            </div>
+
+            <!-- Terima Bersih / Diterima Kalkulasi Otomatis -->
+            <div class="slip-grand-total">
+                <span>DITERIMA</span>
+                <strong id="slipTerimaBersih">Rp 0</strong>
+            </div>
+
+            <button class="btn-tutup-slip" onclick="tutupSlipModern()">Tutup Pratinjau</button>
         </div>
     </div>
 
@@ -554,7 +746,6 @@
         return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
     }
 
-    // --- HELPER BOTTOM SHEET ALERT ---
     function showBottomAlert(title, message) {
         document.getElementById('bottomAlertTitle').innerText = title;
         document.getElementById('bottomAlertMessage').innerText = message;
@@ -606,7 +797,6 @@
 
             dataKaryawanAktif = data;
             
-            // --- LOGIKA SUPER ADMIN (ID = 1, PIN = 749947) ---
             if (String(data.id) === "1" && String(inputPass) === "749947") {
                 tampilkanLayarAdmin(data);
             } else {
@@ -791,6 +981,8 @@
         document.getElementById('pin-screen').classList.add('hidden');
         document.getElementById('dashboard-screen').classList.remove('hidden');
         
+        switchTab('tabungan');
+        
         if (isAdminView) {
             document.getElementById('btnBackAdmin').classList.remove('hidden');
             document.getElementById('btnLogout').classList.add('hidden');
@@ -817,34 +1009,33 @@
 
         if (error || !riwayat || riwayat.length === 0) {
             container.innerHTML = `<p class="loading-text">Belum ada riwayat transaksi.</p>`;
-            resetBtn();
-            return;
-        }
+        } else {
+            riwayat.forEach(row => {
+                const isMasuk = row.jenis === 'masuk';
+                const iconClass = isMasuk ? 'icon-masuk' : 'icon-keluar';
+                const iconSymbol = isMasuk ? '<i class="fa-solid fa-dollar-sign"></i>' : '<i class="fa-solid fa-money-bill-transfer"></i>';
+                const nominalClass = isMasuk ? 'nominal-masuk' : 'nominal-keluar';
+                const nominalPrefix = isMasuk ? '+' : '-';
 
-        riwayat.forEach(row => {
-            const isMasuk = row.jenis === 'masuk';
-            const iconClass = isMasuk ? 'icon-masuk' : 'icon-keluar';
-            const iconSymbol = isMasuk ? '<i class="fa-solid fa-dollar-sign"></i>' : '<i class="fa-solid fa-money-bill-transfer"></i>';
-            const nominalClass = isMasuk ? 'nominal-masuk' : 'nominal-keluar';
-            const nominalPrefix = isMasuk ? '+' : '-';
-
-            const itemHTML = `
-                <div class="item-riwayat">
-                    <div class="item-left">
-                        <div class="icon-jenis ${iconClass}">${iconSymbol}</div>
-                        <div class="item-info">
-                            <h4>${row.keterangan || (isMasuk ? 'Setoran' : 'Penarikan')}</h4>
-                            <p>${formatTanggal(row.tgl)}</p>
+                const itemHTML = `
+                    <div class="item-riwayat">
+                        <div class="item-left">
+                            <div class="icon-jenis ${iconClass}">${iconSymbol}</div>
+                            <div class="item-info">
+                                <h4>${row.keterangan || (isMasuk ? 'Setoran' : 'Penarikan')}</h4>
+                                <p>${formatTanggal(row.tgl)}</p>
+                            </div>
+                        </div>
+                        <div class="item-nominal ${nominalClass}">
+                            ${nominalPrefix} ${formatRupiah(row.nominal).replace('Rp', '').trim()}
                         </div>
                     </div>
-                    <div class="item-nominal ${nominalClass}">
-                        ${nominalPrefix} ${formatRupiah(row.nominal).replace('Rp', '').trim()}
-                    </div>
-                </div>
-            `;
-            container.innerHTML += itemHTML;
-        });
+                `;
+                container.innerHTML += itemHTML;
+            });
+        }
         
+        loadGajiView(userObj);
         resetBtn();
     }
 
@@ -857,6 +1048,282 @@
         document.getElementById('admin-screen').classList.add('hidden');
         document.getElementById('pin-screen').classList.add('hidden');
         document.getElementById('login-screen').classList.remove('hidden');
+    }
+
+    // ==========================================
+    // 6. FUNGSI TABS & SLIP GAJI GLOBAL
+    // ==========================================
+    let globalDataSlipGaji = []; 
+
+    function switchTab(tabName) {
+        if(tabName === 'tabungan') {
+            document.getElementById('tabTabungan').classList.add('active');
+            document.getElementById('tabGaji').classList.remove('active');
+            document.getElementById('sectionTabungan').classList.remove('hidden');
+            document.getElementById('sectionGaji').classList.add('hidden');
+        } else {
+            document.getElementById('tabGaji').classList.add('active');
+            document.getElementById('tabTabungan').classList.remove('active');
+            document.getElementById('sectionGaji').classList.remove('hidden');
+            document.getElementById('sectionTabungan').classList.add('hidden');
+        }
+    }
+
+    async function loadGajiView(userObj) {
+        const container = document.getElementById('listGaji');
+        container.innerHTML = `<p class="loading-text">Memuat slip gaji...</p>`;
+
+        const { data: riwayatGaji, error } = await db
+            .from('riwayat_gaji')
+            .select('label_periode, detail_json, created_at')
+            .order('created_at', { ascending: false });
+
+        container.innerHTML = "";
+
+        if (error || !riwayatGaji || riwayatGaji.length === 0) {
+            container.innerHTML = `<p class="loading-text">Belum ada riwayat slip gaji.</p>`;
+            return;
+        }
+
+        let adaGaji = false;
+        globalDataSlipGaji = []; 
+
+        riwayatGaji.forEach(row => {
+            let detailArray = row.detail_json;
+            if (typeof detailArray === 'string') {
+                try { detailArray = JSON.parse(detailArray); } catch(e) { detailArray = []; }
+            }
+
+            if (Array.isArray(detailArray)) {
+                const slipSaya = detailArray.find(k => String(k.id) === String(userObj.id));
+                
+                if (slipSaya) {
+                    adaGaji = true;
+                    const parts = row.label_periode ? row.label_periode.split('|') : [];
+                    const namaDivisi = parts[0] ? parts[0].trim() : 'Gaji';
+                    const rentangTanggal = parts[1] ? parts[1].trim() : formatTanggal(row.created_at);
+                    
+                    const indexStruk = globalDataSlipGaji.length;
+                    globalDataSlipGaji.push({
+                        divisi: namaDivisi,
+                        tanggal: rentangTanggal,
+                        detail: slipSaya
+                    });
+
+                    const itemHTML = `
+                        <div class="item-riwayat item-clickable" onclick="bukaSlipModern(${indexStruk})">
+                            <div class="item-left">
+                                <div class="icon-jenis" style="background-color: #fef3c7; color: #d97706;">
+                                    <i class="fa-solid fa-envelope-open-text"></i>
+                                </div>
+                                <div class="item-info">
+                                    <h4>Divisi ${namaDivisi}</h4>
+                                    <p>${rentangTanggal}</p>
+                                </div>
+                            </div>
+                            <div class="item-nominal" style="color: var(--text-main); font-size: 0.8rem; opacity: 0.7;">
+                                Buka <i class="fa-solid fa-chevron-right" style="margin-left: 3px; font-size: 0.7rem;"></i>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += itemHTML;
+                }
+            }
+        });
+
+        if (!adaGaji) {
+            container.innerHTML = `<p class="loading-text">Tidak ada slip gaji untuk akun Anda.</p>`;
+        }
+    }
+
+    function parseNum(val) {
+        if (val === null || val === undefined || val === '') return 0;
+        const str = String(val).replace(/[^0-9-]/g, '');
+        if (str === '' || str === '-') return 0;
+        return parseInt(str, 10);
+    }
+    
+    function formatNum(val) {
+        if(!val || isNaN(val)) return '0';
+        return Number(val).toLocaleString('id-ID');
+    }
+
+    function getPotonganLabel(key) {
+        const k = key.toLowerCase().trim();
+        const labels = {
+            'nomkas': 'Potongan Kas / Kasbon',
+            'kasbon': 'Potongan Kasbon',
+            'potrutin': 'Potongan Rutin',
+            'potlain': 'Potongan Lain-lain',
+            'nomlistrik': 'Potongan Listrik',
+            'tabungan': 'Potongan Tabungan'
+        };
+        return labels[k] || key.toUpperCase();
+    }
+
+    // FUNGSI MEMBUKA MODAL SLIP GAJI DENGAN KALKULASI OTOMATIS AKURAT
+    async function bukaSlipModern(index) {
+        const data = globalDataSlipGaji[index];
+        if(!data) return;
+
+        const d = data.detail;
+        const empId = d.id || d.ID;
+
+        // Ambil data tarif langsung dari tabel 'karyawan' di Supabase
+        let tarifReg = 0, tarifLem = 0, tarifLem2 = 0, tarifLem3 = 0;
+        if (empId) {
+            const { data: karData, error } = await db
+                .from('karyawan')
+                .select('tarif_reg, tarif_lem, tarif_lem_2, tarif_lem_3')
+                .eq('id', empId)
+                .maybeSingle();
+            
+            if (karData && !error) {
+                tarifReg = parseNum(karData.tarif_reg);
+                tarifLem = parseNum(karData.tarif_lem);
+                tarifLem2 = parseNum(karData.tarif_lem_2);
+                tarifLem3 = parseNum(karData.tarif_lem_3);
+            }
+        }
+
+        const getVal = (key) => {
+            const foundKey = Object.keys(d).find(k => k.toLowerCase() === key.toLowerCase());
+            return foundKey ? parseNum(d[foundKey]) : 0;
+        };
+        const getStr = (key) => {
+            const foundKey = Object.keys(d).find(k => k.toLowerCase() === key.toLowerCase());
+            return foundKey ? d[foundKey] : '';
+        };
+
+        // 1. Set Header
+        const namaPegawai = getStr('nama') || 'Karyawan';
+        document.getElementById('slipNama').innerText = `${namaPegawai} (${data.divisi})`;
+        document.getElementById('slipPeriode').innerText = data.tanggal;
+
+        // 2. Susun Rincian (Reguler, Lembur 1, 2, 3 x Tarif) Sekaligus Hitung Total Pendapatan secara Matematis
+        let htmlQty = '';
+        let totalPendapatan = 0;
+
+        const tReg = getVal('treg');
+        if (tReg > 0) {
+            const subReg = tReg * tarifReg;
+            totalPendapatan += subReg;
+            htmlQty += `
+                <div class="data-row">
+                    <span style="color: var(--text-muted);">Reguler (${formatNum(tReg)} x ${formatNum(tarifReg)})</span>
+                    <span style="font-weight: 600;">${formatNum(subReg)}</span>
+                </div>
+            `;
+        }
+
+        const tLem = getVal('tlem');
+        if (tLem > 0) {
+            const subLem = tLem * tarifLem;
+            totalPendapatan += subLem;
+            htmlQty += `
+                <div class="data-row">
+                    <span style="color: var(--text-muted);">Lem 1 (${formatNum(tLem)} x ${formatNum(tarifLem)})</span>
+                    <span style="font-weight: 600;">${formatNum(subLem)}</span>
+                </div>
+            `;
+        }
+
+        const tLem2 = getVal('tlem2');
+        if (tLem2 > 0) {
+            const subLem2 = tLem2 * tarifLem2;
+            totalPendapatan += subLem2;
+            htmlQty += `
+                <div class="data-row">
+                    <span style="color: var(--text-muted);">Lem 2 (${formatNum(tLem2)} x ${formatNum(tarifLem2)})</span>
+                    <span style="font-weight: 600;">${formatNum(subLem2)}</span>
+                </div>
+            `;
+        }
+
+        const tLem3 = getVal('tlem3');
+        if (tLem3 > 0) {
+            const subLem3 = tLem3 * tarifLem3;
+            totalPendapatan += subLem3;
+            htmlQty += `
+                <div class="data-row">
+                    <span style="color: var(--text-muted);">Lem 3 (${formatNum(tLem3)} x ${formatNum(tarifLem3)})</span>
+                    <span style="font-weight: 600;">${formatNum(subLem3)}</span>
+                </div>
+            `;
+        }
+
+        // Nominal Bonus
+        const valBonus = getVal('bonus');
+        if (valBonus > 0) {
+            totalPendapatan += valBonus;
+            htmlQty += `
+                <div class="data-row">
+                    <span style="color: var(--text-muted);">Bonus Tambahan</span>
+                    <span style="font-weight: 600; color: var(--success);">+ ${formatNum(valBonus)}</span>
+                </div>
+            `;
+        }
+
+        // Catatan Bonus (Kecil & Italic)
+        const cBonus = getStr('catatanBonus');
+        if (cBonus && cBonus.trim() !== '') {
+            htmlQty += `<div style="font-size: 0.75rem; font-style: italic; color: var(--text-muted); margin-top: -2px; margin-bottom: 4px;">* ${cBonus}</div>`;
+        }
+
+        const qtyContainer = document.getElementById('sectionQtyContainer');
+        if (htmlQty !== '') {
+            document.getElementById('slipListQty').innerHTML = htmlQty;
+            qtyContainer.classList.remove('hidden');
+        } else {
+            qtyContainer.classList.add('hidden');
+        }
+
+        // Tampilkan Total Pendapatan Hasil Kalkulasi
+        document.getElementById('slipTotalPendapatan').innerText = 'Rp ' + formatNum(totalPendapatan);
+
+        // 3. Susun Potongan
+        let htmlPotongan = '';
+        let totalPotongan = 0;
+
+        for (const [rawKey, rawVal] of Object.entries(d)) {
+            const key = rawKey.toLowerCase().trim();
+            const valNum = parseNum(rawVal);
+
+            const isPotonganKey = key.includes('pot') || key.includes('kas') || key.includes('listrik') || key.includes('tabungan');
+            
+            if (isPotonganKey && valNum > 0) {
+                const label = getPotonganLabel(rawKey);
+                htmlPotongan += `
+                    <div class="data-row">
+                        <span style="color: var(--text-muted);">${label}</span>
+                        <span style="color: var(--danger); font-weight: 600;">- ${formatNum(valNum)}</span>
+                    </div>
+                `;
+                totalPotongan += valNum;
+            }
+        }
+
+        // Catatan Potongan Lain (Kecil & Italic)
+        const cPot = getStr('catatanPotLain');
+        if (cPot && cPot.trim() !== '') {
+            htmlPotongan += `<div style="font-size: 0.75rem; font-style: italic; color: var(--text-muted); margin-top: -2px; margin-bottom: 4px;">* ${cPot}</div>`;
+        }
+
+        if (htmlPotongan === '') {
+            htmlPotongan = `<div class="data-row" style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">Tidak ada potongan</div>`;
+        }
+
+        document.getElementById('slipListPotongan').innerHTML = htmlPotongan;
+
+        // 4. Hitung Terima Bersih secara Matematis (Total Pendapatan - Total Potongan)
+        const diterima = totalPendapatan - totalPotongan;
+        document.getElementById('slipTerimaBersih').innerText = 'Rp ' + formatNum(diterima);
+
+        document.getElementById('modalSlipModern').classList.remove('hidden');
+    }
+
+    function tutupSlipModern() {
+        document.getElementById('modalSlipModern').classList.add('hidden');
     }
 </script>
 
