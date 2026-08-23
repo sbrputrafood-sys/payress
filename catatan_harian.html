@@ -1370,8 +1370,11 @@
                 
                 cmd.push(0x1B, 0x61, 0x00);
                 let res = masterData.resellers.find(r => r.id === rId);
-                cmd.push(...enc.encode(`Agen/Reseller : ${res ? res.nama : '-'}\n`));
-                cmd.push(...enc.encode(`Tgl Transaksi : ${formatHariTanggalID(tgl)}\n`));
+                cmd.push(...enc.encode(`Nama    : ${res ? res.nama : '-'}\n`));
+                const waktuCetak = new Date();
+				const jam = String(waktuCetak.getHours()).padStart(2, '0');
+				const menit = String(waktuCetak.getMinutes()).padStart(2, '0');
+				cmd.push(...enc.encode(`Jam/Tgl : ${jam}.${menit} ${formatHariTanggalID(tgl)}\n`));
                 cmd.push(...enc.encode("--------------------------------\nQTY | NAMA BARANG\n--------------------------------\n\n"));
 
                 items.forEach(item => {
