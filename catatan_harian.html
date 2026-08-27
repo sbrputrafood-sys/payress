@@ -984,7 +984,16 @@
                 
                 let res = masterData.resellers.find(r => r.id === item.reseller_id);
                 cmd.push(...enc.encode(`--------------------------------\nTanggal : ${formatHariTanggalID(item.tanggal_pengajuan)}\nNama    : ${res ? res.nama : '-'}\nKet     : ${item.keterangan}\n--------------------------------\n`));
-                cmd.push(0x1B, 0x45, 0x01); cmd.push(...enc.encode(`NOMINAL : Rp ${item.nominal.toLocaleString('id-ID')}\n`)); cmd.push(0x1B, 0x45, 0x00); cmd.push(...enc.encode(`--------------------------------\n\n\n\n`));
+                // Teks "NOMINAL :" ukuran normal
+				cmd.push(...enc.encode(`NOMINAL :\n`));
+				
+				// Angka Rupiah ukuran Double Height + Double Width (0x11) dan posisi di Tengah (0x1B, 0x61, 0x01)
+				cmd.push(0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01, 0x1D, 0x21, 0x11);
+				cmd.push(...enc.encode(`Rp ${item.nominal.toLocaleString('id-ID')}\n`));
+				
+				// Reset ke ukuran normal (0x00) dan rata kiri (0x00)
+				cmd.push(0x1D, 0x21, 0x00, 0x1B, 0x45, 0x00, 0x1B, 0x61, 0x00);
+				cmd.push(...enc.encode(`--------------------------------\n`));
                 cmd.push(0x1D, 0x56, 0x41, 0x03);
                 
                 const rawData = new Uint8Array(cmd); for (let i = 0; i < rawData.length; i += 64) { await targetChar.writeValue(rawData.slice(i, i + 64)); await new Promise(r => setTimeout(r, 50)); }
