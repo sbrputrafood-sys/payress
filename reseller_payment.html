@@ -458,9 +458,9 @@
                     <h4 class="text-[11px] font-bold text-gray-500 uppercase mb-3 flex justify-between items-center shrink-0">
                         <div class="flex items-center gap-1.5">
                             Daftar Draft Tersimpan
-                            <button onclick="document.getElementById('filterContainer').classList.toggle('hidden'); feather.replace();" class="p-1 bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded text-gray-500 transition" title="Filter Draft">
-                                <i data-feather="filter" class="w-3.5 h-3.5"></i>
-                            </button>
+                            <button onclick="document.getElementById('filterContainer').classList.toggle('hidden'); feather.replace();" class="p-1 bg-blue-50 hover:bg-blue-100 dark:bg-slate-700 dark:hover:bg-slate-600 rounded text-blue-500 animate-pulse transition border border-blue-200 shadow-sm" title="Filter Draft">
+								<i data-feather="filter" class="w-3.5 h-3.5"></i>
+							</button>
                         </div>
                         <button onclick="fetchListHarian()" class="text-blue-500 hover:text-blue-600 flex items-center gap-1 normal-case transition"><i data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan</button>
                     </h4>
@@ -533,7 +533,7 @@
                 <button onclick="closeFormModal('modalPin')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
             </div>
             <p class="text-[11px] text-gray-500 dark:text-slate-400 mb-3">Masukkan PIN untuk menghapus rincian data ini.</p>
-            <input type="password" id="inputPinHapus" placeholder="•••" class="w-full text-center tracking-widest text-lg font-bold p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500 mb-4">
+            <input type="password" id="inputPinHapus" placeholder="••••••" class="w-full text-center tracking-widest text-lg font-bold p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500 mb-4">
             <div class="flex gap-2">
                 <button onclick="closeFormModal('modalPin')" class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-xs font-bold px-4 py-2 rounded-lg flex-1">Batal</button>
                 <button onclick="prosesHapusDenganPin()" class="bg-red-500 hover:bg-red-400 text-white text-xs font-bold px-4 py-2 rounded-lg flex-1 shadow-sm">Hapus</button>
@@ -859,6 +859,10 @@
         const supabaseUrl = 'https://uocvuddqhviorebinpva.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvY3Z1ZGRxaHZpb3JlYmlucHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2OTQ0NDAsImV4cCI6MjEwMTI3MDQ0MH0.mWGTOTfHG4Q62S3P4LQi-5bGviMPWgMzo2p2AECquL8';
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+		let startRiwayat = 0;
+		const limitRiwayat = 15;
+		let hasMoreRiwayat = true;
+		let isFetchingRiwayat = false;
 
         let masterData = { resellers: [], barangJadi: [], bahanBaku: [], hargaDefault: {}, hargaKhusus: {}, rawHargaKhusus: [] };
         let selectedResellerId = '';
@@ -1197,22 +1201,42 @@
         }
 
         function updateOpsiHarian() {
-            const tipeFokus = document.getElementById('inputTipeHarian').value;
-            const newHtml = getOptionsHarianHtmlWithSelected(null, tipeFokus);
-            document.querySelectorAll('.item-harian').forEach(select => {
-                const currentVal = select.value;
-                select.innerHTML = newHtml;
-                const exists = Array.from(select.options).some(opt => opt.value === currentVal);
-                if(exists) select.value = currentVal;
-            });
-        }
+			const tipeFokus = document.getElementById('inputTipeHarian').value;
+			const btnMatrix = document.getElementById('btnModeMatrix');
+
+			if (tipeFokus === 'kasbon') {
+				// Kunci tombol Mode Matrix jika Kasbon Uang dipilih
+				btnMatrix.disabled = true;
+				btnMatrix.classList.add('opacity-50', 'cursor-not-allowed');
+				
+				// Paksa pindah ke mode baris (standard) jika sedang di matrix
+				if (currentHarianMode === 'matrix') {
+					switchInputMode('standard'); // Ini otomatis memanggil renderFormHarianBody()
+				} else {
+					renderFormHarianBody(); // Render ulang baris menjadi form kasbon
+				}
+			} else {
+				// Buka kembali kunci Mode Matrix untuk Barang / Bahan
+				btnMatrix.disabled = false;
+				btnMatrix.classList.remove('opacity-50', 'cursor-not-allowed');
+				
+				renderFormHarianBody(); // Render ulang baris menjadi form barang
+			}
+		}
 
         function renderFormHarianBody() {
-            const container = document.getElementById('containerHarianRows');
-            container.innerHTML = '';
-            if(currentHarianMode === 'standard') { for(let i=0; i<3; i++) addRowHarianStandard(); } 
-            else { addRowHarianMatrix(); }
-        }
+			const container = document.getElementById('containerHarianRows');
+			container.innerHTML = '';
+			const tipeFokus = document.getElementById('inputTipeHarian')?.value || 'semua';
+			
+			if(currentHarianMode === 'standard') { 
+				// Jika kasbon, munculkan 1 baris default. Jika barang, munculkan 3 baris.
+				const loopCount = (tipeFokus === 'kasbon') ? 1 : 3;
+				for(let i=0; i<loopCount; i++) addRowHarianStandard(); 
+			} else { 
+				addRowHarianMatrix(); 
+			}
+		}
 
         function addRowHarian() {
             if(currentHarianMode === 'standard') addRowHarianStandard();
@@ -1224,24 +1248,27 @@
 			const tipeFokus = document.getElementById('inputTipeHarian')?.value || 'semua';
 			const div = document.createElement('div');
 			
-			// Jika user sedang memfokuskan ke tipe kasbon uang
+			// Tampilan Khusus Kasbon Uang (Atas & Bawah)
 			if (tipeFokus === 'kasbon') {
-				div.className = 'row-input-harian mode-std-kasbon mb-2 flex flex-col gap-1 bg-emerald-50/50 dark:bg-slate-700/50 p-2 rounded-lg border border-emerald-200 dark:border-slate-600';
+				div.className = 'row-input-harian mode-std-kasbon mb-3 flex flex-col gap-3 bg-emerald-50/40 dark:bg-slate-700/50 p-3 rounded-xl border border-emerald-200 dark:border-slate-600 relative';
 				div.innerHTML = `
-					<div class="flex gap-2 items-center">
-						<div class="w-7/12">
-							<input type="text" placeholder="Keterangan Kasbon (Misal: Pinjaman)" class="keterangan-kasbon-input w-full text-xs p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500 font-semibold">
+					<button type="button" onclick="this.closest('.row-input-harian').remove()" class="absolute top-3 right-3 text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 p-1.5 rounded-lg transition" title="Hapus Kasbon"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+					
+					<div class="w-full pr-10">
+						<label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1.5">Nominal (Rupiah)</label>
+						<div class="relative">
+							<span class="absolute left-3 top-2.5 text-xs font-bold text-gray-400">Rp</span>
+							<input type="text" placeholder="Contoh: 1.500.000" oninput="formatInputRibuan(this)" class="nominal-kasbon-input w-full text-xs p-2.5 pl-8 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-emerald-400 outline-none focus:border-emerald-500 font-black tracking-wide">
 						</div>
-						<div class="w-4/12">
-							<input type="text" placeholder="Nominal (Rp)" oninput="formatInputRibuan(this)" class="nominal-kasbon-input w-full text-xs p-1.5 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-emerald-400 outline-none focus:border-emerald-500 text-right font-black">
-						</div>
-						<div class="w-1/12 flex justify-end">
-							<button type="button" onclick="this.closest('.row-input-harian').remove()" class="text-red-400 hover:text-red-600 p-1 bg-red-50 rounded transition" title="Hapus Baris"><i data-feather="x" class="w-3.5 h-3.5"></i></button>
-						</div>
+					</div>
+					
+					<div class="w-full">
+						<label class="block text-[11px] font-bold text-gray-600 dark:text-slate-400 mb-1.5">Keterangan / Tujuan (Wajib)</label>
+						<input type="text" placeholder="Misal: kasbon mingguan, dll" class="keterangan-kasbon-input w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white outline-none focus:border-emerald-500 font-medium">
 					</div>
 				`;
 			} else {
-				// Tampilan standar untuk Barang / Bahan
+				// Tampilan standar untuk Barang Jadi / Bahan Baku
 				div.className = 'row-input-harian mode-std mb-2 flex flex-col gap-1 bg-gray-50 dark:bg-slate-700/50 p-2 rounded-lg border border-gray-200 dark:border-slate-600';
 				div.innerHTML = `
 					<div class="flex gap-2 items-center">
@@ -1327,33 +1354,59 @@
 			const rId = document.getElementById('inputResellerHarian').value;
 			if(!rId) return showNotification("Harap pilih Agen / Reseller di atas!", "error");
 			
-			const tglStd = document.getElementById('inputTglHarianStandard').value;
-			if(!tglStd) return showNotification("Harap tentukan Tanggal Input!", "error");
-
 			let dataBukuToInsert = [];
 			let dataKasbonToInsert = [];
 
-			// Cek jika mode standard kasbon
-			const kasbonRows = document.querySelectorAll('.row-input-harian.mode-std-kasbon');
-			kasbonRows.forEach(row => {
-				const ket = row.querySelector('.keterangan-kasbon-input').value.trim();
-				const nom = parseFloat(row.querySelector('.nominal-kasbon-input').value.replace(/[^0-9]/g, '')) || 0;
-				if (ket && nom > 0) {
-					dataKasbonToInsert.push({ reseller_id: rId, tanggal_pengajuan: tglStd, keterangan: ket, nominal: nom, is_paid: false, status: 'approved' });
-				}
-			});
+			// Logika Berdasarkan Mode Input yang Aktif
+			if (currentHarianMode === 'standard') {
+				const tglStd = document.getElementById('inputTglHarianStandard').value;
+				if(!tglStd) return showNotification("Harap tentukan Tanggal Input!", "error");
 
-			// Cek jika mode standard barang (buku_harian)
-			const barangRows = document.querySelectorAll('.row-input-harian.mode-std');
-			barangRows.forEach(row => {
-				const bId = row.querySelector('.item-harian').value;
-				const qty = parseFloat(row.querySelector('.qty-harian').value) || 0;
-				const ket = row.querySelector('.keterangan-input')?.value || '';
-				if (bId && qty > 0) {
-					const tipeOtomatis = masterData.bahanBaku.some(b => b.id === bId) ? 'bahan' : 'jadi';
-					dataBukuToInsert.push({ reseller_id: rId, barang_id: bId, tanggal_setor: tglStd, qty: qty, tipe: tipeOtomatis, keterangan: ket, is_paid: false, status: 'approved' });
-				}
-			});
+				// Cek jika mode standard kasbon
+				const kasbonRows = document.querySelectorAll('.row-input-harian.mode-std-kasbon');
+				kasbonRows.forEach(row => {
+					const ket = row.querySelector('.keterangan-kasbon-input').value.trim();
+					const nom = parseFloat(row.querySelector('.nominal-kasbon-input').value.replace(/[^0-9]/g, '')) || 0;
+					if (ket && nom > 0) {
+						dataKasbonToInsert.push({ reseller_id: rId, tanggal_pengajuan: tglStd, keterangan: ket, nominal: nom, is_paid: false, status: 'approved' });
+					}
+				});
+
+				// Cek jika mode standard barang
+				const barangRows = document.querySelectorAll('.row-input-harian.mode-std');
+				barangRows.forEach(row => {
+					const bId = row.querySelector('.item-harian').value;
+					const qty = parseFloat(row.querySelector('.qty-harian').value) || 0;
+					const ket = row.querySelector('.keterangan-input')?.value || '';
+					if (bId && qty > 0) {
+						const tipeOtomatis = masterData.bahanBaku.some(b => b.id === bId) ? 'bahan' : 'jadi';
+						dataBukuToInsert.push({ reseller_id: rId, barang_id: bId, tanggal_setor: tglStd, qty: qty, tipe: tipeOtomatis, keterangan: ket, is_paid: false, status: 'approved' });
+					}
+				});
+
+			} else if (currentHarianMode === 'matrix') {
+				// Cek jika mode matrix (multi-tanggal)
+				const matrixRows = document.querySelectorAll('.row-input-harian.mode-mtx');
+				matrixRows.forEach(row => {
+					const bId = row.querySelector('.item-harian').value;
+					const ket = row.querySelector('.keterangan-input')?.value || '';
+					
+					if (bId) {
+						const tipeOtomatis = masterData.bahanBaku.some(b => b.id === bId) ? 'bahan' : 'jadi';
+						const tglInputs = row.querySelectorAll('.tgl-harian');
+						const qtyInputs = row.querySelectorAll('.qty-harian');
+						
+						// Looping semua sub-tanggal di dalam baris matrix
+						for(let i = 0; i < tglInputs.length; i++) {
+							const tgl = tglInputs[i].value;
+							const qty = parseFloat(qtyInputs[i].value) || 0;
+							if (tgl && qty > 0) {
+								dataBukuToInsert.push({ reseller_id: rId, barang_id: bId, tanggal_setor: tgl, qty: qty, tipe: tipeOtomatis, keterangan: ket, is_paid: false, status: 'approved' });
+							}
+						}
+					}
+				});
+			}
 
 			if (dataBukuToInsert.length === 0 && dataKasbonToInsert.length === 0) {
 				return showNotification("Minimal isi data barang atau kasbon dengan benar!", "error");
@@ -1600,38 +1653,48 @@
 				let textKet = item.keterangan ? `<div class="w-full mt-1.5 pt-1 border-t border-gray-200/60 dark:border-slate-600 text-[10px] text-gray-500 italic">Catatan: ${item.keterangan}</div>` : '';
 
 				htmlList += `
-				<li class="draft-edit-row flex flex-col bg-white dark:bg-slate-700/50 p-2.5 rounded-xl border border-gray-200 dark:border-slate-600 shadow-sm" data-id="${item.id}" data-table="buku_harian">
+				<li class="draft-edit-row flex flex-col bg-white dark:bg-slate-700/50 p-2.5 rounded-xl border border-gray-200 dark:border-slate-600 shadow-sm transition-all" data-id="${item.id}" data-table="buku_harian">
+					<!-- VIEW MODE -->
 					<div class="view-mode flex flex-col w-full ${isPending ? 'hidden' : ''}">
 						<div class="flex justify-between items-center w-full">
 							<div class="flex items-center gap-2">
 								<span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor}">${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}</span>
 								<span class="font-semibold text-gray-700 dark:text-slate-300 text-xs">${bName}</span>
 							</div>
-							<div class="flex items-center gap-3">
-								<span class="font-black text-blue-600 text-xs bg-blue-50 px-2 py-0.5 rounded border">Qty: ${item.qty}</span>
-								<button onclick="toggleEditRow(this)" class="text-amber-500 hover:text-amber-600 p-1 rounded-lg transition bg-amber-50 border border-amber-100 shadow-sm"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>
+							<div class="flex items-center gap-2">
+								<button onclick="toggleEditRow(this)" class="text-amber-500 hover:text-amber-600 hover:scale-110 active:scale-95 p-1.5 rounded-lg transition-all bg-amber-50 border border-amber-100 shadow-sm" title="Edit Rincian"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>
+								<span class="font-black text-blue-600 text-xs bg-blue-50 px-2 py-1 rounded border">Qty: ${item.qty}</span>
+								<button onclick="hapusCatatanHarian('${item.id}', '${rId}', '${tgl}', this)" class="text-white hover:bg-red-600 hover:scale-110 active:scale-95 bg-red-500 p-1.5 rounded-lg transition-all shadow-sm" title="Hapus Rincian"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
 							</div>
 						</div>
 						${textKet}
 					</div>
+
+					<!-- EDIT MODE (Diperbaiki Sejajar Sempurna) -->
 					<div class="edit-mode flex flex-col w-full ${isPending ? '' : 'hidden'}">
 						<div class="flex justify-between items-center gap-2 w-full mb-1">
-							<div class="w-8/12 flex flex-col">
-								<span class="text-[9px] font-bold px-1.5 py-0.5 mb-1 rounded border self-start ${badgeColor}">${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}</span>
-								<select class="edit-brg w-full text-xs p-1.5 border border-gray-300 rounded bg-gray-50 dark:bg-slate-800 font-semibold text-gray-800 dark:text-slate-100">
+							<div class="flex items-center gap-2 flex-1">
+								<span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor}">${item.tipe === 'bahan' ? 'Bahan' : 'Jadi'}</span>
+								<select class="edit-brg text-xs p-1.5 border border-gray-300 rounded bg-gray-50 dark:bg-slate-800 font-semibold text-gray-800 dark:text-slate-100 outline-none focus:border-blue-500 flex-1">
 									${getOptionsHarianHtmlWithSelected(item.barang_id)}
 								</select>
 							</div>
-							<div class="w-3/12">
-								<label class="block text-[9px] font-bold text-gray-500 mb-0.5 text-center">Qty</label>
-								<input type="number" class="edit-qty w-full text-xs p-1.5 border rounded text-center font-black bg-gray-50 dark:bg-slate-800 text-blue-600" value="${item.qty}">
-							</div>
-							<div class="w-1/12 flex justify-end self-end mb-0.5">
-								<button onclick="hapusCatatanHarian('${item.id}', '${rId}', '${tgl}', this)" class="text-gray-400 hover:text-red-500 bg-gray-100 p-1.5 rounded border transition"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
+							<div class="flex items-center gap-2 shrink-0">
+								<!-- Tombol Pensil Batal -->
+								<button onclick="toggleEditRow(this)" class="text-slate-500 hover:text-slate-700 hover:scale-110 active:scale-95 p-1.5 rounded-lg transition-all bg-slate-100 border border-slate-200 shadow-sm self-center" title="Batal Edit"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>
+								
+								<!-- Input Qty dengan placeholder label di dalam flex agar sejajar -->
+								<div class="relative self-center">
+									<span class="absolute -top-3.5 left-0 right-0 text-[9px] font-bold text-gray-400 text-center">Qty</span>
+									<input type="number" class="edit-qty w-16 text-xs p-1.5 border rounded text-center font-black bg-gray-50 dark:bg-slate-800 text-blue-600 outline-none focus:border-blue-500" value="${item.qty}">
+								</div>
+								
+								<!-- Tombol Sampah disejajarkan dengan self-center -->
+								<button onclick="hapusCatatanHarian('${item.id}', '${rId}', '${tgl}', this)" class="text-white bg-red-500 hover:bg-red-600 hover:scale-110 active:scale-95 p-1.5 rounded-lg transition-all shadow-sm self-center" title="Hapus Rincian"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
 							</div>
 						</div>
 						<div class="w-full flex gap-1.5 mt-1">
-							<input type="text" class="edit-ket flex-1 text-[10px] p-1.5 border bg-gray-50 dark:bg-slate-800 rounded text-gray-600 dark:text-gray-300" placeholder="Catatan..." value="${item.keterangan || ''}">
+							<input type="text" class="edit-ket flex-1 text-[10px] p-1.5 border bg-gray-50 dark:bg-slate-800 rounded text-gray-600 dark:text-gray-300 outline-none focus:border-blue-400" placeholder="Catatan..." value="${item.keterangan || ''}">
 						</div>
 					</div>
 				</li>`;
@@ -1731,18 +1794,11 @@
 			}
 		}
 
-		async function hapusKasbonHarianDraft(id, btnElement) {
-			if(!confirm("Yakin ingin menghapus pengajuan kasbon ini?")) return;
-			try {
-				const { error } = await supabaseClient.from('kasbon_harian').delete().eq('id', id);
-				if(error) throw error;
-				showNotification("Kasbon harian dihapus!", "success");
-				btnElement.closest('li').remove();
-				fetchListHarian();
-				cekNotifikasiPending();
-			} catch(err) {
-				showNotification("Gagal menghapus: " + err.message, "error");
-			}
+		function hapusKasbonHarianDraft(id, btnElement) {
+			draftToDelete = { id, btnElement };
+			targetHapusType = 'kasbon_draft'; // Daftarkan tipe hapus baru
+			document.getElementById('inputPinHapus').value = '';
+			openFormModal('modalPin');
 		}
 
         function hapusCatatanHarian(id, rId = null, tgl = null, btnElement = null) {
@@ -1760,15 +1816,48 @@
         }
 
         async function prosesHapusDenganPin() {
-            const pin = document.getElementById('inputPinHapus').value;
-            if (pin !== "749947") { showNotification("PIN Salah! Aksi dibatalkan.", "error"); return; }
-            
-            if (targetHapusType === 'harian') {
-                await prosesHapusCatatanHarianExecute();
-            } else if (targetHapusType === 'riwayat') {
-                await prosesHapusRiwayatExecute();
-            }
-        }
+			const pin = document.getElementById('inputPinHapus').value;
+			if (pin !== "749947") { showNotification("PIN Salah! Aksi dibatalkan.", "error"); return; }
+			
+			if (targetHapusType === 'harian') {
+				await prosesHapusCatatanHarianExecute();
+			} else if (targetHapusType === 'riwayat') {
+				await prosesHapusRiwayatExecute();
+			} else if (targetHapusType === 'kasbon_draft') {
+				await prosesHapusKasbonDraftExecute(); // Panggil fungsi eksekusi baru
+			}
+		}
+
+		// Tambahkan fungsi eksekusi baru ini di bawah prosesHapusDenganPin
+		async function prosesHapusKasbonDraftExecute() {
+			if(!draftToDelete) return;
+			const { id, btnElement } = draftToDelete;
+
+			const btnHapus = document.querySelector('#modalPin button.bg-red-500');
+			const textAwal = btnHapus.innerText;
+			btnHapus.innerHTML = `<i data-feather="loader" class="w-4 h-4 animate-spin"></i>`;
+			feather.replace();
+
+			try {
+				const { error } = await supabaseClient.from('kasbon_harian').delete().eq('id', id);
+				if(error) throw error;
+				
+				showNotification("Kasbon harian dihapus!", "success");
+				if (btnElement) {
+					btnElement.closest('li').remove();
+				}
+				
+				fetchListHarian();
+				cekNotifikasiPending();
+				closeFormModal('modalPin');
+			} catch(err) {
+				showNotification("Gagal menghapus: " + err.message, "error");
+			} finally {
+				draftToDelete = null;
+				targetHapusType = '';
+				btnHapus.innerText = textAwal;
+			}
+		}
 
         async function prosesHapusCatatanHarianExecute() {
             if(!draftToDelete) return;
@@ -1861,14 +1950,15 @@
                     showNotification(`Ada ${pendingItems.length} rincian ${targetTipe} yang berstatus PENDING. Harap Buka Menu "Catatan Harian" dan Setujui (Approve) terlebih dahulu sebelum ditarik ke Nota!`, "error");
                     return;
                 }
+				
+				// PERBAIKAN: Filter item yang ID-nya belum ada di currentDraftIds
+				const approvedItems = data.filter(d => (d.status === 'approved' || !d.status) && !currentDraftIds.includes(d.id));
 
-                const approvedItems = data.filter(d => d.status === 'approved' || !d.status);
-                if (approvedItems.length === 0) return showNotification(`Tidak ada data ${targetTipe} yang tervalidasi siap ditarik.`, "warning-flash");
+                if (approvedItems.length === 0) return showNotification(`Semua data ${targetTipe} yang tersedia sudah ditarik ke dalam form nota.`, "warning-flash");
 
-                tempTarikData = approvedItems;
-                currentTargetTipe = targetTipe;
-                
-                document.getElementById('labelTipeTarik').innerText = targetTipe === 'bahan' ? 'Bahan Baku' : 'Barang Jadi';
+				tempTarikData = approvedItems;
+				currentTargetTipe = targetTipe;
+				document.getElementById('labelTipeTarik').innerText = targetTipe === 'bahan' ? 'Bahan Baku' : 'Barang Jadi';
                 
                 let grouped = {};
                 approvedItems.forEach(d => {
@@ -1997,11 +2087,13 @@
                     return;
                 }
 
-                const approvedItems = data.filter(d => d.status === 'approved' || !d.status);
-                if (approvedItems.length === 0) return showNotification("Tidak ada data kasbon tervalidasi siap ditarik.", "warning-flash");
+                // PERBAIKAN: Filter item yang ID-nya belum ada di currentKasbonDraftIds
+				const approvedItems = data.filter(d => (d.status === 'approved' || !d.status) && !currentKasbonDraftIds.includes(d.id));
+				
+				if (approvedItems.length === 0) return showNotification("Semua data kasbon yang tersedia sudah ditarik ke dalam form nota.", "warning-flash");
 
-                tempTarikKasbonData = approvedItems;
-                document.getElementById('labelTipeTarik').innerText = 'Kasbon Harian';
+				tempTarikKasbonData = approvedItems;
+				document.getElementById('labelTipeTarik').innerText = 'Kasbon Harian';
 
                 let html = '';
                 approvedItems.forEach(item => {
@@ -2296,28 +2388,87 @@
             } catch (err) { showNotification("Gagal: " + err.message, "error"); }
         }
 
-        async function fetchRiwayatData() {
-            const container = document.getElementById('containerRiwayat');
-            container.innerHTML = `<div class="flex justify-center py-8"><i data-feather="loader" class="w-6 h-6 animate-spin text-blue-500"></i></div>`;
-            feather.replace();
-            try {
-                const { data, error } = await supabaseClient.from('transaksi').select('*').order('tanggal_transaksi', { ascending: false });
-                if (error) throw error; riwayatTransactions = data; renderRiwayatDates();
-            } catch (err) { container.innerHTML = `<div class="text-center text-xs text-red-500 py-4">Gagal memuat: ${err.message}</div>`; }
-        }
+        async function fetchRiwayatData(isLoadMore = false) {
+			const container = document.getElementById('containerRiwayat');
+			
+			// Reset state jika bukan load more (misal saat modal baru dibuka)
+			if (!isLoadMore) {
+				startRiwayat = 0;
+				hasMoreRiwayat = true;
+				riwayatTransactions = [];
+				container.innerHTML = `<div class="flex justify-center py-8"><i data-feather="loader" class="w-6 h-6 animate-spin text-blue-500"></i></div>`;
+				feather.replace();
+			}
 
-        function renderRiwayatDates() {
-            document.getElementById('btnBackRiwayat').classList.add('hidden');
-            const container = document.getElementById('containerRiwayat');
-            if (riwayatTransactions.length === 0) { container.innerHTML = `<div class="text-center text-xs text-gray-500 py-4">Belum ada riwayat.</div>`; return; }
-            let grouped = {};
-            riwayatTransactions.forEach(t => { if(!grouped[t.tanggal_transaksi]) grouped[t.tanggal_transaksi] = 0; grouped[t.tanggal_transaksi] += t.net_pembayaran; });
-            let html = '<ul class="space-y-2">';
-            Object.keys(grouped).forEach(date => {
-                html += `<li onclick="renderRiwayatReseller('${date}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 cursor-pointer transition"><div class="flex items-center gap-3"><div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i data-feather="calendar" class="w-4 h-4"></i></div><span class="font-bold text-xs text-gray-800">${formatHariTanggalID(date)}</span></div><div class="text-right"><span class="block text-[10px] text-gray-500">Total</span><span class="font-black text-xs text-green-600">${formatRupiah(grouped[date])}</span></div></li>`;
-            });
-            html += '</ul>'; container.innerHTML = html; feather.replace();
-        }
+			if (isFetchingRiwayat || !hasMoreRiwayat) return;
+			isFetchingRiwayat = true;
+
+			try {
+				const { data, error } = await supabaseClient
+					.from('transaksi')
+					.select('*')
+					.order('tanggal_transaksi', { ascending: false })
+					.range(startRiwayat, startRiwayat + limitRiwayat - 1); // Server-Side Pagination
+				
+				if (error) throw error;
+				
+				// Hentikan infinite scroll jika data yang ditarik kurang dari limit
+				if (data.length < limitRiwayat) hasMoreRiwayat = false;
+				
+				if (data.length > 0) {
+					riwayatTransactions = isLoadMore ? [...riwayatTransactions, ...data] : data;
+					startRiwayat += limitRiwayat;
+				}
+				
+				renderRiwayatDates(isLoadMore);
+			} catch (err) { 
+				if(!isLoadMore) container.innerHTML = `<div class="text-center text-xs text-red-500 py-4">Gagal memuat: ${err.message}</div>`; 
+			} finally {
+				isFetchingRiwayat = false;
+			}
+		}
+
+		function renderRiwayatDates(isLoadMore = false) {
+			document.getElementById('btnBackRiwayat').classList.add('hidden');
+			const container = document.getElementById('containerRiwayat');
+			
+			if (riwayatTransactions.length === 0) { 
+				container.innerHTML = `<div class="text-center text-xs text-gray-500 py-4">Belum ada riwayat.</div>`; 
+				return; 
+			}
+			
+			let grouped = {};
+			riwayatTransactions.forEach(t => { 
+				if(!grouped[t.tanggal_transaksi]) grouped[t.tanggal_transaksi] = 0; 
+				grouped[t.tanggal_transaksi] += t.net_pembayaran; 
+			});
+			
+			let html = '<ul class="space-y-2">';
+			Object.keys(grouped).forEach(date => {
+				html += `<li onclick="renderRiwayatReseller('${date}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 cursor-pointer transition"><div class="flex items-center gap-3"><div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i data-feather="calendar" class="w-4 h-4"></i></div><span class="font-bold text-xs text-gray-800">${formatHariTanggalID(date)}</span></div><div class="text-right"><span class="block text-[10px] text-gray-500">Total</span><span class="font-black text-xs text-green-600">${formatRupiah(grouped[date])}</span></div></li>`;
+			});
+			html += '</ul>'; 
+			
+			// Indikator loading tambahan di bawah jika masih ada data
+			if (hasMoreRiwayat) {
+				html += `<div id="loadingMoreRiwayat" class="flex justify-center py-4"><i data-feather="loader" class="w-4 h-4 animate-spin text-gray-400"></i></div>`;
+			}
+
+			container.innerHTML = html; 
+			feather.replace();
+		}
+
+		// Pasang Infinite Scroll Event Listener (Letakkan di luar fungsi, misalnya di bawah fungsi fetchRiwayatData)
+		document.getElementById('containerRiwayat').addEventListener('scroll', function() {
+			// Deteksi jika scroll sudah mencapai 50px dari bawah
+			if (this.scrollTop + this.clientHeight >= this.scrollHeight - 50) {
+				// Jangan pemicu fetch jika sedang melihat detail transaksi harian (tombol back tidak hidden)
+				const isViewingDetail = !document.getElementById('btnBackRiwayat').classList.contains('hidden');
+				if (!isViewingDetail) {
+					fetchRiwayatData(true);
+				}
+			}
+		});
 
         function renderRiwayatReseller(date) {
             document.getElementById('btnBackRiwayat').classList.remove('hidden');
@@ -2691,24 +2842,36 @@
             setTimeout(() => { document.getElementById(id).children[0].classList.replace('scale-95','scale-100'); }, 10);
             
             if(id === 'modalHarian') {
-                const selRes = document.getElementById('inputResellerHarian');
-                selRes.innerHTML = '<option value="">Pilih...</option>';
-                masterData.resellers.forEach(r => selRes.innerHTML += `<option value="${r.id}">${r.nama}</option>`);
-                
-                const selTipe = document.getElementById('inputTipeHarian');
-                if(selTipe) selTipe.value = 'semua';
-                
-                const tzOffset = (new Date()).getTimezoneOffset() * 60000; 
-                const defaultDate = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
-                
-                const elStdTgl = document.getElementById('inputTglHarianStandard');
-                if (elStdTgl) elStdTgl.value = defaultDate;
-                const elDispTgl = document.getElementById('displayTglHarianStandard');
-                if (elDispTgl) elDispTgl.innerText = formatTanggalSingkatID(defaultDate);
+				const selRes = document.getElementById('inputResellerHarian');
+				selRes.innerHTML = '<option value="">Pilih...</option>';
+				masterData.resellers.forEach(r => selRes.innerHTML += `<option value="${r.id}">${r.nama}</option>`);
+				
+				const selTipe = document.getElementById('inputTipeHarian');
+				if(selTipe) selTipe.value = 'semua';
+				
+				// Hitung offset zona waktu lokal
+				const tzOffset = (new Date()).getTimezoneOffset() * 60000; 
+				
+				// 1. Variabel defaultDate (Hari ini) yang hilang, dikembalikan ke sini
+				const defaultDate = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
+				
+				// 2. Filter 8 Hari ke Belakang
+				const dateAkhir = new Date(Date.now() - tzOffset);
+				const dateAwal = new Date(Date.now() - tzOffset);
+				dateAwal.setDate(dateAwal.getDate() - 9);
 
-                switchInputMode('standard'); 
-                fetchListHarian();
-            }
+				document.getElementById('filterTglAwal').value = dateAwal.toISOString().slice(0, 10);
+				document.getElementById('filterTglAkhir').value = dateAkhir.toISOString().slice(0, 10);
+
+				// 3. Memasukkan defaultDate ke UI Input Standard
+				const elStdTgl = document.getElementById('inputTglHarianStandard');
+				if (elStdTgl) elStdTgl.value = defaultDate;
+				const elDispTgl = document.getElementById('displayTglHarianStandard');
+				if (elDispTgl) elDispTgl.innerText = formatTanggalSingkatID(defaultDate);
+
+				switchInputMode('standard'); 
+				fetchListHarian();
+			}
             if(id === 'modalAgen') {
                 const ul = document.getElementById('listModalAgen'); ul.innerHTML = '';
                 masterData.resellers.forEach(r => {
