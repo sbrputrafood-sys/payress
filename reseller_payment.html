@@ -860,7 +860,7 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvY3Z1ZGRxaHZpb3JlYmlucHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2OTQ0NDAsImV4cCI6MjEwMTI3MDQ0MH0.mWGTOTfHG4Q62S3P4LQi-5bGviMPWgMzo2p2AECquL8';
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 		let startRiwayat = 0;
-		const limitRiwayat = 15;
+		const limitRiwayat = 35;
 		let hasMoreRiwayat = true;
 		let isFetchingRiwayat = false;
 
@@ -1624,13 +1624,15 @@
 			const allGroupItems = [...itemsBuku, ...itemsKasbon];
 			
 			const isGroupPending = allGroupItems.some(i => i.status === 'pending');
+			const inputBy = allGroupItems[0]?.input_by || 'Admin'; // Tarik data pembuat
 
 			document.getElementById('headerDetailDraft').innerHTML = `
 				<div class="flex flex-col gap-1.5">
 					<div class="flex justify-between items-start">
 						<div>
 							<span class="font-black text-gray-800 dark:text-slate-200 text-base block">${resellerName}</span>
-							<span class="text-[11px] text-gray-500 dark:text-slate-400">Total Rincian: <b>${allGroupItems.length} item</b></span>
+							<span class="text-[11px] text-gray-500 dark:text-slate-400 block mb-0.5">Total Rincian: <b>${allGroupItems.length} item</b></span>
+							<span class="text-[10px] text-gray-500 dark:text-slate-400">Di siapkan : <span class="font-bold text-blue-600 dark:text-blue-400">${inputBy}</span></span>
 						</div>
 						<div class="text-right">
 							<span class="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-slate-700 px-2 py-0.5 rounded block mb-1">${formatHariTanggalID(tgl)}</span>
@@ -1967,16 +1969,18 @@
                 });
 
                 let html = '';
-                Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)).forEach(tgl => {
-                    html += `
-                    <div class="bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl overflow-hidden shadow-sm mb-3">
-                        <div class="bg-gray-100 dark:bg-slate-700 px-3 py-2 border-b border-gray-200 dark:border-slate-600 flex justify-between items-center">
-                            <label class="flex items-center gap-2 cursor-pointer font-bold text-xs text-gray-700 dark:text-slate-200 select-none w-full">
-                                <input type="checkbox" class="cb-tgl w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" checked onchange="toggleTglCheckboxes(this, '${tgl}')">
-                                <i data-feather="calendar" class="w-3.5 h-3.5 text-blue-500"></i> ${formatHariTanggalID(tgl)}
-                            </label>
-                        </div>
-                        <div class="p-2 space-y-1" id="group_${tgl}">`;
+				Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)).forEach(tgl => {
+					let inputBy = grouped[tgl][0]?.input_by || 'Admin'; // Tarik data pembuat
+					html += `
+					<div class="bg-white dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-xl overflow-hidden shadow-sm mb-3">
+						<div class="bg-gray-100 dark:bg-slate-700 px-3 py-2 border-b border-gray-200 dark:border-slate-600 flex justify-between items-center">
+							<label class="flex items-center gap-2 cursor-pointer font-bold text-xs text-gray-700 dark:text-slate-200 select-none flex-1">
+								<input type="checkbox" class="cb-tgl w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" checked onchange="toggleTglCheckboxes(this, '${tgl}')">
+								<i data-feather="calendar" class="w-3.5 h-3.5 text-blue-500"></i> ${formatHariTanggalID(tgl)}
+							</label>
+							<span class="text-[10px] text-gray-500 dark:text-slate-400 font-medium whitespace-nowrap ml-2">Di siapkan : <span class="font-bold text-blue-600 dark:text-blue-400">${inputBy}</span></span>
+						</div>
+						<div class="p-2 space-y-1" id="group_${tgl}">`;
                     
                     grouped[tgl].forEach(item => {
                         let barang = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
@@ -2427,11 +2431,24 @@
 				isFetchingRiwayat = false;
 			}
 		}
+		
+		
+		function loadMoreRiwayat(btn) {
+			btn.innerHTML = `<i data-feather="loader" class="w-4 h-4 mr-1.5 animate-spin"></i> Memuat...`;
+			btn.disabled = true;
+			btn.classList.add('opacity-75', 'cursor-not-allowed');
+			feather.replace();
+			
+			fetchRiwayatData(true);
+		}
 
 		function renderRiwayatDates(isLoadMore = false) {
 			document.getElementById('btnBackRiwayat').classList.add('hidden');
 			const container = document.getElementById('containerRiwayat');
 			
+			// Simpan posisi scroll agar tidak melompat ke atas
+			const previousScroll = container.scrollTop;
+
 			if (riwayatTransactions.length === 0) { 
 				container.innerHTML = `<div class="text-center text-xs text-gray-500 py-4">Belum ada riwayat.</div>`; 
 				return; 
@@ -2444,31 +2461,29 @@
 			});
 			
 			let html = '<ul class="space-y-2">';
-			Object.keys(grouped).forEach(date => {
+			Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)).forEach(date => {
 				html += `<li onclick="renderRiwayatReseller('${date}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 cursor-pointer transition"><div class="flex items-center gap-3"><div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i data-feather="calendar" class="w-4 h-4"></i></div><span class="font-bold text-xs text-gray-800">${formatHariTanggalID(date)}</span></div><div class="text-right"><span class="block text-[10px] text-gray-500">Total</span><span class="font-black text-xs text-green-600">${formatRupiah(grouped[date])}</span></div></li>`;
 			});
 			html += '</ul>'; 
 			
-			// Indikator loading tambahan di bawah jika masih ada data
+			// Ganti indikator spin otomatis menjadi Tombol Manual
 			if (hasMoreRiwayat) {
-				html += `<div id="loadingMoreRiwayat" class="flex justify-center py-4"><i data-feather="loader" class="w-4 h-4 animate-spin text-gray-400"></i></div>`;
+				html += `
+				<div class="flex justify-center mt-3 mb-2">
+					<button onclick="loadMoreRiwayat(this)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-[11px] font-bold py-2.5 px-5 rounded-xl border border-gray-200 transition flex items-center shadow-sm">
+						<i data-feather="chevron-down" class="w-3.5 h-3.5 mr-1.5"></i> Tampilkan Lebih Banyak
+					</button>
+				</div>`;
 			}
 
 			container.innerHTML = html; 
 			feather.replace();
-		}
 
-		// Pasang Infinite Scroll Event Listener (Letakkan di luar fungsi, misalnya di bawah fungsi fetchRiwayatData)
-		document.getElementById('containerRiwayat').addEventListener('scroll', function() {
-			// Deteksi jika scroll sudah mencapai 50px dari bawah
-			if (this.scrollTop + this.clientHeight >= this.scrollHeight - 50) {
-				// Jangan pemicu fetch jika sedang melihat detail transaksi harian (tombol back tidak hidden)
-				const isViewingDetail = !document.getElementById('btnBackRiwayat').classList.contains('hidden');
-				if (!isViewingDetail) {
-					fetchRiwayatData(true);
-				}
+			// Kembalikan ke posisi scroll terakhir jika ini adalah muat lebih banyak
+			if (isLoadMore) {
+				container.scrollTop = previousScroll;
 			}
-		});
+		}
 
         function renderRiwayatReseller(date) {
             document.getElementById('btnBackRiwayat').classList.remove('hidden');
