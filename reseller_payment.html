@@ -859,10 +859,17 @@
         const supabaseUrl = 'https://uocvuddqhviorebinpva.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvY3Z1ZGRxaHZpb3JlYmlucHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2OTQ0NDAsImV4cCI6MjEwMTI3MDQ0MH0.mWGTOTfHG4Q62S3P4LQi-5bGviMPWgMzo2p2AECquL8';
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-		let startRiwayat = 0;
-		const limitRiwayat = 15;
-		let hasMoreRiwayat = true;
-		let isFetchingRiwayat = false;
+		// --- VARIABEL UNTUK PAGINATION RIWAYAT ---
+        let startRiwayat = 0;
+        const limitFetchTrx = 50; // Tarik 50 rincian sekaligus ke balik layar
+        let hasMoreServerRiwayat = true;
+        let isFetchingRiwayat = false;
+
+        let groupedRiwayatDates = []; // Menyimpan daftar tanggal unik
+        let groupedRiwayatData = {}; // Menyimpan total nominal per tanggal
+        let currentRiwayatPage = 1;
+        const limitGroupsPerPage = 7; // Memuat maksimal 7 Hari (Grup) per halaman
+        // -----------------------------------------
 
         let masterData = { resellers: [], barangJadi: [], bahanBaku: [], hargaDefault: {}, hargaKhusus: {}, rawHargaKhusus: [] };
         let selectedResellerId = '';
@@ -2388,99 +2395,134 @@
             } catch (err) { showNotification("Gagal: " + err.message, "error"); }
         }
 
-        async function fetchRiwayatData(isLoadMore = false) {
+        async function fetchRiwayatData(reset = true) {
 			const container = document.getElementById('containerRiwayat');
 			
-			// Reset state jika bukan load more (misal saat modal baru dibuka)
-			if (!isLoadMore) {
+			if (reset) {
 				startRiwayat = 0;
-				hasMoreRiwayat = true;
+				hasMoreServerRiwayat = true;
 				riwayatTransactions = [];
+				groupedRiwayatDates = [];
+				groupedRiwayatData = {};
+				currentRiwayatPage = 1;
 				container.innerHTML = `<div class="flex justify-center py-8"><i data-feather="loader" class="w-6 h-6 animate-spin text-blue-500"></i></div>`;
 				feather.replace();
 			}
 
-			if (isFetchingRiwayat || !hasMoreRiwayat) return;
+			if (isFetchingRiwayat || (!hasMoreServerRiwayat && !reset)) return;
 			isFetchingRiwayat = true;
 
+			if (!reset) {
+				container.innerHTML = `<div class="flex justify-center py-8"><i data-feather="loader" class="w-6 h-6 animate-spin text-blue-500"></i><span class="text-xs text-gray-500 ml-2 mt-1">Mengambil data lanjutan...</span></div>`;
+				feather.replace();
+			}
+
 			try {
-				const { data, error } = await supabaseClient
-					.from('transaksi')
-					.select('*')
-					.order('tanggal_transaksi', { ascending: false })
-					.range(startRiwayat, startRiwayat + limitRiwayat - 1); // Server-Side Pagination
-				
-				if (error) throw error;
-				
-				// Hentikan infinite scroll jika data yang ditarik kurang dari limit
-				if (data.length < limitRiwayat) hasMoreRiwayat = false;
-				
-				if (data.length > 0) {
-					riwayatTransactions = isLoadMore ? [...riwayatTransactions, ...data] : data;
-					startRiwayat += limitRiwayat;
+				// Tarik data berulang sampai target 7 tanggal per halaman terpenuhi
+				while (hasMoreServerRiwayat) {
+					// Jika total tanggal yang dikelompokkan sudah cukup untuk halaman saat ini
+					if (groupedRiwayatDates.length >= currentRiwayatPage * limitGroupsPerPage) {
+						break; 
+					}
+
+					const { data, error } = await supabaseClient
+						.from('transaksi')
+						.select('*')
+						.order('tanggal_transaksi', { ascending: false })
+						.range(startRiwayat, startRiwayat + limitFetchTrx - 1);
+					
+					if (error) throw error;
+					
+					if (data.length < limitFetchTrx) hasMoreServerRiwayat = false; // Data database habis
+					
+					if (data.length > 0) {
+						riwayatTransactions = [...riwayatTransactions, ...data];
+						startRiwayat += limitFetchTrx;
+						
+						// Kelompokkan data yang baru ditarik berdasarkan tanggal
+						groupedRiwayatData = {};
+						riwayatTransactions.forEach(t => { 
+							if(!groupedRiwayatData[t.tanggal_transaksi]) groupedRiwayatData[t.tanggal_transaksi] = 0; 
+							groupedRiwayatData[t.tanggal_transaksi] += t.net_pembayaran; 
+						});
+						
+                        // Urutkan selalu dari yang terbaru (Descending)
+						groupedRiwayatDates = Object.keys(groupedRiwayatData).sort((a,b) => new Date(b) - new Date(a));
+					} else {
+						break; 
+					}
 				}
 				
-				renderRiwayatDates(isLoadMore);
+				renderRiwayatDates();
 			} catch (err) { 
-				if(!isLoadMore) container.innerHTML = `<div class="text-center text-xs text-red-500 py-4">Gagal memuat: ${err.message}</div>`; 
+				container.innerHTML = `<div class="text-center text-xs text-red-500 py-4">Gagal memuat: ${err.message}</div>`; 
 			} finally {
 				isFetchingRiwayat = false;
 			}
 		}
-
-		function renderRiwayatDates(isLoadMore = false) {
+		
+        function renderRiwayatDates() {
 			document.getElementById('btnBackRiwayat').classList.add('hidden');
 			const container = document.getElementById('containerRiwayat');
 			
-			if (riwayatTransactions.length === 0) { 
-				container.innerHTML = `<div class="text-center text-xs text-gray-500 py-4">Belum ada riwayat.</div>`; 
+			if (groupedRiwayatDates.length === 0) { 
+				container.innerHTML = `<div class="text-center text-xs text-gray-500 py-4">Belum ada riwayat pembayaran.</div>`; 
 				return; 
 			}
 			
-			let grouped = {};
-			riwayatTransactions.forEach(t => { 
-				if(!grouped[t.tanggal_transaksi]) grouped[t.tanggal_transaksi] = 0; 
-				grouped[t.tanggal_transaksi] += t.net_pembayaran; 
-			});
-			
-			let html = '<ul class="space-y-2">';
-			Object.keys(grouped).forEach(date => {
-				html += `<li onclick="renderRiwayatReseller('${date}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 cursor-pointer transition"><div class="flex items-center gap-3"><div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i data-feather="calendar" class="w-4 h-4"></i></div><span class="font-bold text-xs text-gray-800">${formatHariTanggalID(date)}</span></div><div class="text-right"><span class="block text-[10px] text-gray-500">Total</span><span class="font-black text-xs text-green-600">${formatRupiah(grouped[date])}</span></div></li>`;
+			// Memotong data sesuai halaman saat ini (Maksimal 7 Item)
+			const startIndex = (currentRiwayatPage - 1) * limitGroupsPerPage;
+			const endIndex = startIndex + limitGroupsPerPage;
+			const datesToRender = groupedRiwayatDates.slice(startIndex, endIndex);
+
+			let html = '<ul class="space-y-2 mb-4">';
+			datesToRender.forEach(date => {
+				html += `<li onclick="renderRiwayatReseller('${date}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 cursor-pointer transition shadow-sm hover:shadow">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-blue-50 p-2 rounded-lg text-blue-600"><i data-feather="calendar" class="w-4 h-4"></i></div>
+                        <span class="font-bold text-xs text-gray-800">${formatHariTanggalID(date)}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-[10px] text-gray-500">Total</span>
+                        <span class="font-black text-xs text-green-600">${formatRupiah(groupedRiwayatData[date])}</span>
+                    </div>
+                </li>`;
 			});
 			html += '</ul>'; 
 			
-			// Indikator loading tambahan di bawah jika masih ada data
-			if (hasMoreRiwayat) {
-				html += `<div id="loadingMoreRiwayat" class="flex justify-center py-4"><i data-feather="loader" class="w-4 h-4 animate-spin text-gray-400"></i></div>`;
-			}
+			// --- KONTROL TOMBOL PREV / NEXT ---
+			const totalPagesFoundSoFar = Math.ceil(groupedRiwayatDates.length / limitGroupsPerPage);
+            // Tombol Next akan mati jika ini adalah halaman terakhir klien DAN data server benar-benar habis
+			const isLastPage = (currentRiwayatPage >= totalPagesFoundSoFar) && !hasMoreServerRiwayat;
+
+			html += `
+            <div class="flex justify-between items-center bg-gray-50 dark:bg-slate-700/50 p-2 rounded-xl border border-gray-200 dark:border-slate-600 shrink-0 mt-auto">
+                <button onclick="changeRiwayatPage(${currentRiwayatPage - 1})" ${currentRiwayatPage === 1 ? 'disabled class="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed"' : 'class="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-blue-600 bg-white border border-blue-200 hover:bg-blue-50 rounded-lg transition shadow-sm"'}>
+                    <i data-feather="chevron-left" class="w-3.5 h-3.5"></i> Prev
+                </button>
+                <span class="text-[11px] font-bold text-gray-600 dark:text-slate-300">Halaman ${currentRiwayatPage}</span>
+                <button onclick="changeRiwayatPage(${currentRiwayatPage + 1})" ${isLastPage ? 'disabled class="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed"' : 'class="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-blue-600 bg-white border border-blue-200 hover:bg-blue-50 rounded-lg transition shadow-sm"'}>
+                    Next <i data-feather="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>`;
 
 			container.innerHTML = html; 
 			feather.replace();
 		}
-
-		// Pasang Infinite Scroll Event Listener (Letakkan di luar fungsi, misalnya di bawah fungsi fetchRiwayatData)
-		document.getElementById('containerRiwayat').addEventListener('scroll', function() {
-			// Deteksi jika scroll sudah mencapai 50px dari bawah
-			if (this.scrollTop + this.clientHeight >= this.scrollHeight - 50) {
-				// Jangan pemicu fetch jika sedang melihat detail transaksi harian (tombol back tidak hidden)
-				const isViewingDetail = !document.getElementById('btnBackRiwayat').classList.contains('hidden');
-				if (!isViewingDetail) {
-					fetchRiwayatData(true);
-				}
+		
+		function changeRiwayatPage(newPage) {
+			if (newPage < 1) return;
+			currentRiwayatPage = newPage;
+			
+			// Cek apakah kita perlu menarik tambahan data dari database untuk halaman yang dituju
+			const requiredGroups = currentRiwayatPage * limitGroupsPerPage;
+			if (groupedRiwayatDates.length < requiredGroups && hasMoreServerRiwayat) {
+				fetchRiwayatData(false); // Mode "false" berarti tidak mereset, hanya menambah
+			} else {
+				renderRiwayatDates(); // Jika data lokal sudah ada, langsung tampilkan
 			}
-		});
-
-        function renderRiwayatReseller(date) {
-            document.getElementById('btnBackRiwayat').classList.remove('hidden');
-            const container = document.getElementById('containerRiwayat');
-            const trxs = riwayatTransactions.filter(t => t.tanggal_transaksi === date);
-            let html = `<div class="mb-3"><span class="text-[11px] font-bold text-gray-500 uppercase">Tanggal:</span><br><span class="text-sm font-black text-gray-800">${formatHariTanggalID(date)}</span></div><ul class="space-y-2">`;
-            trxs.forEach(trx => {
-                const reseller = masterData.resellers.find(r => r.id === trx.reseller_id);
-                html += `<li onclick="lihatPratinjauRiwayat('${trx.id}')" class="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-xl hover:border-blue-400 cursor-pointer transition"><div class="flex items-center gap-3"><div class="bg-gray-100 p-2 rounded-lg text-gray-600"><i data-feather="user" class="w-4 h-4"></i></div><span class="font-bold text-xs text-gray-800">${reseller ? reseller.nama : 'Unknown'}</span></div><div class="text-right flex items-center gap-3"><span class="font-black text-xs text-blue-600">${formatRupiah(trx.net_pembayaran)}</span><i data-feather="chevron-right" class="w-4 h-4 text-gray-400"></i></div></li>`;
-            });
-            html += '</ul>'; container.innerHTML = html; feather.replace();
-        }
+		}
+		
 
         async function lihatPratinjauRiwayat(trxId) {
             const trx = riwayatTransactions.find(t => String(t.id) === String(trxId));
@@ -2790,14 +2832,22 @@
                 }
 
                 let detailData = [];
+                let mapDetailQty = {}; // [BARU] Untuk melacak total Qty per barang di form
                 document.querySelectorAll('.row-item').forEach(row => {
-                    const barangId = row.querySelector('.item-select').value; 
+                    const barangId = row.querySelector('.item-select').value;
                     const qty = parseFloat(row.dataset.qty) || 0;
-                    const harga = parseFloat(row.querySelector('.harga-input').value.replace(/[^0-9,-]+/g,"")) || 0; 
+                    const harga = parseFloat(row.querySelector('.harga-input').value.replace(/[^0-9,-]+/g,"")) || 0;
                     const sub = parseFloat(row.dataset.subtotal) || 0;
-                    if (barangId && qty > 0) detailData.push({ transaksi_id: trxId, barang_id: barangId, qty: qty, harga_satuan: harga, subtotal: sub });
+                    if (barangId && qty > 0) {
+                        detailData.push({ transaksi_id: trxId, barang_id: barangId, qty: qty, harga_satuan: harga, subtotal: sub });
+                        
+                        // Akumulasi total Qty untuk keperluan sinkronisasi
+                        if(!mapDetailQty[barangId]) mapDetailQty[barangId] = 0;
+                        mapDetailQty[barangId] += qty;
+                    }
                 });
-                
+
+                // Simpan ke nota final
                 if (detailData.length > 0) await supabaseClient.from('transaksi_detail').insert(detailData);
 
                 // Tandai lunas data barang harian yang ditarik
@@ -2812,6 +2862,65 @@
                 if(currentKasbonDraftIds.length > 0 && !modeEditTrxId) {
                     await supabaseClient.from('kasbon_harian').update({ is_paid: true }).in('id', currentKasbonDraftIds);
                 }
+
+                // ==========================================
+                // FITUR BARU: SINKRONISASI OTOMATIS KE RINCIAN BUKU HARIAN
+                // Memastikan input/edit manual di nota otomatis masuk ke "Rincian"
+                // ==========================================
+                const { data: existingBuku } = await supabaseClient.from('buku_harian').select('*').eq('transaksi_id', trxId);
+                
+                let mapBukuQty = {};
+                if (existingBuku) {
+                    existingBuku.forEach(b => {
+                        if(!mapBukuQty[b.barang_id]) mapBukuQty[b.barang_id] = 0;
+                        mapBukuQty[b.barang_id] += b.qty;
+                    });
+                }
+
+                let bukuToInsert = [];
+                for (const bId of Object.keys(mapDetailQty)) {
+                    let qtyForm = mapDetailQty[bId];
+                    let qtyBuku = mapBukuQty[bId] || 0;
+
+                    if (qtyForm > qtyBuku) {
+                        // Jika Qty di Nota lebih besar (ada tambahan manual), buat baris rincian otomatis
+                        let selisih = qtyForm - qtyBuku;
+                        let tipe = masterData.bahanBaku.some(b => b.id === bId) ? 'bahan' : 'jadi';
+                        bukuToInsert.push({
+                            reseller_id: selectedResellerId,
+                            barang_id: bId,
+                            tanggal_setor: tgl,
+                            qty: selisih,
+                            tipe: tipe,
+                            status: 'approved',
+                            is_paid: true,
+                            transaksi_id: trxId,
+                            input_by: 'Auto-Sync Nota',
+                            keterangan: 'Ditambahkan otomatis saat input/edit nota'
+                        });
+                    } else if (qtyForm < qtyBuku) {
+                        // Jika Qty di Nota dikurangi saat edit, kurangi juga dari rincian agar balance
+                        let selisihKurang = qtyBuku - qtyForm;
+                        let rowsToReduce = existingBuku.filter(b => b.barang_id === bId).sort((a,b) => (a.input_by === 'Auto-Sync Nota' ? -1 : 1));
+                        
+                        for (let row of rowsToReduce) {
+                            if (selisihKurang <= 0) break;
+                            if (row.qty <= selisihKurang) {
+                                await supabaseClient.from('buku_harian').delete().eq('id', row.id);
+                                selisihKurang -= row.qty;
+                            } else {
+                                await supabaseClient.from('buku_harian').update({ qty: row.qty - selisihKurang }).eq('id', row.id);
+                                selisihKurang = 0;
+                            }
+                        }
+                    }
+                }
+                
+                // Eksekusi penambahan baris otomatis
+                if (bukuToInsert.length > 0) {
+                    await supabaseClient.from('buku_harian').insert(bukuToInsert);
+                }
+                // ==========================================
 
                 showNotification("Transaksi Berhasil Disimpan!", "success");
                 
