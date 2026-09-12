@@ -1044,61 +1044,132 @@
         async function cetakSatuKasbon(id) { const item = globalKasbonData.find(k => String(k.id) === String(id)); if(item) await prosesCetakKasbon(item); }
 
         async function prosesCetakBluetooth(items, rId, tgl) {
+            let device; // Deklarasikan device di luar try agar bisa diakses blok finally
             try {
                 if (!navigator.bluetooth) throw new Error("Web Bluetooth tidak didukung browser ini.");
                 showNotification("Menghubungkan ke printer...", "info");
-                const device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '0000ff00-0000-1000-8000-00805f9b34fb', '49535343-fe7d-4ae5-8fa9-9fafd205e455'] });
-                const server = await device.gatt.connect(); const services = await server.getPrimaryServices();
+                
+                device = await navigator.bluetooth.requestDevice({ 
+                    acceptAllDevices: true, 
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '0000ff00-0000-1000-8000-00805f9b34fb', '49535343-fe7d-4ae5-8fa9-9fafd205e455'] 
+                });
+                
+                const server = await device.gatt.connect(); 
+                const services = await server.getPrimaryServices();
                 let targetChar = null;
-                for (let s of services) { for (let c of await s.getCharacteristics()) { if (c.properties.write || c.properties.writeWithoutResponse) { targetChar = c; break; } } if (targetChar) break; }
-                if (!targetChar) throw new Error("Printer write char not found.");
+                
+                for (let s of services) { 
+                    for (let c of await s.getCharacteristics()) { 
+                        if (c.properties.write || c.properties.writeWithoutResponse) { 
+                            targetChar = c; 
+                            break; 
+                        } 
+                    } 
+                    if (targetChar) break; 
+                }
+                if (!targetChar) throw new Error("Karakteristik Write printer tidak ditemukan.");
 
                 let enc = new TextEncoder(); let cmd = [];
-                cmd.push(0x1B, 0x40, 0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01); cmd.push(...enc.encode("SBR PUTRA FOOD\n")); cmd.push(0x1B, 0x45, 0x00); 
+                cmd.push(0x1B, 0x40, 0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01); 
+                cmd.push(...enc.encode("SBR PUTRA FOOD\n")); cmd.push(0x1B, 0x45, 0x00); 
                 cmd.push(...enc.encode("NOTA CATATAN HARIAN\n--------------------------------\n")); cmd.push(0x1B, 0x61, 0x00);
                 
                 let res = masterData.resellers.find(r => r.id === rId);
-                const w = new Date(); cmd.push(...enc.encode(`Nama    : ${res ? res.nama : '-'}\nJam/Tgl : ${String(w.getHours()).padStart(2,'0')}.${String(w.getMinutes()).padStart(2,'0')} ${formatHariTanggalID(tgl)}\n--------------------------------\nQTY | NAMA BARANG\n--------------------------------\n\n`));
+                const w = new Date(); 
+                cmd.push(...enc.encode(`Nama    : ${res ? res.nama : '-'}\nJam/Tgl : ${String(w.getHours()).padStart(2,'0')}.${String(w.getMinutes()).padStart(2,'0')} ${formatHariTanggalID(tgl)}\n--------------------------------\nQTY | NAMA BARANG\n--------------------------------\n\n`));
+                
                 items.forEach(item => {
                     let brg = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
                     cmd.push(...enc.encode(`${`${item.qty}x`.padEnd(4, ' ')}| ${brg ? brg.nama : 'Item'}\n`));
                     if(item.keterangan) cmd.push(...enc.encode(`        Ket: ${item.keterangan}\n`));
                 });
-                cmd.push(...enc.encode("\n")); cmd.push(0x1B, 0x61, 0x01); cmd.push(...enc.encode(`Oleh: ${items[0]?.input_by || '-'}\n--------------------------------\nMOHON CEK KEMBALI\n\n\n\n`)); cmd.push(0x1D, 0x56, 0x41, 0x03);
+                
+                cmd.push(...enc.encode("\n")); cmd.push(0x1B, 0x61, 0x01); 
+                cmd.push(...enc.encode(`Oleh: ${items[0]?.input_by || '-'}\n--------------------------------\nMOHON CEK KEMBALI\n\n\n\n`)); 
+                cmd.push(0x1D, 0x56, 0x41, 0x03); // Perintah cut / feed kertas
 
-                const rawData = new Uint8Array(cmd); for (let i = 0; i < rawData.length; i += 64) { await targetChar.writeValue(rawData.slice(i, i + 64)); await new Promise(r => setTimeout(r, 50)); }
+                const rawData = new Uint8Array(cmd); 
+                for (let i = 0; i < rawData.length; i += 64) { 
+                    let chunk = rawData.slice(i, i + 64);
+                    // Prioritaskan writeWithoutResponse untuk perangkat thermal BLE
+                    if (targetChar.properties.writeWithoutResponse) {
+                        await targetChar.writeValueWithoutResponse(chunk);
+                    } else {
+                        await targetChar.writeValue(chunk);
+                    }
+                    await new Promise(r => setTimeout(r, 40)); 
+                }
                 showNotification("Berhasil mencetak!", "success");
-            } catch (err) { showNotification("Gagal cetak: " + err.message, "error"); }
+            } catch (err) { 
+                showNotification("Gagal cetak: " + err.message, "error"); 
+            } finally {
+                // Membebaskan buffer Bluetooth setelah selesai atau terjadi error
+                if (device && device.gatt.connected) {
+                    device.gatt.disconnect();
+                }
+            }
         }
 
         async function prosesCetakKasbon(item) {
+            let device; // Deklarasikan device di luar
             try {
-                if (!navigator.bluetooth) throw new Error("Bluetooth Web tidak didukung.");
-                const device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '0000ff00-0000-1000-8000-00805f9b34fb', '49535343-fe7d-4ae5-8fa9-9fafd205e455'] });
-                const server = await device.gatt.connect(); const services = await server.getPrimaryServices();
+                if (!navigator.bluetooth) throw new Error("Bluetooth Web tidak didukung browser ini.");
+                showNotification("Menghubungkan ke printer...", "info");
+                
+                device = await navigator.bluetooth.requestDevice({ 
+                    acceptAllDevices: true, 
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '0000ff00-0000-1000-8000-00805f9b34fb', '49535343-fe7d-4ae5-8fa9-9fafd205e455'] 
+                });
+                
+                const server = await device.gatt.connect(); 
+                const services = await server.getPrimaryServices();
                 let targetChar = null;
-                for (let s of services) { for (let c of await s.getCharacteristics()) { if (c.properties.write || c.properties.writeWithoutResponse) { targetChar = c; break; } } if (targetChar) break; }
+                
+                for (let s of services) { 
+                    for (let c of await s.getCharacteristics()) { 
+                        if (c.properties.write || c.properties.writeWithoutResponse) { 
+                            targetChar = c; 
+                            break; 
+                        } 
+                    } 
+                    if (targetChar) break; 
+                }
+                if (!targetChar) throw new Error("Karakteristik Write printer tidak ditemukan.");
 
                 let enc = new TextEncoder(); let cmd = [];
-                cmd.push(0x1B, 0x40, 0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01); cmd.push(...enc.encode("SBR PUTRA FOOD\nBUKTI KASBON\n")); cmd.push(0x1B, 0x45, 0x00, 0x1B, 0x61, 0x00);
+                cmd.push(0x1B, 0x40, 0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01); 
+                cmd.push(...enc.encode("SBR PUTRA FOOD\nBUKTI KASBON\n")); 
+                cmd.push(0x1B, 0x45, 0x00, 0x1B, 0x61, 0x00);
                 
                 let res = masterData.resellers.find(r => r.id === item.reseller_id);
                 cmd.push(...enc.encode(`--------------------------------\nTanggal : ${formatHariTanggalID(item.tanggal_pengajuan)}\nNama    : ${res ? res.nama : '-'}\nKet     : ${item.keterangan}\n--------------------------------\n`));
-                // Teks "NOMINAL :" ukuran normal
-				cmd.push(...enc.encode(`NOMINAL :\n`));
-				
-				// Angka Rupiah ukuran Double Height + Double Width (0x11) dan posisi di Tengah (0x1B, 0x61, 0x01)
-				cmd.push(0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01, 0x1D, 0x21, 0x11);
-				cmd.push(...enc.encode(`Rp ${item.nominal.toLocaleString('id-ID')}\n`));
-				
-				// Reset ke ukuran normal (0x00) dan rata kiri (0x00)
-				cmd.push(0x1D, 0x21, 0x00, 0x1B, 0x45, 0x00, 0x1B, 0x61, 0x00);
-				cmd.push(...enc.encode(`--------------------------------\n`));
+                
+                cmd.push(...enc.encode(`NOMINAL :\n`));
+                cmd.push(0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01, 0x1D, 0x21, 0x11);
+                cmd.push(...enc.encode(`Rp ${item.nominal.toLocaleString('id-ID')}\n`));
+                cmd.push(0x1D, 0x21, 0x00, 0x1B, 0x45, 0x00, 0x1B, 0x61, 0x00);
+                cmd.push(...enc.encode(`--------------------------------\n\n\n\n`));
                 cmd.push(0x1D, 0x56, 0x41, 0x03);
                 
-                const rawData = new Uint8Array(cmd); for (let i = 0; i < rawData.length; i += 64) { await targetChar.writeValue(rawData.slice(i, i + 64)); await new Promise(r => setTimeout(r, 50)); }
+                const rawData = new Uint8Array(cmd); 
+                for (let i = 0; i < rawData.length; i += 64) { 
+                    let chunk = rawData.slice(i, i + 64);
+                    if (targetChar.properties.writeWithoutResponse) {
+                        await targetChar.writeValueWithoutResponse(chunk);
+                    } else {
+                        await targetChar.writeValue(chunk);
+                    }
+                    await new Promise(r => setTimeout(r, 40)); 
+                }
                 showNotification("Berhasil mencetak kasbon!", "success");
-            } catch (err) { showNotification("Gagal cetak: " + err.message, "error"); }
+            } catch (err) { 
+                showNotification("Gagal cetak: " + err.message, "error"); 
+            } finally {
+                // Membebaskan buffer Bluetooth setelah selesai
+                if (device && device.gatt.connected) {
+                    device.gatt.disconnect();
+                }
+            }
         }
         
         function openFormModal(id) { document.getElementById(id).classList.remove('hidden'); feather.replace(); }
