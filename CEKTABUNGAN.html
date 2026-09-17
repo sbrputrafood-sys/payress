@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SBR Putra Food - Tabungan & Gaji</title>
     
-    <!-- SCRIPT CDN SUPABASE & FONTAWESOME -->
+    <!-- CDN SUPABASE, FONTAWESOME & GOOGLE FONTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- PWA META TAGS STANDALONE -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,42 +23,86 @@
 
     <style>
         :root {
+            /* Variable Warna Utama */
             --primary: #E1C4FF;
             --primary-dark: #C293FF;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-main: #1f2937; 
-            --text-muted: #6b7280;
-            --danger: #ef4444;
-            --success: #10b981; 
-            --text-on-primary: #1f2937; 
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-main: #0F172A; 
+            --text-muted: #64748B;
+            --danger: #EF4444;
+            --danger-bg: #FEF2F2;
+            --success: #10B981;
+            --success-bg: #ECFDF5;
+            --border-color: #E2E8F0;
+            --text-on-primary: #0F172A;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- MENUMPAS / MENGHILANGKAN SCROLLBAR DI SELURUH BROWSER --- */
+        *::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        * {
+            -ms-overflow-style: none !important;  /* IE and Edge */
+            scrollbar-width: none !important;  /* Firefox */
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: #CBD5E1;
             display: flex;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             color: var(--text-main);
         }
 
         #app-container {
             width: 100%;
-            max-width: 480px;
-            background-color: var(--card-bg);
+            max-width: 440px;
+            background-color: var(--bg-color);
             min-height: 100vh;
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: translateZ(0);
+        }
+
+        @media (min-width: 480px) {
+            #app-container {
+                min-height: 840px;
+                height: 90vh;
+                border-radius: 28px;
+                overflow-y: auto;
+            }
         }
 
         .hidden { display: none !important; }
+
+        /* --- ANIMASI FADE-IN --- */
+        .fade-in {
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* --- HALAMAN LOGIN --- */
         #login-screen {
@@ -63,71 +110,83 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            padding: 2rem;
+            flex: 1;
+            padding: 2.5rem 2rem;
             text-align: center;
         }
 
         .logo-img {
-            width: 110px;
-            height: auto;
-            margin-bottom: 1.5rem;
-            border-radius: 16px;
+            width: 96px;
+            height: 96px;
+            object-fit: cover;
+            border-radius: 24px;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
         .login-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.2rem;
         }
 
         .login-subtitle {
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             margin-bottom: 2rem;
         }
 
         .input-group {
             width: 100%;
             margin-bottom: 1rem;
+            position: relative;
         }
 
         input {
             width: 100%;
-            padding: 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            font-size: 1rem;
+            padding: 0.95rem 1rem;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 500;
             outline: none;
-            transition: border-color 0.2s;
-            text-align: center;
+            transition: all 0.2s ease;
+            background-color: var(--card-bg);
+            color: var(--text-main);
         }
 
-        input:focus { border-color: var(--primary-dark); }
+        input:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(194, 147, 255, 0.25);
+        }
 
         button.btn-primary {
             width: 100%;
             padding: 1rem;
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: var(--text-on-primary); 
             border: none;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: background-color 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            will-change: transform;
         }
 
-        button.btn-primary:active { background-color: var(--primary-dark); }
-        button:disabled { opacity: 0.7; cursor: not-allowed; }
+        button.btn-primary:active { transform: scale(0.98); }
+        button:disabled { opacity: 0.7; cursor: not-allowed; transform: none !important; }
 
-        /* --- HALAMAN DASHBOARD & ADMIN --- */
+        /* --- HEADER GLOBAL (DASHBOARD & ADMIN) --- */
         .header {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: var(--text-on-primary); 
-            padding: 2rem 1.5rem 3rem 1.5rem;
-            border-bottom-left-radius: 24px;
-            border-bottom-right-radius: 24px;
+            padding: 2.2rem 1.5rem 3.2rem 1.5rem;
+            border-bottom-left-radius: 28px;
+            border-bottom-right-radius: 28px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
         }
 
         .header-top {
@@ -149,51 +208,83 @@
             gap: 8px;
         }
 
+        /* STYLING DIVERSIFIKASI TOMBOL HEADER KANAN */
         .action-btn {
-            background: rgba(0, 0, 0, 0.05);
             border: none;
-            color: var(--text-on-primary);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            padding: 0.55rem 0.9rem;
+            border-radius: 12px;
             font-size: 0.8rem;
             cursor: pointer;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-        
-        .action-btn:hover { background: rgba(0, 0, 0, 0.1); }
-
-        .action-btn-icon {
-            padding: 0.5rem;
-            display: flex;
+            font-weight: 700;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 34px;
-            height: 34px;
+            gap: 0.4rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        /* 1. Tombol Tema (Gear): Soft Translucent Glass */
+        .btn-header-theme {
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(8px);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .btn-header-theme:hover { transform: rotate(30deg); }
+        .btn-header-theme:active { transform: scale(0.92); }
+
+        /* 2. Tombol PIN (Kunci): Warm Amber / Emas Accent */
+        .btn-header-pin {
+            background: rgba(245, 158, 11, 0.22);
+            color: #78350F;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+        .btn-header-pin:active { transform: scale(0.92); background: rgba(245, 158, 11, 0.35); }
+
+        /* 3. Tombol Keluar (Logout): Soft Danger / Merah Accent */
+        .btn-header-logout {
+            background: rgba(239, 68, 68, 0.2);
+            color: #991B1B;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .btn-header-logout:active { transform: scale(0.92); background: rgba(239, 68, 68, 0.35); }
+
+        .action-btn-icon {
+            padding: 0.55rem;
+            width: 38px;
+            height: 38px;
         }
 
         .saldo-title {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            opacity: 0.85;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
         }
 
         .saldo-amount {
-            font-size: 2.2rem;
-            font-weight: 700;
+            font-size: 2.1rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
         }
 
         .content {
             padding: 0 1.25rem; 
-            margin-top: -1.5rem;
+            margin-top: -1.8rem;
             padding-bottom: 2rem;
+            flex: 1;
         }
 
         .card-riwayat {
-            background-color: white;
-            border-radius: 16px;
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
             padding: 1.25rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            contain: content;
         }
 
         .riwayat-header {
@@ -204,11 +295,12 @@
         }
 
         .riwayat-title {
-            font-weight: 600;
-            font-size: 1rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-main);
         }
 
-        /* --- STYLING DAFTAR --- */
+        /* --- STYLING ITEM DAFTAR DENGAN IKON FRESH --- */
         .list-riwayat {
             display: flex;
             flex-direction: column;
@@ -219,51 +311,48 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid #f3f4f6;
-        }
-
-        .item-riwayat:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
+            padding: 0.85rem;
+            border-radius: var(--radius-md);
+            background-color: #FAFAFA;
+            border: 1px solid #F1F5F9;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
         .item-clickable {
             cursor: pointer;
-            transition: background-color 0.2s;
-            border-radius: 8px;
-            padding: 0.5rem;
-            margin: -0.5rem; 
         }
-        .item-clickable:hover { background-color: #f9fafb; }
+        .item-clickable:active { transform: scale(0.98); background-color: #F1F5F9; }
 
         .item-left {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.9rem;
             overflow: hidden; 
             flex-grow: 1; 
         }
 
+        /* IKON INTERAKTIF & FRESH */
         .icon-jenis {
-            width: 36px; 
-            height: 36px;
-            border-radius: 10px;
+            width: 44px; 
+            height: 44px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.95rem;
+            font-size: 1.15rem;
             flex-shrink: 0; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
 
-        .icon-masuk { background-color: #d1fae5; color: var(--success); }
-        .icon-keluar { background-color: #fee2e2; color: var(--danger); }
-        .icon-user { background-color: #e0f2fe; color: #0284c7; }
-        .icon-key { background-color: #fef3c7; color: #d97706; }
+        .icon-masuk { background-color: #D1FAE5; color: #059669; }
+        .icon-keluar { background-color: #FEE2E2; color: #DC2626; }
+        .icon-user { background-color: #E0F2FE; color: #0284C7; }
+        .icon-key { background-color: #FEF3C7; color: #D97706; }
 
         .item-info { overflow: hidden; }
         .item-info h4 {
-            font-size: 0.85rem; 
+            font-size: 0.875rem; 
+            font-weight: 700;
             margin-bottom: 0.15rem;
             color: var(--text-main);
             white-space: nowrap; 
@@ -271,11 +360,11 @@
             text-overflow: ellipsis; 
         }
 
-        .item-info p { font-size: 0.7rem; color: var(--text-muted); }
+        .item-info p { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
 
         .item-nominal {
-            font-weight: 600;
-            font-size: 0.85rem; 
+            font-weight: 700;
+            font-size: 0.875rem; 
             white-space: nowrap; 
             flex-shrink: 0; 
             text-align: right;
@@ -285,25 +374,36 @@
         .nominal-masuk { color: var(--success); } 
         .nominal-keluar { color: var(--text-main); }
         .nominal-netral { color: var(--text-main); }
-        
-        .loading-text { text-align: center; color: var(--text-muted); font-size: 0.85rem; }
 
-        /* --- STYLING TABS GAJI & TABUNGAN --- */
+        /* SKELETON ANIMATION */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-wave 1.2s infinite ease-in-out;
+            border-radius: 12px;
+        }
+        @keyframes skeleton-wave {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .skeleton-item { height: 60px; width: 100%; }
+
+        /* TABS GAJI & TABUNGAN */
         .tab-container {
             display: flex;
-            background: #f3f4f6;
-            border-radius: 12px;
+            background: #F1F5F9;
+            border-radius: var(--radius-md);
             margin-bottom: 1.25rem;
-            padding: 0.3rem;
+            padding: 0.25rem;
         }
 
         .tab-btn {
             flex: 1;
             text-align: center;
-            padding: 0.6rem;
+            padding: 0.65rem;
             border-radius: 10px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.875rem;
+            font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
             transition: all 0.2s ease;
@@ -312,58 +412,54 @@
         }
 
         .tab-btn.active {
-            background: white;
+            background: #FFFFFF;
             color: var(--text-main);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         }
 
-        /* --- MODAL EDIT PIN --- */
+        /* MODAL GLOBAL */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); 
+            background: rgba(15, 23, 42, 0.5); 
+            backdrop-filter: blur(4px);
             display: flex; align-items: center; justify-content: center;
-            z-index: 50;
-            opacity: 1; transition: opacity 0.2s;
+            z-index: 100;
+            opacity: 1; transition: opacity 0.2s ease;
         }
         .modal-overlay.hidden { display: none !important; opacity: 0; pointer-events: none; }
         .modal-box {
-            background: var(--card-bg); padding: 1.5rem; border-radius: 16px; 
-            width: 90%; max-width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            background: var(--card-bg); padding: 1.5rem; border-radius: 20px; 
+            width: 90%; max-width: 340px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
         }
-        .modal-box h3 { margin-bottom: 0.25rem; font-size: 1.1rem; }
+        .modal-box h3 { margin-bottom: 0.25rem; font-size: 1.1rem; font-weight: 800; }
         .modal-box p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.25rem; }
-        .modal-box input { margin-bottom: 1.25rem; width: 100%; }
         .modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
         
         .btn-batal { 
-            background: #f3f4f6; color: var(--text-main); padding: 0.6rem 1rem; 
-            border-radius: 8px; border: none; font-weight: 600; cursor: pointer; 
+            background: #F1F5F9; color: var(--text-main); padding: 0.7rem 1.2rem; 
+            border-radius: 10px; border: none; font-weight: 700; cursor: pointer; 
         }
         .btn-simpan { 
-            background: var(--primary); color: var(--text-main); padding: 0.6rem 1rem; 
-            border-radius: 8px; border: none; font-weight: 600; cursor: pointer; 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
+            color: var(--text-on-primary); padding: 0.7rem 1.2rem; 
+            border-radius: 10px; border: none; font-weight: 700; cursor: pointer; 
         }
-        .btn-batal:hover { background: #e5e7eb; }
-        .btn-simpan:hover { background: var(--primary-dark); }
-        .btn-simpan:disabled { opacity: 0.7; cursor: not-allowed; }
 
-        /* --- MODERN BOTTOM SHEET ALERT --- */
+        /* BOTTOM ALERT SHEET */
         .bottom-alert-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.45);
-            backdrop-filter: blur(2px);
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(3px);
             display: flex; align-items: flex-end; justify-content: center;
-            z-index: 100;
+            z-index: 200;
             opacity: 1; transition: opacity 0.3s ease;
         }
-        .bottom-alert-overlay.hidden {
-            display: none !important; opacity: 0; pointer-events: none;
-        }
+        .bottom-alert-overlay.hidden { display: none !important; opacity: 0; pointer-events: none; }
         .bottom-alert-sheet {
-            background: #ffffff;
+            background: #FFFFFF;
             width: 100%;
-            max-width: 480px;
-            padding: 1.5rem 1.25rem 2rem 1.25rem;
+            max-width: 440px;
+            padding: 1.75rem 1.5rem 2rem 1.5rem;
             border-top-left-radius: 28px;
             border-top-right-radius: 28px;
             box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15);
@@ -371,7 +467,7 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            animation: slideUpSheet 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         @keyframes slideUpSheet {
             from { transform: translateY(100%); }
@@ -379,131 +475,127 @@
         }
         .bottom-alert-icon {
             width: 52px; height: 52px; border-radius: 50%;
-            background-color: #fee2e2; color: var(--danger);
+            background-color: var(--danger-bg); color: var(--danger);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem; margin-bottom: 1rem;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+            font-size: 1.4rem; margin-bottom: 1rem;
         }
         .bottom-alert-content h4 {
-            font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem;
+            font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;
         }
         .bottom-alert-content p {
             font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.4;
         }
         .bottom-alert-btn {
             width: 100%; padding: 0.9rem;
-            background-color: var(--text-main); color: #ffffff;
-            border: none; border-radius: 14px; font-weight: 600;
+            background-color: var(--text-main); color: #FFFFFF;
+            border: none; border-radius: 12px; font-weight: 700;
             font-size: 0.95rem; cursor: pointer;
-            transition: opacity 0.2s;
         }
-        .bottom-alert-btn:active { opacity: 0.85; }
 
-        /* --- MODAL SLIP GAJI MODERN --- */
+        /* MODAL SLIP GAJI MODERN */
         .slip-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
             display: flex; align-items: center; justify-content: center;
-            z-index: 1000;
-            opacity: 1; transition: opacity 0.2s;
+            z-index: 150;
+            opacity: 1; transition: opacity 0.2s ease;
         }
         .slip-overlay.hidden { display: none !important; opacity: 0; pointer-events: none; }
         
         .slip-card {
-            background: #ffffff;
+            background: #FFFFFF;
             width: 92%;
-            max-width: 400px;
-            border-radius: 20px;
+            max-width: 390px;
+            border-radius: 24px;
             padding: 1.5rem;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            max-height: 90vh;
+            max-height: 88vh;
             overflow-y: auto;
         }
         .slip-header {
             text-align: center;
-            border-bottom: 2px solid #f3f4f6;
+            border-bottom: 2px dashed #E2E8F0;
             padding-bottom: 1rem;
             margin-bottom: 1rem;
         }
         .slip-header h2 {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: 800;
             color: var(--text-main);
-            margin-bottom: 0.2rem;
-            letter-spacing: 0.5px;
+            letter-spacing: -0.01em;
         }
         .slip-header p {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
+            font-weight: 600;
         }
         .slip-info {
-            background: #f9fafb;
-            padding: 1rem;
+            background: #F8FAFC;
+            padding: 0.85rem 1rem;
             border-radius: 12px;
             margin-bottom: 1.25rem;
+            border: 1px solid #F1F5F9;
         }
         .info-row {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
-            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
         }
         .info-row:last-child { margin-bottom: 0; }
-        .info-row span { color: var(--text-muted); }
-        .info-row strong { color: var(--text-main); text-align: right; }
+        .info-row span { color: var(--text-muted); font-weight: 500; }
+        .info-row strong { color: var(--text-main); text-align: right; font-weight: 700; }
         
-        .slip-section {
-            margin-bottom: 1.25rem;
-        }
+        .slip-section { margin-bottom: 1.25rem; }
         .section-title {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #8b5cf6;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--primary-dark);
             margin-bottom: 0.5rem;
-            letter-spacing: 1px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
         .data-row {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 0.4rem;
             color: var(--text-main);
         }
         .slip-grand-total {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: var(--text-on-primary);
-            padding: 1.25rem;
+            padding: 1.1rem 1.25rem;
             border-radius: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.25rem;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 800;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
         .btn-tutup-slip {
             width: 100%;
-            padding: 1rem;
+            padding: 0.9rem;
             background-color: var(--text-main);
-            color: #ffffff;
+            color: #FFFFFF;
             border: none;
-            border-radius: 14px;
-            font-weight: 600;
-            font-size: 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: opacity 0.2s;
         }
-        .btn-tutup-slip:active { opacity: 0.85; }
-		
-		/* --- STYLING INPUT PASSWORD HIDEABLE --- */
+
+        /* STYLING INPUT PASSWORD HIDEABLE & NUMERIC */
         .input-password-wrapper {
             position: relative;
             width: 100%;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1rem;
         }
         .input-password-wrapper input {
-            margin-bottom: 0 !important; /* Timpa margin bawaan */
-            padding-right: 2.5rem; /* Beri ruang agar teks tidak tertutup ikon */
+            padding-right: 2.8rem;
         }
         .toggle-password {
             position: absolute;
@@ -512,54 +604,51 @@
             transform: translateY(-50%);
             color: var(--text-muted);
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1rem;
             transition: color 0.2s;
         }
-        .toggle-password:hover {
-            color: var(--primary-dark);
-        }
-		
+        .toggle-password:hover { color: var(--primary-dark); }
     </style>
 </head>
 <body>
 
 <div id="app-container">
-	<!-- MODAL TEMA WARNA -->
+
+    <!-- MODAL TEMA WARNA -->
     <div id="modalTema" class="modal-overlay hidden">
         <div class="modal-box">
             <h3>Pilih Warna Tema</h3>
             <p>Ubah warna dasar tampilan aplikasi.</p>
-            <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center;">
-                <!-- Ungu (Default) -->
-                <div style="background-color: #E1C4FF; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#E1C4FF', '#C293FF')"></div>
-                <!-- Biru -->
-                <div style="background-color: #93C5FD; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#93C5FD', '#60A5FA')"></div>
-                <!-- Hijau -->
-                <div style="background-color: #6EE7B7; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#6EE7B7', '#34D399')"></div>
-                <!-- Merah Muda -->
-                <div style="background-color: #FCA5A5; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#FCA5A5', '#F87171')"></div>
-                <!-- Kuning Emas -->
-                <div style="background-color: #FDE047; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#FDE047', '#FACC15')"></div>
+            <div style="display: flex; gap: 12px; margin-bottom: 20px; justify-content: center;">
+                <div style="background-color: #E1C4FF; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#E1C4FF', '#C293FF')"></div>
+                <div style="background-color: #93C5FD; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#93C5FD', '#60A5FA')"></div>
+                <div style="background-color: #6EE7B7; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#6EE7B7', '#34D399')"></div>
+                <div style="background-color: #FCA5A5; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#FCA5A5', '#F87171')"></div>
+                <div style="background-color: #FDE047; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="ubahTema('#FDE047', '#FACC15')"></div>
             </div>
             <div class="modal-actions">
                 <button class="btn-batal" style="width: 100%;" onclick="tutupModalTema()">Tutup</button>
             </div>
         </div>
     </div>    
+
     <!-- LAYAR LOGIN -->
-    <div id="login-screen">
+    <div id="login-screen" class="fade-in">
         <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/3e98b9797affc74211878c59439be66c3e99d5bc/sbr_logo.png" alt="SBR Putra Food Logo" class="logo-img">
         
         <h1 class="login-title">SBR Putra Food</h1>
         <p class="login-subtitle">Portal Tabungan & Gaji Karyawan</p>
         
-        <div class="input-group">
-            <input type="text" id="inputIdKaryawan" placeholder="ID Karyawan / Nama" autocomplete="off">
-        </div>
-        <div class="input-group">
-            <input type="password" id="inputPassword" placeholder="Masukkan Password / PIN" autocomplete="off">
-        </div>
-        <button id="btnLogin" class="btn-primary" onclick="prosesLogin()">Masuk</button>
+        <form id="loginForm" onsubmit="event.preventDefault(); prosesLogin();" style="width: 100%;">
+            <div class="input-group">
+                <input type="text" id="inputIdKaryawan" placeholder="ID Karyawan / Nama" autocomplete="off" enterkeyhint="next">
+            </div>
+            <div class="input-password-wrapper">
+                <input type="password" id="inputPassword" inputmode="numeric" pattern="[0-9]*" placeholder="Masukkan Password / PIN" autocomplete="off" enterkeyhint="done">
+                <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility('inputPassword', this)"></i>
+            </div>
+            <button id="btnLogin" type="submit" class="btn-primary">Masuk</button>
+        </form>
     </div>
 
     <!-- LAYAR ADMIN -->
@@ -568,19 +657,22 @@
             <div class="header-top">
                 <div class="header-top-left">
                     <div>
-                        <p style="font-size: 0.8rem; opacity: 0.8;">Halo Super Admin,</p>
-                        <h3 id="namaAdmin">Nama Admin</h3>
+                        <p style="font-size: 0.75rem; opacity: 0.85;">Halo Super Admin,</p>
+                        <h3 id="namaAdmin" style="font-size: 1.1rem; font-weight: 800;">Nama Admin</h3>
                     </div>
                 </div>
+                <!-- DIFERENSIASI TOMBOL HEADER ATAS KANAN -->
                 <div class="header-top-right">
-                    <!-- Tombol Setting Tema Warna -->
-                    <button class="action-btn action-btn-icon" onclick="bukaModalTema()" title="Pengaturan Tema">
-                        <i class="fa-solid fa-gear"></i>
+                    <button class="action-btn action-btn-icon btn-header-theme" onclick="bukaModalTema()" title="Pengaturan Tema">
+                        <i class="fa-solid fa-sliders"></i>
                     </button>
-                    <button class="action-btn action-btn-icon" onclick="bukaLayarPin()" title="Manajemen PIN Karyawan">
+                    <button class="action-btn action-btn-icon btn-header-pin" onclick="bukaLayarPin()" title="Manajemen PIN Karyawan">
                         <i class="fa-solid fa-key"></i>
                     </button>
-                    <button class="action-btn" onclick="prosesLogout()">Keluar</button>
+                    <button class="action-btn btn-header-logout" onclick="prosesLogout()">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Keluar</span>
+                    </button>
                 </div>
             </div>
             <p class="saldo-title">Total Seluruh Tabungan</p>
@@ -602,11 +694,11 @@
         <div class="header" style="padding-bottom: 2rem;">
             <div class="header-top">
                 <div class="header-top-left">
-                    <button class="action-btn action-btn-icon" onclick="tutupLayarPin()">
+                    <button class="action-btn action-btn-icon btn-header-theme" onclick="tutupLayarPin()">
                         <i class="fa-solid fa-arrow-left"></i>
                     </button>
                     <div>
-                        <h3 style="margin-left: 10px;">Akses & PIN</h3>
+                        <h3 style="margin-left: 10px; font-size: 1.1rem;">Akses & PIN Karyawan</h3>
                     </div>
                 </div>
             </div>
@@ -627,20 +719,22 @@
         <div class="header">
             <div class="header-top">
                 <div class="header-top-left">
-                    <button id="btnBackAdmin" class="action-btn action-btn-icon hidden" onclick="kembaliKeAdmin()">
+                    <button id="btnBackAdmin" class="action-btn action-btn-icon btn-header-theme hidden" onclick="kembaliKeAdmin()">
                         <i class="fa-solid fa-arrow-left"></i>
                     </button>
                     <div>
-                        <p id="labelSapaan" style="font-size: 0.8rem; opacity: 0.8;">Halo,</p>
-                        <h3 id="namaKaryawan">Nama Karyawan</h3>
+                        <p id="labelSapaan" style="font-size: 0.75rem; opacity: 0.85;">Halo,</p>
+                        <h3 id="namaKaryawan" style="font-size: 1.1rem; font-weight: 800;">Nama Karyawan</h3>
                     </div>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <!-- Tombol Ganti PIN Pribadi -->
-                    <button id="btnGantiPinPribadi" class="action-btn action-btn-icon hidden" style="color: #fbbf24; background: rgba(251, 191, 36, 0.15);" onclick="bukaModalPinPribadi()" title="Ganti PIN Saya">
+                    <button id="btnGantiPinPribadi" class="action-btn action-btn-icon btn-header-pin hidden" onclick="bukaModalPinPribadi()" title="Ganti PIN Saya">
                         <i class="fa-solid fa-key"></i>
                     </button>
-                    <button id="btnLogout" class="action-btn" onclick="prosesLogout()">Keluar</button>
+                    <button id="btnLogout" class="action-btn btn-header-logout" onclick="prosesLogout()">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Keluar</span>
+                    </button>
                 </div>
             </div>
             <p class="saldo-title">Total Tabungan</p>
@@ -681,12 +775,12 @@
             <p id="modalNamaKaryawan">Nama Karyawan</p>
             
             <div class="input-password-wrapper">
-                <input type="password" id="inputPinBaru" placeholder="Masukkan PIN baru" autocomplete="off">
+                <input type="password" id="inputPinBaru" inputmode="numeric" pattern="[0-9]*" placeholder="Masukkan PIN baru" autocomplete="off">
                 <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility('inputPinBaru', this)"></i>
             </div>
 
             <div class="input-password-wrapper" style="margin-bottom: 1.5rem;">
-                <input type="password" id="inputPinVerifikasi" placeholder="Konfirmasi PIN baru" autocomplete="off">
+                <input type="password" id="inputPinVerifikasi" inputmode="numeric" pattern="[0-9]*" placeholder="Konfirmasi PIN baru" autocomplete="off">
                 <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility('inputPinVerifikasi', this)"></i>
             </div>
 
@@ -697,7 +791,7 @@
         </div>
     </div>
 
-    <!-- MODERN BOTTOM SHEET ALERT -->
+    <!-- BOTTOM ALERT SHEET -->
     <div id="bottomAlertOverlay" class="bottom-alert-overlay hidden">
         <div class="bottom-alert-sheet">
             <div class="bottom-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -722,41 +816,32 @@
                 <div class="info-row"><span>Periode</span><strong id="slipPeriode"></strong></div>
             </div>
 
-            <!-- Rincian Upah & Tarif -->
             <div class="slip-section" id="sectionQtyContainer">
                 <div class="section-title">RINCIAN UPAH</div>
-                <div id="slipListQty">
-                    <!-- Dinamis by JS -->
-                </div>
-                <hr style="border: none; border-top: 1px dashed #e5e7eb; margin: 10px 0 0 0;">
+                <div id="slipListQty"></div>
+                <hr style="border: none; border-top: 1px dashed #E2E8F0; margin: 10px 0 0 0;">
             </div>
 
-            <!-- Total Pendapatan Kalkulasi Otomatis -->
             <div class="slip-section">
-                <div class="data-row" style="font-size: 1rem; font-weight: 700;">
+                <div class="data-row" style="font-size: 0.95rem; font-weight: 800;">
                     <span>Total Pendapatan</span>
                     <span id="slipTotalPendapatan" style="color: var(--success);">Rp 0</span>
                 </div>
             </div>
 
-            <hr style="border: none; border-top: 1px dashed #e5e7eb; margin: 5px 0 15px 0;">
+            <hr style="border: none; border-top: 1px dashed #E2E8F0; margin: 5px 0 15px 0;">
 
-            <!-- Bagian Potongan -->
             <div class="slip-section">
                 <div class="section-title">DIKURANGI:</div>
-                <div id="slipListPotongan">
-                    <!-- Dinamis by JS -->
-                </div>
+                <div id="slipListPotongan"></div>
             </div>
 
-            <!-- Terima Bersih / Diterima Kalkulasi Otomatis -->
             <div class="slip-grand-total">
                 <span>DITERIMA</span>
                 <strong id="slipTerimaBersih">Rp 0</strong>
             </div>
 			
-			<!-- TAMBAHAN: Kotak Catatan Sisa Kasbon -->
-            <div id="slipSisaKasbonContainer" class="hidden" style="background-color: #fffbeb; color: #b45309; padding: 1rem; border-radius: 12px; margin-bottom: 1.25rem; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid #fde68a;">
+            <div id="slipSisaKasbonContainer" class="hidden" style="background-color: #FEF3C7; color: #92400E; padding: 0.85rem 1rem; border-radius: 12px; margin-bottom: 1.25rem; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid #FDE68A;">
                 <span><i class="fa-solid fa-circle-info" style="margin-right: 5px;"></i> Catatan Sisa Kasbon</span>
                 <strong id="slipSisaKasbon">Rp 0</strong>
             </div>
@@ -776,7 +861,7 @@
       short_name: "SBR Tabungan",
       start_url: window.location.href,
       display: "standalone",
-      background_color: "#f3f4f6",
+      background_color: "#F8FAFC",
       theme_color: "#E1C4FF",
       icons: [{
         src: "https://raw.githubusercontent.com/sbrputrafood-sys/payress/3e98b9797affc74211878c59439be66c3e99d5bc/sbr_logo.png",
@@ -799,7 +884,7 @@
     }
 
     // ==========================================
-    // 1. KONFIGURASI SUPABASE
+    // 1. KONFIGURASI SUPABASE & TEMA
     // ==========================================
     const SUPABASE_URL = 'https://ephcczlqvtihmbowqxdt.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwaGNjemxxdnRpaG1ib3dxeGR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwOTgxNTMsImV4cCI6MjA5OTY3NDE1M30.Ky9XSDmsqVBrOrWOMJaMY6gzE8Z32eXxZ6cqdACp_2M';
@@ -808,7 +893,6 @@
     let dataKaryawanAktif = null;
     let targetKaryawanEditId = null;
 	
-	// Muat tema yang tersimpan saat aplikasi dibuka
     window.addEventListener('DOMContentLoaded', () => {
         const savedPrimary = localStorage.getItem('sbrThemePrimary');
         const savedDark = localStorage.getItem('sbrThemeDark');
@@ -821,7 +905,6 @@
 	function bukaModalPinPribadi() {
         targetKaryawanEditId = dataKaryawanAktif.id;
         document.getElementById('modalNamaKaryawan').innerText = `Ganti PIN Anda (${dataKaryawanAktif.nama})`;
-        // Kosongkan kolom setiap dibuka agar aman
 		document.getElementById('inputPinBaru').value = "";
         document.getElementById('inputPinVerifikasi').value = "";
         document.getElementById('modalPin').classList.remove('hidden');
@@ -838,7 +921,6 @@
     function ubahTema(primary, primaryDark) {
         document.documentElement.style.setProperty('--primary', primary);
         document.documentElement.style.setProperty('--primary-dark', primaryDark);
-        // Simpan ke penyimpanan peramban (browser)
         localStorage.setItem('sbrThemePrimary', primary);
         localStorage.setItem('sbrThemeDark', primaryDark);
     }
@@ -877,7 +959,7 @@
         }
 
         btnLogin.disabled = true;
-        btnLogin.innerText = "Memeriksa...";
+        btnLogin.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa...`;
 
         try {
             let query = db.from('karyawan').select('*');
@@ -930,12 +1012,18 @@
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('dashboard-screen').classList.add('hidden');
         document.getElementById('pin-screen').classList.add('hidden');
-        document.getElementById('admin-screen').classList.remove('hidden');
+        
+        const adminScreen = document.getElementById('admin-screen');
+        adminScreen.classList.remove('hidden');
+        adminScreen.classList.add('fade-in');
 
         document.getElementById('namaAdmin').innerText = adminData.nama;
 
         const container = document.getElementById('listKaryawanAdmin');
-        container.innerHTML = `<p class="loading-text">Memuat data karyawan...</p>`;
+        container.innerHTML = `
+            <div class="skeleton skeleton-item"></div>
+            <div class="skeleton skeleton-item"></div>
+        `;
 
         const { data: karyawanList, error } = await db
             .from('karyawan')
@@ -943,38 +1031,44 @@
             .order('nama', { ascending: true });
 
         if (error || !karyawanList) {
-            container.innerHTML = `<p class="loading-text">Gagal memuat data karyawan.</p>`;
+            container.innerHTML = `<p class="loading-text" style="text-align:center; padding:1rem; color:var(--text-muted);">Gagal memuat data karyawan.</p>`;
             return;
         }
 
         container.innerHTML = "";
         let totalSeluruh = 0;
+        const fragment = document.createDocumentFragment();
 
         karyawanList.forEach(k => {
             const saldo = k.saldo_tabungan || 0;
             totalSeluruh += saldo;
 
             if (saldo > 0) {
-                const itemHTML = `
-                    <div class="item-riwayat item-clickable" onclick='lihatRincianKaryawan(${JSON.stringify(k)})'>
-                        <div class="item-left">
-                            <div class="icon-jenis icon-user"><i class="fa-solid fa-user"></i></div>
-                            <div class="item-info">
-                                <h4>${k.nama}</h4>
-                                <p>ID: ${k.id}</p>
-                            </div>
-                        </div>
-                        <div class="item-nominal nominal-netral">
-                            ${formatRupiah(saldo)}
+                const itemEl = document.createElement('div');
+                itemEl.className = 'item-riwayat item-clickable';
+                itemEl.onclick = () => lihatRincianKaryawan(k);
+                
+                // IKON PROFIL KARYAWAN FRESH
+                itemEl.innerHTML = `
+                    <div class="item-left">
+                        <div class="icon-jenis icon-user"><i class="fa-solid fa-circle-user"></i></div>
+                        <div class="item-info">
+                            <h4>${k.nama}</h4>
+                            <p>ID: ${k.id}</p>
                         </div>
                     </div>
+                    <div class="item-nominal nominal-netral">
+                        ${formatRupiah(saldo)}
+                    </div>
                 `;
-                container.innerHTML += itemHTML;
+                fragment.appendChild(itemEl);
             }
         });
 
-        if (container.innerHTML === "") {
-            container.innerHTML = `<p class="loading-text">Belum ada data tabungan karyawan.</p>`;
+        if (fragment.children.length === 0) {
+            container.innerHTML = `<p class="loading-text" style="text-align:center; padding:1rem; color:var(--text-muted);">Belum ada data tabungan karyawan.</p>`;
+        } else {
+            container.appendChild(fragment);
         }
 
         document.getElementById('totalSaldoAdmin').innerText = formatRupiah(totalSeluruh);
@@ -986,10 +1080,15 @@
     // ==========================================
     async function bukaLayarPin() {
         document.getElementById('admin-screen').classList.add('hidden');
-        document.getElementById('pin-screen').classList.remove('hidden');
+        const pinScreen = document.getElementById('pin-screen');
+        pinScreen.classList.remove('hidden');
+        pinScreen.classList.add('fade-in');
         
         const container = document.getElementById('listKaryawanPin');
-        container.innerHTML = `<p class="loading-text">Memuat data akses...</p>`;
+        container.innerHTML = `
+            <div class="skeleton skeleton-item"></div>
+            <div class="skeleton skeleton-item"></div>
+        `;
 
         const { data: karyawanList, error } = await db
             .from('karyawan')
@@ -997,30 +1096,34 @@
             .order('nama', { ascending: true });
 
         if (error || !karyawanList) {
-            container.innerHTML = `<p class="loading-text">Gagal memuat data akses.</p>`;
+            container.innerHTML = `<p class="loading-text" style="text-align:center; padding:1rem; color:var(--text-muted);">Gagal memuat data akses.</p>`;
             return;
         }
 
         container.innerHTML = "";
+        const fragment = document.createDocumentFragment();
         
         karyawanList.forEach(k => {
             const currentPin = k.password ? k.password : 'Belum diatur';
-            const itemHTML = `
-                <div class="item-riwayat">
-                    <div class="item-left">
-                        <div class="icon-jenis icon-key"><i class="fa-solid fa-lock"></i></div>
-                        <div class="item-info">
-                            <h4>${k.nama}</h4>
-                            <p>ID: ${k.id} &nbsp;|&nbsp; PIN: <strong style="color:var(--text-main);">${currentPin}</strong></p>
-                        </div>
-                    </div>
-                    <div>
-                        <button class="action-btn" style="background:var(--primary); color:var(--text-main);" onclick="bukaModalPin('${k.id}', '${k.nama}', '${k.password || ''}')">Edit</button>
+            const itemEl = document.createElement('div');
+            itemEl.className = 'item-riwayat';
+            
+            // IKON PERISAI PIN FRESH
+            itemEl.innerHTML = `
+                <div class="item-left">
+                    <div class="icon-jenis icon-key"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="item-info">
+                        <h4>${k.nama}</h4>
+                        <p>ID: ${k.id} &nbsp;|&nbsp; PIN: <strong style="color:var(--text-main);">${currentPin}</strong></p>
                     </div>
                 </div>
+                <div>
+                    <button class="action-btn btn-header-theme" style="color:var(--text-main);" onclick="bukaModalPin('${k.id}', '${k.nama}', '${k.password || ''}')">Edit</button>
+                </div>
             `;
-            container.innerHTML += itemHTML;
+            fragment.appendChild(itemEl);
         });
+        container.appendChild(fragment);
     }
 
     function tutupLayarPin() {
@@ -1031,7 +1134,6 @@
     function bukaModalPin(id, nama, pinSekarang) {
         targetKaryawanEditId = id;
         document.getElementById('modalNamaKaryawan').innerText = `ID: ${id} - ${nama}`;
-		// Kosongkan kolom setiap dibuka agar aman
 		document.getElementById('inputPinBaru').value = ""; 
         document.getElementById('inputPinVerifikasi').value = "";
         document.getElementById('modalPin').classList.remove('hidden');
@@ -1042,7 +1144,6 @@
         targetKaryawanEditId = null;
         document.getElementById('inputPinBaru').value = "";
 		document.getElementById('inputPinVerifikasi').value = "";
-		// Kembalikan ke mode password tersembunyi tiap modal ditutup
         document.getElementById('inputPinBaru').type = "password";
         document.getElementById('inputPinVerifikasi').type = "password";
         document.querySelectorAll('.toggle-password').forEach(icon => {
@@ -1110,36 +1211,33 @@
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('admin-screen').classList.add('hidden');
         document.getElementById('pin-screen').classList.add('hidden');
-        document.getElementById('dashboard-screen').classList.remove('hidden');
+        
+        const dashScreen = document.getElementById('dashboard-screen');
+        dashScreen.classList.remove('hidden');
+        dashScreen.classList.add('fade-in');
+
 		if (isAdminView) {
             document.getElementById('btnBackAdmin').classList.remove('hidden');
             document.getElementById('btnLogout').classList.add('hidden');
-            document.getElementById('btnGantiPinPribadi').classList.add('hidden'); // Sembunyikan ikon ganti PIN
+            document.getElementById('btnGantiPinPribadi').classList.add('hidden');
             document.getElementById('labelSapaan').innerText = "Rincian Tabungan:";
         } else {
             document.getElementById('btnBackAdmin').classList.add('hidden');
             document.getElementById('btnLogout').classList.remove('hidden');
-            document.getElementById('btnGantiPinPribadi').classList.remove('hidden'); // Tampilkan ikon ganti PIN
+            document.getElementById('btnGantiPinPribadi').classList.remove('hidden');
             document.getElementById('labelSapaan').innerText = "Halo,";
         }
         
         switchTab('tabungan');
-        
-        if (isAdminView) {
-            document.getElementById('btnBackAdmin').classList.remove('hidden');
-            document.getElementById('btnLogout').classList.add('hidden');
-            document.getElementById('labelSapaan').innerText = "Rincian Tabungan:";
-        } else {
-            document.getElementById('btnBackAdmin').classList.add('hidden');
-            document.getElementById('btnLogout').classList.remove('hidden');
-            document.getElementById('labelSapaan').innerText = "Halo,";
-        }
 
         document.getElementById('namaKaryawan').innerText = userObj.nama;
         document.getElementById('totalSaldo').innerText = formatRupiah(userObj.saldo_tabungan);
         
         const container = document.getElementById('listRiwayat');
-        container.innerHTML = `<p class="loading-text">Memuat riwayat...</p>`;
+        container.innerHTML = `
+            <div class="skeleton skeleton-item"></div>
+            <div class="skeleton skeleton-item"></div>
+        `;
 
         const { data: riwayat, error } = await db
             .from('riwayat_tabungan')
@@ -1150,31 +1248,35 @@
         container.innerHTML = "";
 
         if (error || !riwayat || riwayat.length === 0) {
-            container.innerHTML = `<p class="loading-text">Belum ada riwayat transaksi.</p>`;
+            container.innerHTML = `<p class="loading-text" style="text-align:center; padding:1rem; color:var(--text-muted);">Belum ada riwayat transaksi.</p>`;
         } else {
+            const fragment = document.createDocumentFragment();
             riwayat.forEach(row => {
                 const isMasuk = row.jenis === 'masuk';
                 const iconClass = isMasuk ? 'icon-masuk' : 'icon-keluar';
-                const iconSymbol = isMasuk ? '<i class="fa-solid fa-dollar-sign"></i>' : '<i class="fa-solid fa-money-bill-transfer"></i>';
+                
+                // IKON IKON MASUK & KELUAR FRESH (Celengan & Dompet)
+                const iconSymbol = isMasuk ? '<i class="fa-solid fa-wallet"></i>' : '<i class="fa-solid fa-wallet"></i>';
                 const nominalClass = isMasuk ? 'nominal-masuk' : 'nominal-keluar';
                 const nominalPrefix = isMasuk ? '+' : '-';
 
-                const itemHTML = `
-                    <div class="item-riwayat">
-                        <div class="item-left">
-                            <div class="icon-jenis ${iconClass}">${iconSymbol}</div>
-                            <div class="item-info">
-                                <h4>${row.keterangan || (isMasuk ? 'Setoran' : 'Penarikan')}</h4>
-                                <p>${formatTanggal(row.tgl)}</p>
-                            </div>
-                        </div>
-                        <div class="item-nominal ${nominalClass}">
-                            ${nominalPrefix} ${formatRupiah(row.nominal).replace('Rp', '').trim()}
+                const itemEl = document.createElement('div');
+                itemEl.className = 'item-riwayat';
+                itemEl.innerHTML = `
+                    <div class="item-left">
+                        <div class="icon-jenis ${iconClass}">${iconSymbol}</div>
+                        <div class="item-info">
+                            <h4>${row.keterangan || (isMasuk ? 'Setoran' : 'Penarikan')}</h4>
+                            <p>${formatTanggal(row.tgl)}</p>
                         </div>
                     </div>
+                    <div class="item-nominal ${nominalClass}">
+                        ${nominalPrefix} ${formatRupiah(row.nominal).replace('Rp', '').trim()}
+                    </div>
                 `;
-                container.innerHTML += itemHTML;
+                fragment.appendChild(itemEl);
             });
+            container.appendChild(fragment);
         }
         
         loadGajiView(userObj);
@@ -1213,7 +1315,10 @@
 
     async function loadGajiView(userObj) {
         const container = document.getElementById('listGaji');
-        container.innerHTML = `<p class="loading-text">Memuat slip gaji...</p>`;
+        container.innerHTML = `
+            <div class="skeleton skeleton-item"></div>
+            <div class="skeleton skeleton-item"></div>
+        `;
 
         const { data: riwayatGaji, error } = await db
             .from('riwayat_gaji')
@@ -1223,12 +1328,13 @@
         container.innerHTML = "";
 
         if (error || !riwayatGaji || riwayatGaji.length === 0) {
-            container.innerHTML = `<p class="loading-text">Belum ada riwayat slip gaji.</p>`;
+            container.innerHTML = `<p class="loading-text" style="text-align:center; padding:1rem; color:var(--text-muted);">Belum ada riwayat slip gaji.</p>`;
             return;
         }
 
         let adaGaji = false;
         globalDataSlipGaji = []; 
+        const fragment = document.createDocumentFragment();
 
         riwayatGaji.forEach(row => {
             let detailArray = row.detail_json;
@@ -1252,29 +1358,34 @@
                         detail: slipSaya
                     });
 
-                    const itemHTML = `
-                        <div class="item-riwayat item-clickable" onclick="bukaSlipModern(${indexStruk})">
-                            <div class="item-left">
-                                <div class="icon-jenis" style="background-color: #fef3c7; color: #d97706;">
-                                    <i class="fa-solid fa-envelope-open-text"></i>
-                                </div>
-                                <div class="item-info">
-                                    <h4>Divisi ${namaDivisi}</h4>
-                                    <p>${rentangTanggal}</p>
-                                </div>
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'item-riwayat item-clickable';
+                    itemEl.onclick = () => bukaSlipModern(indexStruk);
+                    
+                    // IKON CEK/SLIP GAJI FRESH
+                    itemEl.innerHTML = `
+                        <div class="item-left">
+                            <div class="icon-jenis" style="background-color: #FEF3C7; color: #D97706;">
+                                <i class="fa-solid fa-money-check-dollar"></i>
                             </div>
-                            <div class="item-nominal" style="color: var(--text-main); font-size: 0.8rem; opacity: 0.7;">
-                                Buka <i class="fa-solid fa-chevron-right" style="margin-left: 3px; font-size: 0.7rem;"></i>
+                            <div class="item-info">
+                                <h4>Divisi ${namaDivisi}</h4>
+                                <p>${rentangTanggal}</p>
                             </div>
                         </div>
+                        <div class="item-nominal" style="color: var(--text-main); font-size: 0.8rem; opacity: 0.8;">
+                            Buka <i class="fa-solid fa-chevron-right" style="margin-left: 3px; font-size: 0.7rem;"></i>
+                        </div>
                     `;
-                    container.innerHTML += itemHTML;
+                    fragment.appendChild(itemEl);
                 }
             }
         });
 
         if (!adaGaji) {
-            container.innerHTML = `<p class="loading-text">Tidak ada slip gaji untuk akun Anda.</p>`;
+            container.innerHTML = `<p class="loading-text" style="text-align:center; padding:1rem; color:var(--text-muted);">Tidak ada slip gaji untuk akun Anda.</p>`;
+        } else {
+            container.appendChild(fragment);
         }
     }
 
@@ -1303,7 +1414,7 @@
         return labels[k] || key.toUpperCase();
     }
 
-    // FUNGSI MEMBUKA MODAL SLIP GAJI DENGAN KALKULASI OTOMATIS AKURAT
+    // FUNGSI MEMBUKA MODAL SLIP GAJI
     async function bukaSlipModern(index) {
         const data = globalDataSlipGaji[index];
         if(!data) return;
@@ -1311,7 +1422,6 @@
         const d = data.detail;
         const empId = d.id || d.ID;
 
-        // Ambil data tarif langsung dari tabel 'karyawan' di Supabase
         let tarifReg = 0, tarifLem = 0, tarifLem2 = 0, tarifLem3 = 0;
         if (empId) {
             const { data: karData, error } = await db
@@ -1337,12 +1447,10 @@
             return foundKey ? d[foundKey] : '';
         };
 
-        // 1. Set Header
         const namaPegawai = getStr('nama') || 'Karyawan';
         document.getElementById('slipNama').innerText = `${namaPegawai} (${data.divisi})`;
         document.getElementById('slipPeriode').innerText = data.tanggal;
 
-        // 2. Susun Rincian (Reguler, Lembur 1, 2, 3 x Tarif) Sekaligus Hitung Total Pendapatan secara Matematis
         let htmlQty = '';
         let totalPendapatan = 0;
 
@@ -1353,7 +1461,7 @@
             htmlQty += `
                 <div class="data-row">
                     <span style="color: var(--text-muted);">Reguler (${formatNum(tReg)} x ${formatNum(tarifReg)})</span>
-                    <span style="font-weight: 600;">${formatNum(subReg)}</span>
+                    <span style="font-weight: 700;">${formatNum(subReg)}</span>
                 </div>
             `;
         }
@@ -1365,7 +1473,7 @@
             htmlQty += `
                 <div class="data-row">
                     <span style="color: var(--text-muted);">Lem 1 (${formatNum(tLem)} x ${formatNum(tarifLem)})</span>
-                    <span style="font-weight: 600;">${formatNum(subLem)}</span>
+                    <span style="font-weight: 700;">${formatNum(subLem)}</span>
                 </div>
             `;
         }
@@ -1377,7 +1485,7 @@
             htmlQty += `
                 <div class="data-row">
                     <span style="color: var(--text-muted);">Lem 2 (${formatNum(tLem2)} x ${formatNum(tarifLem2)})</span>
-                    <span style="font-weight: 600;">${formatNum(subLem2)}</span>
+                    <span style="font-weight: 700;">${formatNum(subLem2)}</span>
                 </div>
             `;
         }
@@ -1389,24 +1497,22 @@
             htmlQty += `
                 <div class="data-row">
                     <span style="color: var(--text-muted);">Lem 3 (${formatNum(tLem3)} x ${formatNum(tarifLem3)})</span>
-                    <span style="font-weight: 600;">${formatNum(subLem3)}</span>
+                    <span style="font-weight: 700;">${formatNum(subLem3)}</span>
                 </div>
             `;
         }
 
-        // Nominal Bonus
         const valBonus = getVal('bonus');
         if (valBonus > 0) {
             totalPendapatan += valBonus;
             htmlQty += `
                 <div class="data-row">
                     <span style="color: var(--text-muted);">Bonus Tambahan</span>
-                    <span style="font-weight: 600; color: var(--success);">+ ${formatNum(valBonus)}</span>
+                    <span style="font-weight: 700; color: var(--success);">+ ${formatNum(valBonus)}</span>
                 </div>
             `;
         }
 
-        // Catatan Bonus (Kecil & Italic)
         const cBonus = getStr('catatanBonus');
         if (cBonus && cBonus.trim() !== '') {
             htmlQty += `<div style="font-size: 0.75rem; font-style: italic; color: var(--text-muted); margin-top: -2px; margin-bottom: 4px;">* ${cBonus}</div>`;
@@ -1420,24 +1526,21 @@
             qtyContainer.classList.add('hidden');
         }
 
-        // Tampilkan Total Pendapatan Hasil Kalkulasi
         document.getElementById('slipTotalPendapatan').innerText = 'Rp ' + formatNum(totalPendapatan);
 
-        // 3. Susun Potongan
         let htmlPotongan = '';
         let totalPotongan = 0;
-		let sisaKasbonVal = 0; // Variabel baru untuk menampung sisa kasbon
+		let sisaKasbonVal = 0;
 
         for (const [rawKey, rawVal] of Object.entries(d)) {
             const key = rawKey.toLowerCase().trim();
             const valNum = parseNum(rawVal);
 			
-			// TAHAP BARU: Pisahkan SISAKASBON agar tidak dihitung sebagai potongan
             if (key === 'sisakasbon') {
                 if (valNum > 0) {
                     sisaKasbonVal = valNum;
                 }
-                continue; // Lompati proses ke bawah, lanjut ke baris data berikutnya
+                continue;
             }
 
             const isPotonganKey = key.includes('pot') || key.includes('kas') || key.includes('listrik') || key.includes('tabungan');
@@ -1447,14 +1550,13 @@
                 htmlPotongan += `
                     <div class="data-row">
                         <span style="color: var(--text-muted);">${label}</span>
-                        <span style="color: var(--danger); font-weight: 600;">- ${formatNum(valNum)}</span>
+                        <span style="color: var(--danger); font-weight: 700;">- ${formatNum(valNum)}</span>
                     </div>
                 `;
                 totalPotongan += valNum;
             }
         }
 
-        // Catatan Potongan Lain (Kecil & Italic)
         const cPot = getStr('catatanPotLain');
         if (cPot && cPot.trim() !== '') {
             htmlPotongan += `<div style="font-size: 0.75rem; font-style: italic; color: var(--text-muted); margin-top: -2px; margin-bottom: 4px;">* ${cPot}</div>`;
@@ -1466,11 +1568,9 @@
 
         document.getElementById('slipListPotongan').innerHTML = htmlPotongan;
 
-        // 4. Hitung Terima Bersih secara Matematis (Total Pendapatan - Total Potongan)
         const diterima = totalPendapatan - totalPotongan;
         document.getElementById('slipTerimaBersih').innerText = 'Rp ' + formatNum(diterima);
 
-		// 5. Tampilkan Catatan Sisa Kasbon di bawah (Tanpa tanda minus)
         const sisaKasbonContainer = document.getElementById('slipSisaKasbonContainer');
         if (sisaKasbonVal > 0) {
             document.getElementById('slipSisaKasbon').innerText = 'Rp ' + formatNum(sisaKasbonVal);
