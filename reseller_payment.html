@@ -407,9 +407,22 @@
                     </div>
 
                     <div id="btnGroupEdit" class="mt-4 mb-2 hidden">
+                        <div
+                            class="bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700 p-3 rounded-xl mb-2 text-left shadow-xs">
+                            <div
+                                class="flex items-center gap-2 font-bold text-xs text-amber-800 dark:text-amber-300 mb-1">
+                                <i data-feather="edit-3" class="w-4 h-4 text-amber-600"></i> MODE EDIT: Mengubah Nota
+                                Riwayat
+                            </div>
+                            <p class="text-[11px] text-amber-700 dark:text-amber-400 leading-relaxed">
+                                Anda sedang mengedit nota tersimpan. Ubah angka, atau klik tombol <b>Tarik Bahan / Tarik
+                                    Harian</b> di atas untuk menarik catatan susulan yang baru diinput. Setelah selesai,
+                                klik <b>Update Data</b>.
+                            </p>
+                        </div>
                         <button onclick="batalEdit()"
-                            class="w-full bg-red-600 text-white text-[11px] tracking-wide font-black py-2.5 rounded-lg shadow-[0_0_15px_rgba(220,38,38,0.5)] animate-pulse hover:bg-red-700 transition flex justify-center items-center gap-1.5 border border-red-500">
-                            <i data-feather="alert-triangle" class="w-4 h-4"></i> !! MODE EDIT, TEKAN UNTUK BATALKAN
+                            class="w-full bg-rose-600 hover:bg-rose-700 text-white text-[11px] tracking-wide font-black py-2.5 rounded-lg shadow-sm transition flex justify-center items-center gap-1.5 border border-rose-500">
+                            <i data-feather="x-circle" class="w-4 h-4"></i> Batalkan Mode Edit (Kembali ke Normal)
                         </button>
                     </div>
 
@@ -450,11 +463,17 @@
                         class="bg-emerald-600 text-white hover:bg-emerald-500 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"><i
                             data-feather="check-circle" class="w-3 h-3 mr-1"></i> Simpan ke Riwayat</button>
                     <button id="btnEditRiwayat" onclick=""
-                        class="hidden bg-amber-500 text-white hover:bg-amber-400 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"><i
-                            data-feather="edit" class="w-3 h-3 mr-1"></i> Edit Data</button>
+                        class="hidden bg-amber-500 text-white hover:bg-amber-400 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"
+                        title="Edit nota ini atau tarik catatan harian susulan"><i data-feather="edit"
+                            class="w-3 h-3 mr-1"></i> Edit Data</button>
+                    <button id="btnVoidRiwayat" onclick=""
+                        class="hidden bg-rose-600 text-white hover:bg-rose-500 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"
+                        title="Batalkan nota ini dan kembalikan semua catatan harian ke draft belum dibayar"><i
+                            data-feather="rotate-ccw" class="w-3 h-3 mr-1"></i> Void / Batal Nota</button>
                     <button id="btnHapusRiwayat" onclick=""
-                        class="hidden bg-red-500 text-white hover:bg-red-400 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"><i
-                            data-feather="trash-2" class="w-3 h-3 mr-1"></i> Hapus Riwayat</button>
+                        class="hidden bg-slate-600 text-white hover:bg-slate-500 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"
+                        title="Hapus riwayat permanen dengan PIN"><i data-feather="trash-2" class="w-3 h-3 mr-1"></i>
+                        Hapus Riwayat</button>
                     <button onclick="simpanPNG()"
                         class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i
                             data-feather="image" class="w-3 h-3 mr-1"></i> Simpan PNG</button>
@@ -760,6 +779,60 @@
                         class="bg-orange-500 hover:bg-orange-400 text-white text-xs font-bold px-4 py-2 rounded-lg flex-1">Ya,
                         Kosongkan</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL VOID / BATAL TRANSAKSI -->
+    <div id="modalVoid" class="fixed inset-0 z-[120] flex items-center justify-center hidden pointer-events-none p-4">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm pointer-events-auto transition-opacity"
+            onclick="closeFormModal('modalVoid')"></div>
+        <div
+            class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl pointer-events-auto p-6 text-center relative z-10 border border-gray-100 dark:border-slate-700">
+            <div
+                class="w-14 h-14 rounded-2xl bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-3 shadow-inner">
+                <i data-feather="rotate-ccw" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-base font-black text-gray-800 dark:text-slate-100 mb-1">Void / Batalkan Nota Ini?</h3>
+
+            <div
+                class="bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50 rounded-xl p-3 my-3 text-left space-y-1">
+                <div class="flex justify-between text-xs">
+                    <span class="text-gray-500 dark:text-slate-400">Agen / Reseller:</span>
+                    <span id="voidNamaReseller" class="font-bold text-gray-800 dark:text-slate-200">-</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                    <span class="text-gray-500 dark:text-slate-400">Tanggal Nota:</span>
+                    <span id="voidTglTransaksi" class="font-semibold text-gray-700 dark:text-slate-300">-</span>
+                </div>
+                <div class="flex justify-between text-xs border-t border-rose-200/60 dark:border-rose-900/40 pt-1">
+                    <span class="text-gray-600 dark:text-slate-400 font-bold">Total Net:</span>
+                    <span id="voidNominalNet" class="font-black text-rose-600 dark:text-rose-400">Rp 0</span>
+                </div>
+            </div>
+
+            <div
+                class="text-[11px] text-gray-500 dark:text-slate-400 mb-5 text-left bg-gray-50 dark:bg-slate-700/40 p-2.5 rounded-lg border border-gray-200 dark:border-slate-600 space-y-1">
+                <p class="font-bold text-gray-700 dark:text-slate-300 flex items-center gap-1">
+                    <i data-feather="info" class="w-3.5 h-3.5 text-blue-500 shrink-0"></i> Apa yang terjadi saat
+                    di-VOID?
+                </p>
+                <ul class="list-disc list-inside space-y-0.5 text-gray-600 dark:text-slate-300 pl-1">
+                    <li>Nota ini akan <b>dibatalkan</b> & dihapus dari riwayat.</li>
+                    <li>Semua catatan harian (bahan & setoran) serta kasbon di nota ini otomatis <b>dikembalikan ke
+                            status BELUM DIBAYAR (Draft)</b>.</li>
+                    <li>Anda bisa melengkapi bahan/barang yang kelupaan di Catatan Harian, lalu menarik kembali semua
+                        data agen ini ke nota baru.</li>
+                </ul>
+            </div>
+
+            <div class="flex gap-2.5 justify-center">
+                <button type="button" onclick="closeFormModal('modalVoid')"
+                    class="bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-300 text-xs font-bold px-4 py-2.5 rounded-xl flex-1 transition">Batal</button>
+                <button type="button" id="btnEksekusiVoid" onclick="eksekusiVoidTransaksi()"
+                    class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex-1 transition shadow-md shadow-rose-600/30 flex items-center justify-center gap-1.5">
+                    <i data-feather="rotate-ccw" class="w-3.5 h-3.5"></i> Ya, Void Nota
+                </button>
             </div>
         </div>
     </div>
@@ -1351,6 +1424,7 @@
         let targetHapusType = '';
         let targetHapusId = null;
         let draftToDelete = null;
+        let targetVoidTrxId = null;
 
         async function cekNotifikasiPending() {
             try {
@@ -2476,21 +2550,119 @@
             feather.replace();
 
             try {
+                // Rollback status catatan harian dan kasbon harian terkait agar tidak terkunci
+                await supabaseClient.from('buku_harian').update({ is_paid: false, transaksi_id: null }).eq('transaksi_id', targetHapusId);
+                try {
+                    await supabaseClient.from('kasbon_harian').update({ is_paid: false, transaksi_id: null }).eq('transaksi_id', targetHapusId);
+                } catch (e) { }
+
                 await supabaseClient.from('transaksi_detail').delete().eq('transaksi_id', targetHapusId);
                 const { error } = await supabaseClient.from('transaksi').delete().eq('id', targetHapusId);
                 if (error) throw error;
 
-                showNotification("Riwayat transaksi berhasil dihapus!", "success");
+                showNotification("Riwayat transaksi berhasil dihapus & catatan harian dikembalikan ke status draft!", "success");
 
                 closeFormModal('modalPin');
                 closeModal('modalPratinjau');
                 fetchRiwayatData();
+                cekNotifikasiPending();
             } catch (err) {
                 showNotification("Gagal menghapus riwayat: " + err.message, "error");
             } finally {
                 targetHapusId = null;
                 targetHapusType = '';
                 btnHapus.innerText = textAwal;
+            }
+        }
+
+        function konfirmasiVoidTransaksi(trxId) {
+            targetVoidTrxId = trxId;
+            const trx = riwayatTransactions.find(t => String(t.id) === String(trxId));
+            const res = trx ? masterData.resellers.find(r => String(r.id) === String(trx.reseller_id)) : null;
+            const namaReseller = res ? res.nama : 'Reseller';
+            const tglTrx = trx ? formatHariTanggalID(trx.tanggal_transaksi) : '';
+
+            const elNama = document.getElementById('voidNamaReseller');
+            const elTgl = document.getElementById('voidTglTransaksi');
+            const elNet = document.getElementById('voidNominalNet');
+            if (elNama) elNama.innerText = namaReseller;
+            if (elTgl) elTgl.innerText = tglTrx;
+            if (elNet) elNet.innerText = trx ? formatRupiah(trx.net_pembayaran) : 'Rp 0';
+
+            openFormModal('modalVoid');
+        }
+
+        async function eksekusiVoidTransaksi() {
+            if (!targetVoidTrxId) return;
+
+            const btnVoid = document.getElementById('btnEksekusiVoid');
+            const textAwal = btnVoid ? btnVoid.innerHTML : '';
+            if (btnVoid) {
+                btnVoid.innerHTML = `<i data-feather="loader" class="w-4 h-4 animate-spin mr-1"></i> Memproses Void...`;
+                btnVoid.disabled = true;
+                feather.replace();
+            }
+
+            const trxId = targetVoidTrxId;
+            const trx = riwayatTransactions.find(t => String(t.id) === String(trxId));
+            const resId = trx ? trx.reseller_id : null;
+
+            try {
+                // 1. Rollback buku_harian: set is_paid = false, transaksi_id = null
+                const { error: errBuku } = await supabaseClient.from('buku_harian')
+                    .update({ is_paid: false, transaksi_id: null })
+                    .eq('transaksi_id', trxId);
+                if (errBuku) console.warn("Rollback buku_harian:", errBuku);
+
+                // 2. Rollback kasbon_harian
+                try {
+                    await supabaseClient.from('kasbon_harian')
+                        .update({ is_paid: false, transaksi_id: null })
+                        .eq('transaksi_id', trxId);
+                } catch (e) {
+                    console.warn("Rollback kasbon_harian:", e);
+                }
+
+                // 3. Hapus transaksi_detail
+                await supabaseClient.from('transaksi_detail').delete().eq('transaksi_id', trxId);
+
+                // 4. Hapus transaksi utama
+                const { error: errTrx } = await supabaseClient.from('transaksi').delete().eq('id', trxId);
+                if (errTrx) throw errTrx;
+
+                showNotification("Nota berhasil di-VOID! Semua catatan harian dikembalikan ke status belum dibayar (Draft).", "success");
+
+                closeFormModal('modalVoid');
+                closeModal('modalPratinjau');
+                closeModal('modalRiwayat');
+
+                // Otomatis arahkan form utama ke agen ini agar siap input susulan / tarik ulang
+                if (resId) {
+                    const select = document.getElementById('resellerSelect');
+                    if (select) select.value = resId;
+                    selectedResellerId = resId;
+                    currentDraftIds = [];
+                    currentKasbonDraftIds = [];
+                    if (trx && trx.tanggal_transaksi) {
+                        const elTgl = document.getElementById('tglTransaksi');
+                        if (elTgl) elTgl.value = trx.tanggal_transaksi;
+                        updateTglDisplay();
+                    }
+                    kalkulasiSemua();
+                }
+
+                await fetchRiwayatData();
+                cekNotifikasiPending();
+
+            } catch (err) {
+                showNotification("Gagal melakukan Void nota: " + err.message, "error");
+            } finally {
+                targetVoidTrxId = null;
+                if (btnVoid) {
+                    btnVoid.innerHTML = textAwal;
+                    btnVoid.disabled = false;
+                    feather.replace();
+                }
             }
         }
 
@@ -2610,28 +2782,50 @@
                 let placed = false;
 
                 const existingRows = container.querySelectorAll('.row-item');
+
+                // 1. Cek apakah barang ini sudah ada di nota (misal saat tarik susulan / edit nota)
                 for (let i = 0; i < existingRows.length; i++) {
                     const row = existingRows[i];
                     const selectEl = row.querySelector('.item-select');
                     const qtyEl = row.querySelector('.qty-input');
 
-                    if (!selectEl.value && (!qtyEl.value || qtyEl.value === "0")) {
-                        selectEl.value = bId;
-                        qtyEl.value = qtyVal;
-                        selectEl.dispatchEvent(new Event('change'));
+                    if (selectEl.value === bId) {
+                        const oldQty = parseFloat(qtyEl.value) || 0;
+                        qtyEl.value = oldQty + qtyVal;
+                        qtyEl.dispatchEvent(new Event('input'));
                         placed = true;
                         break;
                     }
                 }
 
+                // 2. Jika belum ada barang yang sama, cari baris yang masih kosong
+                if (!placed) {
+                    for (let i = 0; i < existingRows.length; i++) {
+                        const row = existingRows[i];
+                        const selectEl = row.querySelector('.item-select');
+                        const qtyEl = row.querySelector('.qty-input');
+
+                        if (!selectEl.value && (!qtyEl.value || qtyEl.value === "0")) {
+                            selectEl.value = bId;
+                            qtyEl.value = qtyVal;
+                            selectEl.dispatchEvent(new Event('change'));
+                            placed = true;
+                            break;
+                        }
+                    }
+                }
+
+                // 3. Jika tidak ada baris kosong, tambahkan baris baru
                 if (!placed) {
                     addRow(currentTargetTipe === 'bahan' ? 'bahanBaku' : 'barangJadi', bId, qtyVal);
                 }
             });
 
             currentDraftIds = [...new Set([...currentDraftIds, ...pulledIds])];
-            showNotification(`Berhasil menarik ${pulledIds.length} rincian data ke nota!`, "success");
+            const msgInfo = modeEditTrxId ? `Berhasil menarik ${pulledIds.length} data susulan ke nota yang sedang diedit!` : `Berhasil menarik ${pulledIds.length} rincian data ke nota!`;
+            showNotification(msgInfo, "success");
             closeFormModal('modalTarikData');
+            kalkulasiSemua();
         }
 
         async function tarikDataKasbonHarian() {
@@ -3545,6 +3739,12 @@
             document.getElementById('btnEditRiwayat').classList.remove('hidden');
             document.getElementById('btnEditRiwayat').setAttribute('onclick', `siapkanEditTransaksi('${trxId}')`);
 
+            const btnVoid = document.getElementById('btnVoidRiwayat');
+            if (btnVoid) {
+                btnVoid.classList.remove('hidden');
+                btnVoid.setAttribute('onclick', `konfirmasiVoidTransaksi('${trxId}')`);
+            }
+
             document.getElementById('btnHapusRiwayat').classList.remove('hidden');
             document.getElementById('btnHapusRiwayat').setAttribute('onclick', `hapusRiwayatTransaksi('${trxId}')`);
 
@@ -3614,6 +3814,17 @@
             document.getElementById('listKasbonManual').innerHTML = '';
 
             try {
+                // Ambil ID catatan harian yang saat ini sudah tertaut pada transaksi ini
+                try {
+                    const { data: linkedBuku } = await supabaseClient.from('buku_harian').select('id').eq('transaksi_id', trx.id);
+                    currentDraftIds = (linkedBuku && linkedBuku.length > 0) ? linkedBuku.map(b => String(b.id)) : [];
+
+                    const { data: linkedKasbon } = await supabaseClient.from('kasbon_harian').select('id').eq('transaksi_id', trx.id);
+                    currentKasbonDraftIds = (linkedKasbon && linkedKasbon.length > 0) ? linkedKasbon.map(k => String(k.id)) : [];
+                } catch (e) {
+                    console.warn("Load linked drafts:", e);
+                }
+
                 const { data: details } = await supabaseClient.from('transaksi_detail').select('*').eq('transaksi_id', trx.id);
                 details.forEach(d => {
                     const isBahan = masterData.bahanBaku.some(b => String(b.id) === String(d.barang_id));
@@ -3637,12 +3848,16 @@
                 kalkulasiSemua();
                 document.getElementById('btnSubmit').innerHTML = `<i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Update Data`;
                 document.getElementById('btnSubmit').classList.replace('bg-blue-600', 'bg-amber-500');
-                document.getElementById('btnGroupEdit').classList.remove('hidden'); feather.replace();
+                document.getElementById('btnGroupEdit').classList.remove('hidden');
+                showNotification("Mode Edit aktif. Anda bisa menambah item manual atau klik 'Tarik Bahan' / 'Tarik Harian' untuk menarik catatan susulan.", "info");
+                feather.replace();
             } catch (err) { showNotification("Gagal edit.", "error"); }
         }
 
         function batalEdit() {
             modeEditTrxId = null;
+            currentDraftIds = [];
+            currentKasbonDraftIds = [];
             document.getElementById('btnSubmit').innerHTML = `<i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan`;
             document.getElementById('btnSubmit').classList.replace('bg-amber-500', 'bg-blue-600');
             document.getElementById('btnGroupEdit').classList.add('hidden');
@@ -3661,8 +3876,21 @@
             document.getElementById('notaNama').innerText = reseller ? reseller.nama : '-';
             document.getElementById('notaTgl').innerText = formatHariTanggalID(document.getElementById('tglTransaksi').value);
             document.getElementById('btnEditRiwayat').classList.add('hidden');
+            const btnVoid = document.getElementById('btnVoidRiwayat');
+            if (btnVoid) btnVoid.classList.add('hidden');
             document.getElementById('btnHapusRiwayat').classList.add('hidden');
-            document.getElementById('btnSimpanPratinjau').style.display = 'flex';
+
+            const btnSimpanPrat = document.getElementById('btnSimpanPratinjau');
+            btnSimpanPrat.style.display = 'flex';
+            if (modeEditTrxId) {
+                btnSimpanPrat.innerHTML = `<i data-feather="save" class="w-3 h-3 mr-1"></i> Update ke Riwayat`;
+                btnSimpanPrat.classList.replace('bg-emerald-600', 'bg-amber-600');
+                btnSimpanPrat.classList.replace('hover:bg-emerald-500', 'hover:bg-amber-500');
+            } else {
+                btnSimpanPrat.innerHTML = `<i data-feather="check-circle" class="w-3 h-3 mr-1"></i> Simpan ke Riwayat`;
+                btnSimpanPrat.classList.replace('bg-amber-600', 'bg-emerald-600');
+                btnSimpanPrat.classList.replace('hover:bg-amber-500', 'hover:bg-emerald-500');
+            }
 
             let htmlSetoran = ''; let htmlBahan = '';
             document.querySelectorAll('#containerBarangJadi .row-item').forEach(row => {
@@ -3875,20 +4103,29 @@
                 }
 
                 if (currentKasbonDraftIds.length > 0) {
-                    await supabaseClient.from('kasbon_harian').update({ is_paid: true }).in('id', currentKasbonDraftIds);
+                    try {
+                        await supabaseClient.from('kasbon_harian').update({ is_paid: true, transaksi_id: trxId }).in('id', currentKasbonDraftIds);
+                    } catch (e) {
+                        await supabaseClient.from('kasbon_harian').update({ is_paid: true }).in('id', currentKasbonDraftIds);
+                    }
                 }
 
-                showNotification("Transaksi Berhasil Disimpan!", "success");
+                const msgSuccess = modeEditTrxId ? "Perubahan transaksi & data susulan berhasil disimpan!" : "Transaksi Berhasil Disimpan!";
+                showNotification(msgSuccess, "success");
 
                 const btnSubmit = document.getElementById('btnSubmit');
                 btnSubmit.innerHTML = `<i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan`;
                 btnSubmit.classList.replace('bg-amber-500', 'bg-blue-600');
 
                 modeEditTrxId = null;
+                currentDraftIds = [];
+                currentKasbonDraftIds = [];
                 document.getElementById('btnGroupEdit').classList.add('hidden');
 
                 jalankanReset();
                 closeModal('modalPratinjau');
+                await fetchRiwayatData();
+                cekNotifikasiPending();
                 feather.replace();
             } catch (error) {
                 showNotification("Gagal menyimpan: " + error.message, "error");
