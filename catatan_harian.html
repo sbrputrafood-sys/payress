@@ -1,67 +1,130 @@
 <!DOCTYPE html>
 <html lang="id" class="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Catatan Harian - SBR Putra Food</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class', }
     </script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Feather Icons -->
     <script src="https://unpkg.com/feather-icons"></script>
-    
+
     <style>
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        input, select { transition: all 0.2s ease-in-out; }
-        input:focus, select:focus { outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        .custom-scroll::-webkit-scrollbar { width: 3px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
-        .dark .custom-scroll::-webkit-scrollbar-thumb { background-color: #475569; }
-		@keyframes borderGlowPulse {
-            0%, 100% { border-color: #fbd38d; box-shadow: 0 0 2px rgba(246, 173, 85, 0.3); }
-            50% { border-color: #f6ad55; box-shadow: 0 0 10px rgba(246, 173, 85, 0.7); }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
-        .animate-border-glow { animation: borderGlowPulse 1s infinite ease-in-out; }
+
+        input,
+        select {
+            transition: all 0.2s ease-in-out;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dark .custom-scroll::-webkit-scrollbar-thumb {
+            background-color: #475569;
+        }
+
+        @keyframes borderGlowPulse {
+
+            0%,
+            100% {
+                border-color: #fbd38d;
+                box-shadow: 0 0 2px rgba(246, 173, 85, 0.3);
+            }
+
+            50% {
+                border-color: #f6ad55;
+                box-shadow: 0 0 10px rgba(246, 173, 85, 0.7);
+            }
+        }
+
+        .animate-border-glow {
+            animation: borderGlowPulse 1s infinite ease-in-out;
+        }
     </style>
 </head>
-<body class="min-h-screen bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
+
+<body
+    class="min-h-screen bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
 
     <!-- Toast Container -->
-    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 z-[130] flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 z-[130] flex flex-col gap-2 pointer-events-none">
+    </div>
 
     <!-- ==================== AREA LOGIN ==================== -->
-    <div id="loginArea" class="min-h-screen flex flex-col justify-center items-center px-4 bg-slate-100 dark:bg-slate-900 absolute inset-0 z-50">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-slate-700">
+    <div id="loginArea"
+        class="min-h-screen flex flex-col justify-center items-center px-4 bg-slate-100 dark:bg-slate-900 absolute inset-0 z-50">
+        <div
+            class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-slate-700">
             <div class="flex justify-center mb-6">
                 <!-- Wrapper untuk membuat bingkai lingkaran yang rapi -->
                 <div class="bg-white p-1 rounded-full shadow-md border border-gray-200 dark:border-slate-600">
-                    <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/677036e078cc7fa6c94788da8482dc53d883e2df/sbr_logo.png" alt="SBR Logo" class="w-25 h-25 object-cover rounded-full border border-gray-200 dark:border-slate-600 bg-white">
+                    <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/677036e078cc7fa6c94788da8482dc53d883e2df/sbr_logo.png"
+                        alt="SBR Logo"
+                        class="w-25 h-25 object-cover rounded-full border border-gray-200 dark:border-slate-600 bg-white">
                 </div>
             </div>
             <h2 class="text-lg font-black text-center text-gray-800 dark:text-slate-100 mb-1">Masuk Sistem</h2>
-            <p class="text-[11px] text-center text-gray-500 dark:text-slate-400 mb-6 font-medium">Catatan Harian Reseller SBR Putra Food</p>
-            
+            <p class="text-[11px] text-center text-gray-500 dark:text-slate-400 mb-6 font-medium">Catatan Harian
+                Reseller SBR Putra Food</p>
+
             <div class="space-y-4">
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Username</label>
-                    <input type="text" id="loginUsername" placeholder="Contoh: fatah / namaanda" class="w-full text-sm p-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                    <label
+                        class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Username</label>
+                    <input type="text" id="loginUsername" placeholder="Contoh: fatah / namaanda"
+                        class="w-full text-sm p-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">PIN (6 Angka)</label>
-                    <input type="password" id="loginPin" placeholder="••••••" inputmode="numeric" maxlength="6" class="w-full text-center tracking-[0.5em] text-lg font-bold p-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                    <label
+                        class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">PIN
+                        (6 Angka)</label>
+                    <input type="password" id="loginPin" placeholder="••••••" inputmode="numeric" maxlength="6"
+                        class="w-full text-center tracking-[0.5em] text-lg font-bold p-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
                 </div>
-                <button onclick="prosesLogin()" id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-3.5 rounded-xl shadow-md shadow-blue-500/20 transition-all flex justify-center items-center gap-2 mt-2">
+                <button onclick="prosesLogin()" id="btnLogin"
+                    class="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-3.5 rounded-xl shadow-md shadow-blue-500/20 transition-all flex justify-center items-center gap-2 mt-2">
                     <i data-feather="log-in" class="w-4 h-4"></i> Akses Catatan
                 </button>
+                <div
+                    class="mt-4 pt-3 border-t border-gray-100 dark:border-slate-700/60 flex justify-between items-center text-[10px] text-gray-400 dark:text-slate-500">
+                    <span class="font-medium">Versi 7.2 • SBR System</span>
+                    <button type="button" onclick="cekPembaruanAplikasiOtomatis(true)"
+                        class="hover:text-blue-500 flex items-center gap-1 font-semibold transition active:scale-95">
+                        <i data-feather="refresh-cw" class="w-3 h-3"></i> Cek Update
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -69,56 +132,90 @@
     <!-- ==================== AREA DASHBOARD ==================== -->
     <div id="dashboardArea" class="hidden pb-16">
         <!-- Mobile Header -->
-        <nav class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-30 px-4 py-3 shadow-sm">
+        <nav
+            class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-30 px-4 py-3 shadow-sm">
             <div class="flex justify-between items-center max-w-md mx-auto">
                 <div class="flex items-center space-x-2.5">
-                    <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/677036e078cc7fa6c94788da8482dc53d883e2df/sbr_logo.png" alt="SBR Logo" class="w-8 h-8 object-cover rounded-full border border-gray-200 dark:border-slate-600 bg-white">
+                    <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/677036e078cc7fa6c94788da8482dc53d883e2df/sbr_logo.png"
+                        alt="SBR Logo"
+                        class="w-8 h-8 object-cover rounded-full border border-gray-200 dark:border-slate-600 bg-white">
                     <div>
-                        <h1 class="font-bold text-xs leading-tight text-gray-900 dark:text-slate-100">Catatan Harian</h1>
-                        <p id="labelRoleDisplay" class="text-[9px] text-blue-500 font-bold bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded inline-block mt-0.5">SBR Putra Food</p>
+                        <h1 class="font-bold text-xs leading-tight text-gray-900 dark:text-slate-100">Catatan Harian
+                        </h1>
+                        <p id="labelRoleDisplay"
+                            class="text-[9px] text-blue-500 font-bold bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded inline-block mt-0.5">
+                            SBR Putra Food</p>
                     </div>
                 </div>
-                
+
                 <div class="flex items-center space-x-1.5">
-                    <div class="flex items-center space-x-1 bg-yellow-50 dark:bg-yellow-900/30 px-2 py-1 rounded-full border border-yellow-100 dark:border-yellow-800/50" id="status-connection">
-                        <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span></span>
-                        <span id="text-connection" class="text-[9px] font-semibold text-yellow-700 dark:text-yellow-500">Loading</span>
+                    <div class="flex items-center space-x-1 bg-yellow-50 dark:bg-yellow-900/30 px-2 py-1 rounded-full border border-yellow-100 dark:border-yellow-800/50 cursor-pointer active:scale-95 transition"
+                        id="status-connection" onclick="cekPembaruanAplikasiOtomatis(true)"
+                        title="Ketuk untuk periksa pembaruan">
+                        <span class="relative flex h-2 w-2"><span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span
+                                class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span></span>
+                        <span id="text-connection"
+                            class="text-[9px] font-semibold text-yellow-700 dark:text-yellow-500">Loading</span>
                     </div>
-                    <button id="btnAdminMasterMenu" onclick="openFormModal('modalMasterAdmin')" class="hidden p-2 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 hover:bg-purple-100 transition shadow-sm border border-purple-100 dark:border-purple-800/50"><i data-feather="settings" class="w-4 h-4"></i></button>
-                    <button id="btnAdminResetMenu" onclick="bukaModalResetAdmin()" class="hidden p-2 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 hover:bg-orange-100 transition"><i data-feather="user-check" class="w-4 h-4"></i></button>
-                    <button onclick="toggleTheme()" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 transition"><i data-feather="moon" id="iconMoon" class="w-4 h-4"></i><i data-feather="sun" id="iconSun" class="w-4 h-4 hidden"></i></button>
-                    <button onclick="openFormModal('modalGantiPin')" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 transition"><i data-feather="key" class="w-4 h-4"></i></button>
-                    <button onclick="prosesLogout()" class="p-2 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-500 hover:bg-red-100 transition"><i data-feather="power" class="w-4 h-4"></i></button>
+                    <button onclick="cekPembaruanAplikasiOtomatis(true)" title="Periksa Pembaruan Sistem"
+                        class="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/40 transition shadow-sm border border-blue-100 dark:border-blue-800/50 active:scale-95"><i
+                            data-feather="refresh-cw" class="w-4 h-4"></i></button>
+                    <button id="btnAdminMasterMenu" onclick="openFormModal('modalMasterAdmin')"
+                        class="hidden p-2 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 hover:bg-purple-100 transition shadow-sm border border-purple-100 dark:border-purple-800/50"><i
+                            data-feather="settings" class="w-4 h-4"></i></button>
+                    <button id="btnAdminResetMenu" onclick="bukaModalResetAdmin()"
+                        class="hidden p-2 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 hover:bg-orange-100 transition"><i
+                            data-feather="user-check" class="w-4 h-4"></i></button>
+                    <button onclick="toggleTheme()"
+                        class="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 transition"><i
+                            data-feather="moon" id="iconMoon" class="w-4 h-4"></i><i data-feather="sun" id="iconSun"
+                            class="w-4 h-4 hidden"></i></button>
+                    <button onclick="openFormModal('modalGantiPin')"
+                        class="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 transition"><i
+                            data-feather="key" class="w-4 h-4"></i></button>
+                    <button onclick="prosesLogout()"
+                        class="p-2 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-500 hover:bg-red-100 transition"><i
+                            data-feather="power" class="w-4 h-4"></i></button>
                 </div>
             </div>
         </nav>
 
         <!-- Main Content -->
         <main class="max-w-md mx-auto px-3 pt-4 space-y-4">
-            
+
             <!-- TAB NAVIGASI: BARANG VS KASBON -->
             <div class="flex p-1 bg-gray-200/80 dark:bg-slate-800 rounded-xl">
-                <button onclick="switchTab('barang')" id="tabBarang" class="flex-1 text-xs font-black py-2.5 rounded-lg bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400 transition flex items-center justify-center gap-1.5 border border-transparent dark:border-slate-600">
+                <button onclick="switchTab('barang')" id="tabBarang"
+                    class="flex-1 text-xs font-black py-2.5 rounded-lg bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400 transition flex items-center justify-center gap-1.5 border border-transparent dark:border-slate-600">
                     <i data-feather="package" class="w-3.5 h-3.5"></i> Barang
                 </button>
-                <button onclick="switchTab('kasbon')" id="tabKasbon" class="flex-1 text-xs font-black py-2.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 transition flex items-center justify-center gap-1.5 border border-transparent">
+                <button onclick="switchTab('kasbon')" id="tabKasbon"
+                    class="flex-1 text-xs font-black py-2.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 transition flex items-center justify-center gap-1.5 border border-transparent">
                     <i data-feather="dollar-sign" class="w-3.5 h-3.5"></i> Kasbon
                 </button>
             </div>
 
             <!-- ================= AREA BARANG ================= -->
             <div id="areaBarang" class="space-y-4 transition-all duration-300">
-                <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 relative overflow-hidden">
-                    <h2 class="text-xs font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center"><i data-feather="edit-3" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Input Catatan Harian</h2>
-                    
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 relative overflow-hidden">
+                    <h2 class="text-xs font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center"><i
+                            data-feather="edit-3" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Input Catatan Harian
+                    </h2>
+
                     <div class="grid grid-cols-2 gap-2.5 mb-3">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Pilih Tanggal</label>
-                            <input type="date" id="inputTglHarian" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Pilih
+                                Tanggal</label>
+                            <input type="date" id="inputTglHarian"
+                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Agen / Reseller</label>
-                            <select id="inputResellerHarian" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Agen /
+                                Reseller</label>
+                            <select id="inputResellerHarian"
+                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
                                 <option value="">Pilih...</option>
                             </select>
                         </div>
@@ -126,12 +223,16 @@
 
                     <div class="grid grid-cols-2 gap-2.5 mb-3">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Input By</label>
-                            <input type="text" id="inputByPegawai" class="w-full text-xs p-2 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-semibold transition-all">
+                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Input
+                                By</label>
+                            <input type="text" id="inputByPegawai"
+                                class="w-full text-xs p-2 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-semibold transition-all">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Fokus Tipe Input</label>
-                            <select id="inputTipeHarian" onchange="updateOpsiHarian()" class="w-full text-[11px] p-2 rounded-xl border border-blue-200 dark:border-slate-600 bg-blue-50 dark:bg-slate-900 text-blue-700 dark:text-blue-400 font-semibold outline-none focus:border-blue-500">
+                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Fokus Tipe
+                                Input</label>
+                            <select id="inputTipeHarian" onchange="updateOpsiHarian()"
+                                class="w-full text-[11px] p-2 rounded-xl border border-blue-200 dark:border-slate-600 bg-blue-50 dark:bg-slate-900 text-blue-700 dark:text-blue-400 font-semibold outline-none focus:border-blue-500">
                                 <option value="semua">Tampilkan Semua</option>
                                 <option value="jadi">📦 Barang Jadi</option>
                                 <option value="bahan">🛍️ Bahan Baku</option>
@@ -139,89 +240,126 @@
                         </div>
                     </div>
 
-                    <div class="space-y-2 mb-3 max-h-[50vh] overflow-y-auto custom-scroll pr-1" id="containerHarianRows"></div>
+                    <div class="space-y-2 mb-3 max-h-[50vh] overflow-y-auto custom-scroll pr-1"
+                        id="containerHarianRows"></div>
 
                     <div class="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-slate-700">
-						<!-- Tombol Baris Dirampingkan & Dibuat Sejajar (Flex Row) -->
-						<button onclick="addRowHarian()" class="bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 text-blue-600 dark:text-blue-300 text-xs font-bold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1 border border-blue-200 dark:border-slate-600 shrink-0">
-							<i data-feather="plus" class="w-3.5 h-3.5"></i> <span>Baris</span>
-						</button>
-						
-						<!-- Tombol Simpan Disesuaikan Tinggi Padding-nya -->
-						<button id="btnSimpanHarian" onclick="simpanCatatanHarian()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition flex items-center justify-center">
-							<i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Catatan
-						</button>
-					</div>
+                        <!-- Tombol Baris Dirampingkan & Dibuat Sejajar (Flex Row) -->
+                        <button onclick="addRowHarian()"
+                            class="bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 text-blue-600 dark:text-blue-300 text-xs font-bold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1 border border-blue-200 dark:border-slate-600 shrink-0">
+                            <i data-feather="plus" class="w-3.5 h-3.5"></i> <span>Baris</span>
+                        </button>
+
+                        <!-- Tombol Simpan Disesuaikan Tinggi Padding-nya -->
+                        <button id="btnSimpanHarian" onclick="simpanCatatanHarian()"
+                            class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition flex items-center justify-center">
+                            <i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Catatan
+                        </button>
+                    </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700">
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="archive" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Daftar Catatan (Belum Lunas)</h3>
+                        <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i
+                                data-feather="archive" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Daftar Catatan
+                            (Belum Lunas)</h3>
                         <div class="flex gap-3">
-                            <button onclick="toggleFilterDraft()" class="text-gray-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1"><i data-feather="filter" class="w-3 h-3"></i> Filter</button>
-                            <button onclick="fetchListHarian()" class="text-blue-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1"><i data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan</button>
+                            <button onclick="toggleFilterDraft()"
+                                class="text-gray-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1"><i
+                                    data-feather="filter" class="w-3 h-3"></i> Filter</button>
+                            <button onclick="fetchListHarian()"
+                                class="text-blue-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1"><i
+                                    data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan</button>
                         </div>
-                    </div>
-                    
-                    <div id="containerFilterDraft" class="hidden bg-gray-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-700 space-y-2 mb-3">
-                        <div class="flex gap-2">
-                            <input type="date" id="filterTglAwal" class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
-                            <input type="date" id="filterTglAkhir" class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()">
-                        </div>
-                        <select id="filterDraftAgen" class="w-full text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400" onchange="renderFilteredDrafts()"><option value="">Semua Agen</option></select>
                     </div>
 
-                    <div class="max-h-[320px] overflow-y-auto custom-scroll pr-1 space-y-2" id="listCatatanHarian"></div>
+                    <div id="containerFilterDraft"
+                        class="hidden bg-gray-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-700 space-y-2 mb-3">
+                        <div class="flex gap-2">
+                            <input type="date" id="filterTglAwal"
+                                class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400"
+                                onchange="renderFilteredDrafts()">
+                            <input type="date" id="filterTglAkhir"
+                                class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400"
+                                onchange="renderFilteredDrafts()">
+                        </div>
+                        <select id="filterDraftAgen"
+                            class="w-full text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400"
+                            onchange="renderFilteredDrafts()">
+                            <option value="">Semua Agen</option>
+                        </select>
+                    </div>
+
+                    <div class="max-h-[320px] overflow-y-auto custom-scroll pr-1 space-y-2" id="listCatatanHarian">
+                    </div>
                 </div>
             </div>
 
             <!-- ================= AREA KASBON ================= -->
             <div id="areaKasbon" class="hidden space-y-4 transition-all duration-300">
                 <!-- Tambahkan id="formKasbonCard" di sini -->
-				<div id="formKasbonCard" class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 relative overflow-hidden">
-					<h2 class="text-xs font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center">
-						<i data-feather="dollar-sign" class="w-3.5 h-3.5 mr-1.5 text-emerald-500"></i> Form Pengambilan Kasbon
-					</h2>
-                    
+                <div id="formKasbonCard"
+                    class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 relative overflow-hidden">
+                    <h2 class="text-xs font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center">
+                        <i data-feather="dollar-sign" class="w-3.5 h-3.5 mr-1.5 text-emerald-500"></i> Form Pengambilan
+                        Kasbon
+                    </h2>
+
                     <div class="grid grid-cols-2 gap-2.5 mb-3">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Tanggal</label>
-                            <input type="date" id="inputTglKasbon" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
+                            <label
+                                class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Tanggal</label>
+                            <input type="date" id="inputTglKasbon"
+                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Agen / Reseller</label>
-                            <select id="inputResellerKasbon" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
+                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Agen /
+                                Reseller</label>
+                            <select id="inputResellerKasbon"
+                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
                                 <option value="">Pilih...</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Nominal (Rupiah)</label>
+                        <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Nominal
+                            (Rupiah)</label>
                         <div class="relative">
                             <span class="absolute left-3 top-2.5 text-xs font-bold text-gray-400">Rp</span>
-                            <input type="text" id="inputNominalKasbon" oninput="formatRupiah(this)" inputmode="numeric" placeholder="Contoh: 1.500.000" class="w-full text-sm font-bold pl-8 p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500 text-emerald-600 dark:text-emerald-400">
+                            <input type="text" id="inputNominalKasbon" oninput="formatRupiah(this)" inputmode="numeric"
+                                placeholder="Contoh: 1.500.000"
+                                class="w-full text-sm font-bold pl-8 p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500 text-emerald-600 dark:text-emerald-400">
                         </div>
                     </div>
-                    
+
                     <div class="mb-4">
-                        <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Keterangan / Tujuan (Wajib)</label>
-                        <input type="text" id="inputKetKasbon" placeholder="Misal: kasbon mingguan, dll" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
+                        <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Keterangan /
+                            Tujuan (Wajib)</label>
+                        <input type="text" id="inputKetKasbon" placeholder="Misal: kasbon mingguan, dll"
+                            class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
                     </div>
 
-                    <button id="btnSimpanKasbon" onclick="simpanCatatanKasbon()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-3 rounded-xl flex justify-center items-center shadow-sm">
+                    <button id="btnSimpanKasbon" onclick="simpanCatatanKasbon()"
+                        class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-3 rounded-xl flex justify-center items-center shadow-sm">
                         <i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Kasbon
                     </button>
                 </div>
 
-                <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700">
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center">
-                            <i data-feather="file-text" class="w-3.5 h-3.5 mr-1.5 text-emerald-500"></i> Draft Kasbon (Belum Lunas)
+                            <i data-feather="file-text" class="w-3.5 h-3.5 mr-1.5 text-emerald-500"></i> Draft Kasbon
+                            (Belum Lunas)
                         </h3>
-                        <button onclick="fetchListKasbon()" class="text-emerald-500 hover:text-emerald-600 text-[11px] font-bold flex items-center gap-1"><i data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan</button>
+                        <button onclick="fetchListKasbon()"
+                            class="text-emerald-500 hover:text-emerald-600 text-[11px] font-bold flex items-center gap-1"><i
+                                data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan</button>
                     </div>
-                    <div class="max-h-[320px] overflow-y-auto custom-scroll pr-1 space-y-2" id="listCatatanKasbon"></div>
+                    <div class="max-h-[320px] overflow-y-auto custom-scroll pr-1 space-y-2" id="listCatatanKasbon">
+                    </div>
                 </div>
             </div>
 
@@ -229,98 +367,533 @@
     </div>
 
     <!-- ==================== MODAL-MODAL LENGKAP ==================== -->
-    
-    <div id="modalMasterAdmin" class="fixed inset-0 z-[120] flex items-center justify-center hidden p-4 bg-gray-900/70 backdrop-blur-sm transition-opacity">
-		<div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl flex flex-col">
-			<!-- Header Modal -->
-			<div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700 shrink-0 bg-purple-50/50 dark:bg-slate-800 rounded-t-2xl">
-				<h3 class="text-xs font-black text-purple-700 dark:text-purple-400 flex items-center"><i data-feather="database" class="w-3.5 h-3.5 mr-1.5"></i> Master Data Kontrol</h3>
-				<button onclick="closeFormModal('modalMasterAdmin')" class="text-gray-400 hover:text-gray-600 p-1 bg-white dark:bg-slate-700 rounded-lg shadow-sm"><i data-feather="x" class="w-4 h-4"></i></button>
-			</div>
-			
-			<!-- Konten Pemberitahuan Maintenance -->
-			<div class="p-6 text-center space-y-3 bg-white dark:bg-slate-800 rounded-b-2xl">
-				<div class="w-12 h-12 bg-amber-50 dark:bg-amber-950 text-amber-500 rounded-full flex items-center justify-center mx-auto shadow-sm">
-					<i data-feather="tool" class="w-6 h-6"></i>
-				</div>
-				<h4 class="text-xs font-bold text-gray-800 dark:text-slate-100">Sedang Maintenance</h4>
-				<p class="text-[11px] text-gray-500 dark:text-slate-400 leading-relaxed">Menu Master Data Kontrol sedang dalam pemeliharaan sementara waktu. Info lebih lanjut hubungi ADMIN KIKI.</p>
-				<button onclick="closeFormModal('modalMasterAdmin')" class="w-full bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-200 text-[10px] font-bold py-2.5 rounded-xl transition-all mt-2">Tutup</button>
-			</div>
-		</div>
-	</div>
 
-    <div id="modalPostSave" class="fixed inset-0 z-[120] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-xs rounded-2xl shadow-2xl flex flex-col p-5 text-center">
-            <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3"><i data-feather="check-circle" class="w-6 h-6"></i></div>
-            <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 mb-1" id="postSaveTitle">Tersimpan!</h3>
-            <p class="text-[11px] text-gray-500 dark:text-slate-400 mb-4" id="postSaveMsg">Cetak Ke BT Thermal 58mm ?</p>
-            <div class="flex flex-col gap-2">
-                <button id="btnPostSavePrint" onclick="cetakDraftTerakhir()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-1.5"><i data-feather="printer" class="w-4 h-4"></i> Cetak via Bluetooth</button>
-                <button onclick="closeFormModal('modalPostSave')" class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-xs font-bold py-2 rounded-xl">Tutup / Lewati</button>
+    <!-- ==================== MASTER DATA KONTROL (ADMIN) ==================== -->
+    <div id="modalMasterAdmin"
+        class="fixed inset-0 z-[120] flex items-center justify-center hidden p-3 bg-gray-900/70 backdrop-blur-sm transition-opacity">
+        <div
+            class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-gray-100 dark:border-slate-700">
+
+            <!-- Header Modal -->
+            <div
+                class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-slate-700 shrink-0 bg-purple-50/70 dark:bg-slate-800/90">
+                <div class="flex items-center gap-2">
+                    <button id="btnBackMasterHub" onclick="tampilMasterHub()"
+                        class="hidden p-1.5 rounded-lg bg-white dark:bg-slate-700 text-purple-600 dark:text-purple-300 hover:bg-purple-100 shadow-sm active:scale-95 transition">
+                        <i data-feather="arrow-left" class="w-4 h-4"></i>
+                    </button>
+                    <div>
+                        <h3 id="masterAdminTitle"
+                            class="text-xs font-black text-purple-800 dark:text-purple-300 flex items-center">
+                            <i data-feather="database" class="w-3.5 h-3.5 mr-1.5 text-purple-600"></i> Master Data
+                            Kontrol
+                        </h3>
+                        <p id="masterAdminSubtitle" class="text-[9px] text-gray-500 dark:text-slate-400 font-medium">
+                            Pengaturan Operasional Khusus Admin</p>
+                    </div>
+                </div>
+                <button onclick="closeFormModal('modalMasterAdmin')"
+                    class="text-gray-400 hover:text-gray-600 p-1.5 bg-white dark:bg-slate-700 rounded-lg shadow-sm active:scale-95 transition">
+                    <i data-feather="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Konten Modal (Scrollable) -->
+            <div class="p-3.5 overflow-y-auto custom-scroll flex-1 space-y-3 bg-slate-50 dark:bg-slate-900/60">
+
+                <!-- 1. HUB VIEW (MENU UTAMA 4 KARTU GRID) -->
+                <div id="masterHubView" class="space-y-2.5">
+                    <!-- Kartu 1: Reseller -->
+                    <div onclick="bukaSubMaster('reseller')"
+                        class="p-3.5 bg-white dark:bg-slate-800 border border-emerald-200/80 dark:border-emerald-800/40 rounded-2xl flex items-center justify-between shadow-sm hover:shadow-md cursor-pointer active:scale-[0.99] transition">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                <i data-feather="users" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4
+                                    class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center gap-1.5">
+                                    Master Reseller
+                                    <span
+                                        class="text-[8px] bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded font-black">MITRA</span>
+                                </h4>
+                                <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">Tambah agen, edit nama &
+                                    aktif/nonaktifkan mitra</p>
+                            </div>
+                        </div>
+                        <i data-feather="chevron-right" class="w-4 h-4 text-gray-400 shrink-0"></i>
+                    </div>
+
+                    <!-- Kartu 2: Barang & Bahan -->
+                    <div onclick="bukaSubMaster('barang')"
+                        class="p-3.5 bg-white dark:bg-slate-800 border border-blue-200/80 dark:border-blue-800/40 rounded-2xl flex items-center justify-between shadow-sm hover:shadow-md cursor-pointer active:scale-[0.99] transition">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                <i data-feather="package" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4
+                                    class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center gap-1.5">
+                                    Barang Jadi & Bahan Baku
+                                    <span
+                                        class="text-[8px] bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded font-black">PRODUK</span>
+                                </h4>
+                                <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">Katalog barang setor
+                                    [STR] & bahan baku [BHN]</p>
+                            </div>
+                        </div>
+                        <i data-feather="chevron-right" class="w-4 h-4 text-gray-400 shrink-0"></i>
+                    </div>
+
+                    <!-- Kartu 3: Kontrol Operasional & Struk -->
+                    <div onclick="bukaSubMaster('operasional')"
+                        class="p-3.5 bg-white dark:bg-slate-800 border border-amber-200/80 dark:border-amber-800/40 rounded-2xl flex items-center justify-between shadow-sm hover:shadow-md cursor-pointer active:scale-[0.99] transition">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                                <i data-feather="lock" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4
+                                    class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center gap-1.5">
+                                    Kunci Tanggal & Struk
+                                    <span
+                                        class="text-[8px] bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded font-black">KONTROL</span>
+                                </h4>
+                                <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">Tutup buku tanggal,
+                                    limit kasbon & nota thermal 58mm</p>
+                            </div>
+                        </div>
+                        <i data-feather="chevron-right" class="w-4 h-4 text-gray-400 shrink-0"></i>
+                    </div>
+
+                    <!-- Kartu 4: Pengguna & Reset PIN -->
+                    <div onclick="bukaSubMaster('pengguna')"
+                        class="p-3.5 bg-white dark:bg-slate-800 border border-purple-200/80 dark:border-purple-800/40 rounded-2xl flex items-center justify-between shadow-sm hover:shadow-md cursor-pointer active:scale-[0.99] transition">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                                <i data-feather="key" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h4
+                                    class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center gap-1.5">
+                                    Pengguna & Reset PIN
+                                    <span
+                                        class="text-[8px] bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-1.5 py-0.5 rounded font-black">AKSES</span>
+                                </h4>
+                                <p class="text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">Tambah staf/reseller
+                                    baru & reset PIN login</p>
+                            </div>
+                        </div>
+                        <i data-feather="chevron-right" class="w-4 h-4 text-gray-400 shrink-0"></i>
+                    </div>
+                </div>
+
+                <!-- 2. SUB-VIEW: RESELLER -->
+                <div id="masterSubReseller" class="hidden space-y-3">
+                    <!-- Form Input Reseller -->
+                    <div
+                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 space-y-2.5">
+                        <div class="flex justify-between items-center">
+                            <span id="labelFormMasterReseller"
+                                class="text-[11px] font-bold text-gray-700 dark:text-slate-200">Tambah Reseller
+                                Baru</span>
+                            <button id="btnBatalEditReseller" onclick="batalEditMasterReseller()"
+                                class="hidden text-[10px] text-red-500 font-bold hover:underline">Batal</button>
+                        </div>
+                        <input type="hidden" id="inputMasterResellerId">
+                        <input type="text" id="inputMasterResellerNama"
+                            placeholder="Nama Reseller (contoh: Pak Joko / Agen Sentosa)"
+                            class="w-full text-xs p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
+                        <button id="btnSimpanMasterReseller" onclick="simpanMasterReseller()"
+                            class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                            <i data-feather="check" class="w-3.5 h-3.5"></i> Simpan Reseller
+                        </button>
+                    </div>
+
+                    <!-- Pencarian & List Reseller -->
+                    <div
+                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 space-y-2">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[11px] font-bold text-gray-600 dark:text-slate-300">Daftar Reseller</span>
+                            <span id="badgeCountReseller"
+                                class="text-[9px] bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 px-2 py-0.5 rounded-full font-bold">0
+                                Mitra</span>
+                        </div>
+                        <input type="text" id="searchMasterReseller" oninput="renderMasterResellerList(this.value)"
+                            placeholder="🔍 Cari nama reseller..."
+                            class="w-full text-xs p-2 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none">
+                        <div id="listMasterResellerContainer"
+                            class="space-y-1.5 max-h-56 overflow-y-auto custom-scroll pr-1 pt-1">
+                            <!-- Diisi via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. SUB-VIEW: BARANG & BAHAN -->
+                <div id="masterSubBarang" class="hidden space-y-3">
+                    <!-- Form Input Barang -->
+                    <div
+                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 space-y-2.5">
+                        <div class="flex justify-between items-center">
+                            <span id="labelFormMasterBarang"
+                                class="text-[11px] font-bold text-gray-700 dark:text-slate-200">Tambah Barang / Bahan
+                                Baru</span>
+                            <button id="btnBatalEditBarang" onclick="batalEditMasterBarang()"
+                                class="hidden text-[10px] text-red-500 font-bold hover:underline">Batal</button>
+                        </div>
+                        <input type="hidden" id="inputMasterBarangId">
+                        <input type="text" id="inputMasterBarangNama"
+                            placeholder="Nama Barang (contoh: Kerupuk Kulit Super)"
+                            class="w-full text-xs p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                        <div class="flex gap-2">
+                            <select id="inputMasterBarangTipe"
+                                class="w-full text-xs p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none">
+                                <option value="jadi">📦 Barang Jadi (Setoran)</option>
+                                <option value="bahan">🛍️ Bahan Baku (Ambil)</option>
+                            </select>
+                        </div>
+                        <button id="btnSimpanMasterBarang" onclick="simpanMasterBarang()"
+                            class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                            <i data-feather="check" class="w-3.5 h-3.5"></i> Simpan Barang
+                        </button>
+                    </div>
+
+                    <!-- Filter & List Barang -->
+                    <div
+                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 space-y-2">
+                        <div class="flex p-0.5 bg-gray-100 dark:bg-slate-700 rounded-xl text-[10px] font-bold">
+                            <button onclick="setFilterMasterBarang('semua')" id="btnFilterBarangSemua"
+                                class="flex-1 py-1.5 rounded-lg bg-white dark:bg-slate-600 shadow-sm text-blue-600 dark:text-blue-300 transition">Semua</button>
+                            <button onclick="setFilterMasterBarang('jadi')" id="btnFilterBarangJadi"
+                                class="flex-1 py-1.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-300 transition">Jadi
+                                [STR]</button>
+                            <button onclick="setFilterMasterBarang('bahan')" id="btnFilterBarangBahan"
+                                class="flex-1 py-1.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-300 transition">Bahan
+                                [BHN]</button>
+                        </div>
+                        <input type="text" id="searchMasterBarang"
+                            oninput="renderMasterBarangList(currentBarangFilter, this.value)"
+                            placeholder="🔍 Cari nama barang/bahan..."
+                            class="w-full text-xs p-2 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none">
+                        <div id="listMasterBarangContainer"
+                            class="space-y-1.5 max-h-56 overflow-y-auto custom-scroll pr-1 pt-1">
+                            <!-- Diisi via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. SUB-VIEW: KONTROL OPERASIONAL & STRUK -->
+                <div id="masterSubOperasional" class="hidden space-y-3">
+                    <!-- Kartu Kunci Tanggal -->
+                    <div
+                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-amber-200/80 dark:border-slate-700 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center gap-1.5">
+                                <i data-feather="lock" class="w-3.5 h-3.5 text-amber-500"></i> Kunci Tanggal (Tutup
+                                Buku)
+                            </span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="checkLockDateActive" class="sr-only peer">
+                                <div
+                                    class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500">
+                                </div>
+                            </label>
+                        </div>
+                        <p class="text-[10px] text-gray-500 dark:text-slate-400 leading-relaxed">Kunci semua tanggal
+                            catatan sebelum tanggal ini agar staf tidak bisa mengubah data lama yang sudah direkap.</p>
+                        <div>
+                            <label
+                                class="block text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase mb-1">Kunci
+                                Tanggal Sebelum:</label>
+                            <input type="date" id="inputLockDateBefore"
+                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Kartu Limit Kasbon -->
+                    <div
+                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-emerald-200/80 dark:border-slate-700 space-y-2.5">
+                        <span class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center gap-1.5">
+                            <i data-feather="dollar-sign" class="w-3.5 h-3.5 text-emerald-500"></i> Plafon / Limit
+                            Kasbon Harian
+                        </span>
+                        <p class="text-[10px] text-gray-500 dark:text-slate-400">Batas maksimal nominal pengajuan kasbon
+                            harian untuk staf/reseller.</p>
+                        <div>
+                            <label
+                                class="block text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase mb-1">Maksimal
+                                Kasbon (Rp):</label>
+                            <input type="number" id="inputMaxKasbonLimit" placeholder="Contoh: 1000000"
+                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Kartu Template Struk Bluetooth -->
+                    <div
+                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-blue-200/80 dark:border-slate-700 space-y-2.5">
+                        <span class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center gap-1.5">
+                            <i data-feather="printer" class="w-3.5 h-3.5 text-blue-500"></i> Teks Struk Thermal 58mm
+                        </span>
+                        <div class="space-y-2">
+                            <div>
+                                <label
+                                    class="block text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase mb-1">Nama
+                                    Pabrik / Toko (Header 1):</label>
+                                <input type="text" id="inputStrukHeader1" placeholder="SBR PUTRA FOOD"
+                                    class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase mb-1">Alamat
+                                    / Subtitle (Header 2):</label>
+                                <input type="text" id="inputStrukHeader2" placeholder="Gudang & Reseller System"
+                                    class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase mb-1">Pesan
+                                    Footer Struk:</label>
+                                <input type="text" id="inputStrukFooter"
+                                    placeholder="Harap periksa barang sebelum keluar"
+                                    class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="simpanPengaturanOperasional()"
+                        class="w-full bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-1.5 active:scale-98">
+                        <i data-feather="save" class="w-3.5 h-3.5"></i> Simpan Pengaturan Operasional
+                    </button>
+                </div>
+
+                <!-- 5. SUB-VIEW: PENGGUNA & RESET PIN -->
+                <div id="masterSubPengguna" class="hidden space-y-3">
+                    <!-- Form Tambah Pengguna Baru -->
+                    <div
+                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 space-y-2.5">
+                        <span class="text-[11px] font-bold text-gray-700 dark:text-slate-200">Tambah Akun Pengguna
+                            Baru</span>
+                        <div class="space-y-2">
+                            <input type="text" id="inputPenggunaUsername" placeholder="Username (misal: fatah / budi)"
+                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none">
+                            <input type="text" id="inputPenggunaNama" placeholder="Nama Lengkap"
+                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none">
+                            <div class="flex gap-2">
+                                <select id="inputPenggunaRole"
+                                    class="w-1/2 text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none">
+                                    <option value="karyawan">Karyawan</option>
+                                    <option value="reseller">Reseller</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                                <input type="password" id="inputPenggunaPin" placeholder="PIN (6 Angka)"
+                                    inputmode="numeric" maxlength="6"
+                                    class="w-1/2 text-center text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none font-bold">
+                            </div>
+                        </div>
+                        <button id="btnSimpanPengguna" onclick="simpanMasterPengguna()"
+                            class="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                            <i data-feather="user-plus" class="w-3.5 h-3.5"></i> Buat Akun Pengguna
+                        </button>
+                    </div>
+
+                    <!-- List Pengguna & Reset PIN -->
+                    <div
+                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 space-y-2">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[11px] font-bold text-gray-600 dark:text-slate-300">Daftar Pengguna &
+                                Reset PIN</span>
+                            <span id="badgeCountPengguna"
+                                class="text-[9px] bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full font-bold">0
+                                User</span>
+                        </div>
+                        <div id="listMasterPenggunaContainer"
+                            class="space-y-1.5 max-h-56 overflow-y-auto custom-scroll pr-1 pt-1">
+                            <!-- Diisi via JS -->
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <div id="modalDetailDraft" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+    <div id="modalPostSave"
+        class="fixed inset-0 z-[120] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-xs rounded-2xl shadow-2xl flex flex-col p-5 text-center">
+            <div
+                class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+                <i data-feather="check-circle" class="w-6 h-6"></i></div>
+            <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 mb-1" id="postSaveTitle">Tersimpan!</h3>
+            <p class="text-[11px] text-gray-500 dark:text-slate-400 mb-4" id="postSaveMsg">Cetak Ke BT Thermal 58mm ?
+            </p>
+            <div class="flex flex-col gap-2">
+                <button id="btnPostSavePrint" onclick="cetakDraftTerakhir()"
+                    class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-1.5"><i
+                        data-feather="printer" class="w-4 h-4"></i> Cetak via Bluetooth</button>
+                <button onclick="closeFormModal('modalPostSave')"
+                    class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-xs font-bold py-2 rounded-xl">Tutup
+                    / Lewati</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalDetailDraft"
+        class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
+        <div
+            class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
             <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-slate-700 shrink-0">
-                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="check-square" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Rincian & Validasi</h3>
-                <button onclick="closeFormModal('modalDetailDraft')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i
+                        data-feather="check-square" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Rincian & Validasi
+                </h3>
+                <button onclick="closeFormModal('modalDetailDraft')"
+                    class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i
+                        data-feather="x" class="w-4 h-4"></i></button>
             </div>
             <div class="p-4 overflow-y-auto custom-scroll flex-1 bg-gray-50/50 dark:bg-slate-800/50">
                 <div id="headerDetailDraft" class="mb-3 border-b border-gray-200 dark:border-slate-600 pb-3"></div>
                 <ul id="listDetailDraft" class="space-y-2 pb-2"></ul>
             </div>
-            <div id="footerDetailDraft" class="border-t border-gray-100 dark:border-slate-700 p-3 bg-white dark:bg-slate-800 shrink-0 flex gap-2 rounded-b-2xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10"></div>
+            <div id="footerDetailDraft"
+                class="border-t border-gray-100 dark:border-slate-700 p-3 bg-white dark:bg-slate-800 shrink-0 flex gap-2 rounded-b-2xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
+            </div>
         </div>
     </div>
 
-    <div id="modalPin" class="fixed inset-0 z-[110] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
+    <div id="modalPin"
+        class="fixed inset-0 z-[110] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
         <div class="bg-white dark:bg-slate-800 w-full max-w-xs rounded-2xl shadow-2xl flex flex-col p-4">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="lock" class="w-3.5 h-3.5 mr-1.5 text-red-500"></i> Otorisasi Admin</h3>
-                <button onclick="closeFormModal('modalPin')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="lock"
+                        class="w-3.5 h-3.5 mr-1.5 text-red-500"></i> Otorisasi Admin</h3>
+                <button onclick="closeFormModal('modalPin')"
+                    class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i
+                        data-feather="x" class="w-4 h-4"></i></button>
             </div>
             <p class="text-[10px] text-gray-500 dark:text-slate-400 mb-3">Masukkan PIN Admin untuk menghapus data.</p>
-            <input type="password" id="inputPinHapus" placeholder="6 Angka PIN Admin" inputmode="numeric" maxlength="6" class="w-full text-center tracking-widest text-base font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500 mb-3">
+            <input type="password" id="inputPinHapus" placeholder="6 Angka PIN Admin" inputmode="numeric" maxlength="6"
+                class="w-full text-center tracking-widest text-base font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500 mb-3">
             <div class="flex gap-2">
-                <button onclick="closeFormModal('modalPin')" class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 text-xs font-bold px-3 py-2 rounded-xl flex-1 hover:bg-gray-200 dark:hover:bg-slate-600 transition">Batal</button>
-                <button onclick="prosesHapusDataValidasi()" class="bg-red-500 hover:bg-red-400 text-white text-xs font-bold px-3 py-2 rounded-xl flex-1 shadow-sm">Hapus</button>
+                <button onclick="closeFormModal('modalPin')"
+                    class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 text-xs font-bold px-3 py-2 rounded-xl flex-1 hover:bg-gray-200 dark:hover:bg-slate-600 transition">Batal</button>
+                <button onclick="prosesHapusDataValidasi()"
+                    class="bg-red-500 hover:bg-red-400 text-white text-xs font-bold px-3 py-2 rounded-xl flex-1 shadow-sm">Hapus</button>
             </div>
         </div>
     </div>
 
-    <div id="modalGantiPin" class="fixed inset-0 z-[105] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
+    <div id="modalGantiPin"
+        class="fixed inset-0 z-[105] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
         <div class="bg-white dark:bg-slate-800 w-full max-w-xs rounded-2xl shadow-2xl flex flex-col p-4">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="key" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Ganti PIN Akun</h3>
-                <button onclick="closeFormModal('modalGantiPin')" class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="key"
+                        class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Ganti PIN Akun</h3>
+                <button onclick="closeFormModal('modalGantiPin')"
+                    class="text-gray-400 hover:text-gray-600 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i
+                        data-feather="x" class="w-4 h-4"></i></button>
             </div>
             <div class="space-y-3 mb-4">
-                <input type="password" id="inputPinBaru" placeholder="PIN Baru (6 angka)" inputmode="numeric" maxlength="6" class="w-full text-center tracking-widest text-sm font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none">
-                <input type="password" id="inputPinKonfirmasi" placeholder="Konfirmasi PIN Baru" inputmode="numeric" maxlength="6" class="w-full text-center tracking-widest text-sm font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none">
+                <input type="password" id="inputPinBaru" placeholder="PIN Baru (6 angka)" inputmode="numeric"
+                    maxlength="6"
+                    class="w-full text-center tracking-widest text-sm font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none">
+                <input type="password" id="inputPinKonfirmasi" placeholder="Konfirmasi PIN Baru" inputmode="numeric"
+                    maxlength="6"
+                    class="w-full text-center tracking-widest text-sm font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none">
             </div>
             <div class="flex gap-2">
-                <button onclick="closeFormModal('modalGantiPin')" class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 text-xs font-bold px-3 py-2.5 rounded-xl flex-1 hover:bg-gray-200 dark:hover:bg-slate-600 transition">Batal</button>
-                <button id="btnSimpanPin" onclick="prosesGantiPIN()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-2.5 rounded-xl flex-1 transition">Simpan PIN</button>
+                <button onclick="closeFormModal('modalGantiPin')"
+                    class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 text-xs font-bold px-3 py-2.5 rounded-xl flex-1 hover:bg-gray-200 dark:hover:bg-slate-600 transition">Batal</button>
+                <button id="btnSimpanPin" onclick="prosesGantiPIN()"
+                    class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-2.5 rounded-xl flex-1 transition">Simpan
+                    PIN</button>
             </div>
         </div>
     </div>
 
-    <div id="modalResetPinAdmin" class="fixed inset-0 z-[115] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
+    <div id="modalResetPinAdmin"
+        class="fixed inset-0 z-[115] flex items-center justify-center hidden p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
         <div class="bg-white dark:bg-slate-800 w-full max-w-xs rounded-2xl shadow-2xl flex flex-col p-4">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i data-feather="user-check" class="w-3.5 h-3.5 mr-1.5 text-orange-500"></i> Reset PIN</h3>
-                <button onclick="closeFormModal('modalResetPinAdmin')" class="text-gray-400 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x" class="w-4 h-4"></i></button>
+                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i
+                        data-feather="user-check" class="w-3.5 h-3.5 mr-1.5 text-orange-500"></i> Reset PIN</h3>
+                <button onclick="closeFormModal('modalResetPinAdmin')"
+                    class="text-gray-400 p-1 bg-gray-50 dark:bg-slate-700 rounded-lg"><i data-feather="x"
+                        class="w-4 h-4"></i></button>
             </div>
             <div class="space-y-3 mb-4">
-                <select id="resetTargetUser" class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none"><option value="">Memuat pengguna...</option></select>
-                <input type="password" id="resetPinBaru" placeholder="PIN Baru (6 angka)" inputmode="numeric" maxlength="6" class="w-full text-center tracking-widest text-sm font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none">
+                <select id="resetTargetUser"
+                    class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none">
+                    <option value="">Memuat pengguna...</option>
+                </select>
+                <input type="password" id="resetPinBaru" placeholder="PIN Baru (6 angka)" inputmode="numeric"
+                    maxlength="6"
+                    class="w-full text-center tracking-widest text-sm font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none">
             </div>
             <div class="flex gap-2">
-                <button onclick="closeFormModal('modalResetPinAdmin')" class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 text-xs font-bold px-3 py-2.5 rounded-xl flex-1 hover:bg-gray-200 dark:hover:bg-slate-600 transition">Batal</button>
-                <button id="btnAdminResetSubmit" onclick="prosesResetPinAdmin()" class="bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold px-3 py-2.5 rounded-xl flex-1 transition">Reset PIN</button>
+                <button onclick="closeFormModal('modalResetPinAdmin')"
+                    class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 text-xs font-bold px-3 py-2.5 rounded-xl flex-1 hover:bg-gray-200 dark:hover:bg-slate-600 transition">Batal</button>
+                <button id="btnAdminResetSubmit" onclick="prosesResetPinAdmin()"
+                    class="bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold px-3 py-2.5 rounded-xl flex-1 transition">Reset
+                    PIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL POPUP UPDATE APLIKASI ==================== -->
+    <div id="modalUpdateAplikasi"
+        class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <div id="modalUpdateCard"
+            class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-xs mx-4 p-6 text-center transform scale-95 transition-all duration-300 border border-slate-100 dark:border-slate-700">
+            <div id="updateIconBox"
+                class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-3xl shadow-inner bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 relative">
+                <i data-feather="download-cloud" id="updateIconFeather" class="w-8 h-8 animate-bounce"></i>
+            </div>
+
+            <h3 id="updateTitle" class="font-extrabold text-slate-900 dark:text-white text-base mb-1.5 leading-snug">
+                Pembaruan Tersedia</h3>
+            <p id="updateMessage"
+                class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line mb-4 font-medium">
+                Sedang mengunduh file versi terbaru dari GitHub...</p>
+
+            <div id="updateProgressContainer"
+                class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden mb-3">
+                <div id="updateProgressBar"
+                    class="bg-blue-600 h-full rounded-full transition-all duration-500 w-2/3 animate-pulse"></div>
+            </div>
+
+            <p id="updateSubtext" class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">Mohon tunggu
+                sebentar, sesi login tetap aman.</p>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL POPUP DIALOG INFORMASI ==================== -->
+    <div id="modalDialog"
+        class="fixed inset-0 z-[190] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+        <div id="modalDialogCard"
+            class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-xs mx-4 p-5 text-center transform scale-95 transition-all duration-300 border border-slate-100 dark:border-slate-700">
+            <div id="dialogIconBox"
+                class="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center text-2xl shadow-inner bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                <i data-feather="info" id="dialogIcon" class="w-7 h-7"></i>
+            </div>
+
+            <h3 id="dialogTitle" class="font-extrabold text-slate-900 dark:text-white text-base mb-1 leading-snug">
+                Pemberitahuan</h3>
+            <p id="dialogMessage"
+                class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line mb-5 font-medium">
+            </p>
+
+            <div id="dialogActions" class="flex gap-2">
+                <button id="dialogBtnCancel" type="button"
+                    class="w-1/2 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs transition active:scale-95">
+                    Batal
+                </button>
+                <button id="dialogBtnConfirm" type="button"
+                    class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow-md active:scale-95">
+                    OK
+                </button>
             </div>
         </div>
     </div>
@@ -333,14 +906,242 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvY3Z1ZGRxaHZpb3JlYmlucHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2OTQ0NDAsImV4cCI6MjEwMTI3MDQ0MH0.mWGTOTfHG4Q62S3P4LQi-5bGviMPWgMzo2p2AECquL8';
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+        // ==============================================================
+        // SISTEM AUTO-UPDATE SENYAP (100% OTOMATIS DARI GITHUB)
+        // Mengecek pembaruan saat pertama buka atau saat kembali ke aplikasi.
+        // Sesi login karyawan tetap aman tersimpan tanpa perlu logout.
+        // ==============================================================
+        async function getSHA256Hash(text) {
+            if (window.crypto && crypto.subtle) {
+                const msgUint8 = new TextEncoder().encode(text);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+            let hash = 5381;
+            for (let i = 0; i < text.length; i++) {
+                hash = ((hash << 5) + hash) + text.charCodeAt(i);
+            }
+            return 'h_' + (hash >>> 0).toString(16);
+        }
+
+        function bukaModalUpdate(title, message, isDone = false) {
+            const modal = document.getElementById('modalUpdateAplikasi');
+            const card = document.getElementById('modalUpdateCard');
+            const elTitle = document.getElementById('updateTitle');
+            const elMsg = document.getElementById('updateMessage');
+            const bar = document.getElementById('updateProgressBar');
+            const iconBox = document.getElementById('updateIconBox');
+            const subtext = document.getElementById('updateSubtext');
+
+            if (elTitle) elTitle.innerText = title;
+            if (elMsg) elMsg.innerText = message;
+
+            if (isDone) {
+                if (bar) {
+                    bar.className = "bg-emerald-500 h-full rounded-full transition-all duration-500 w-full";
+                }
+                if (iconBox) {
+                    iconBox.className = "w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-3xl shadow-inner bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 relative";
+                    iconBox.innerHTML = '<i data-feather="check-circle" class="w-8 h-8"></i>';
+                }
+                if (subtext) subtext.innerText = "Memuat ulang aplikasi sekarang...";
+            } else {
+                if (bar) {
+                    bar.className = "bg-blue-600 h-full rounded-full transition-all duration-500 w-2/3 animate-pulse";
+                }
+                if (iconBox) {
+                    iconBox.className = "w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-3xl shadow-inner bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 relative";
+                    iconBox.innerHTML = '<i data-feather="download-cloud" class="w-8 h-8 animate-bounce"></i>';
+                }
+                if (subtext) subtext.innerText = "Mohon tunggu sebentar, sesi login tetap aman.";
+            }
+            feather.replace();
+
+            if (modal) modal.classList.remove('opacity-0', 'pointer-events-none');
+            if (card) card.classList.remove('scale-95');
+        }
+
+        function tutupModalUpdate() {
+            const modal = document.getElementById('modalUpdateAplikasi');
+            const card = document.getElementById('modalUpdateCard');
+            if (modal) modal.classList.add('opacity-0', 'pointer-events-none');
+            if (card) card.classList.add('scale-95');
+        }
+
+        function showDialog({ title = "Pemberitahuan", message = "", type = "info", confirmText = "OK", cancelText = "Batal", showCancel = false }) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('modalDialog');
+                const card = document.getElementById('modalDialogCard');
+                const iconBox = document.getElementById('dialogIconBox');
+                const elTitle = document.getElementById('dialogTitle');
+                const elMsg = document.getElementById('dialogMessage');
+                const btnCancel = document.getElementById('dialogBtnCancel');
+                const btnConfirm = document.getElementById('dialogBtnConfirm');
+
+                if (!modal || !card) {
+                    alert(message);
+                    resolve(true);
+                    return;
+                }
+
+                elTitle.innerText = title;
+                elMsg.innerText = message;
+                btnConfirm.innerText = confirmText;
+                btnCancel.innerText = cancelText;
+
+                if (type === 'success') {
+                    iconBox.className = "w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center shadow-inner bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400";
+                    iconBox.innerHTML = '<i data-feather="check-circle" class="w-7 h-7"></i>';
+                    btnConfirm.className = "w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition shadow-md active:scale-95";
+                } else if (type === 'warning') {
+                    iconBox.className = "w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center shadow-inner bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400";
+                    iconBox.innerHTML = '<i data-feather="alert-triangle" class="w-7 h-7"></i>';
+                    btnConfirm.className = "w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition shadow-md active:scale-95";
+                } else if (type === 'error') {
+                    iconBox.className = "w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center shadow-inner bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400";
+                    iconBox.innerHTML = '<i data-feather="alert-octagon" class="w-7 h-7"></i>';
+                    btnConfirm.className = "w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition shadow-md active:scale-95";
+                } else {
+                    iconBox.className = "w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center shadow-inner bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400";
+                    iconBox.innerHTML = '<i data-feather="info" class="w-7 h-7"></i>';
+                    btnConfirm.className = "w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow-md active:scale-95";
+                }
+                feather.replace();
+
+                if (showCancel) {
+                    btnCancel.classList.remove('hidden');
+                    btnConfirm.classList.remove('w-full');
+                    btnConfirm.classList.add('w-1/2');
+                } else {
+                    btnCancel.classList.add('hidden');
+                    btnConfirm.classList.remove('w-1/2');
+                    btnConfirm.classList.add('w-full');
+                }
+
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                card.classList.remove('scale-95');
+
+                function onConfirmClick() { cleanup(true); }
+                function onCancelClick() { cleanup(false); }
+
+                function cleanup(result) {
+                    modal.classList.add('opacity-0', 'pointer-events-none');
+                    card.classList.add('scale-95');
+                    btnConfirm.removeEventListener('click', onConfirmClick);
+                    btnCancel.removeEventListener('click', onCancelClick);
+                    resolve(result);
+                }
+
+                btnConfirm.addEventListener('click', onConfirmClick);
+                btnCancel.addEventListener('click', onCancelClick);
+            });
+        }
+
+        const showNotice = (msg, title = "Informasi") => showDialog({ title, message: msg, type: "info", showCancel: false });
+
+        let isCekUpdateBerjalan = false;
+
+        async function cekPembaruanAplikasiOtomatis(manual = false) {
+            if (isCekUpdateBerjalan) return;
+            isCekUpdateBerjalan = true;
+
+            try {
+                // Ambil URL murni file saat ini tanpa query string lama
+                let urlBersih = window.location.origin + window.location.pathname;
+                if (window.location.protocol === 'file:' || !urlBersih.startsWith('http')) {
+                    urlBersih = 'https://sbrputrafood-sys.github.io/payress/catatan_harian.html';
+                }
+
+                if (manual) {
+                    showNotification("Memeriksa pembaruan di GitHub...", "info");
+                }
+
+                // Tarik file HTML terbaru langsung dari GitHub (tembus cache dengan timestamp)
+                const response = await fetch(`${urlBersih}?_ts=${Date.now()}`, {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+                });
+
+                if (!response.ok) {
+                    if (manual) showNotification("Gagal terhubung ke server GitHub.", "error");
+                    isCekUpdateBerjalan = false;
+                    return;
+                }
+
+                const textServer = await response.text();
+                const hashServer = await getSHA256Hash(textServer);
+                const hashLokal = localStorage.getItem('sbr_catatan_harian_hash');
+
+                // Jika baru pertama kali dipasang/dibuka, simpan hash server awal
+                if (!hashLokal) {
+                    localStorage.setItem('sbr_catatan_harian_hash', hashServer);
+                    if (manual) showNotification("Aplikasi sudah menggunakan versi terbaru.", "success");
+                    isCekUpdateBerjalan = false;
+                    return;
+                }
+
+                // Jika ada perubahan kode di GitHub (hash berbeda), mulai pembaruan otomatis
+                if (hashServer !== hashLokal) {
+                    console.log("Kode baru terdeteksi di GitHub! Mengunduh pembaruan...");
+
+                    // 1. Munculkan popup alert keterangan sedang mengunduh file terbaru
+                    bukaModalUpdate(
+                        "Pembaruan Sistem Tersedia",
+                        "Terdeteksi pembaruan file terbaru di GitHub.\nSedang mengunduh file terbaru sistem...",
+                        false
+                    );
+
+                    // Jeda visual agar pengguna melihat proses pengunduhan
+                    await new Promise(r => setTimeout(r, 1000));
+
+                    // 2. Simpan hash baru agar tidak update berulang kali
+                    localStorage.setItem('sbr_catatan_harian_hash', hashServer);
+
+                    // 3. Bersihkan cache storage HP jika ada (sesi login localStorage tetap utuh)
+                    if ('caches' in window) {
+                        try {
+                            const keys = await caches.keys();
+                            await Promise.all(keys.map(k => caches.delete(k)));
+                        } catch (e) {
+                            console.warn("Pembersihan cache dilewati:", e);
+                        }
+                    }
+
+                    // 4. Ubah status modal menjadi selesai diunduh
+                    bukaModalUpdate(
+                        "Pembaruan Berhasil Diunduh!",
+                        "Pembaruan sistem berhasil diunduh!\nAplikasi akan memuat versi terbaru tanpa perlu login ulang...",
+                        true
+                    );
+
+                    // 5. Jeda 1.2 detik lalu reload halaman dengan file segar
+                    await new Promise(r => setTimeout(r, 1200));
+
+                    // Muat ulang halaman dengan file segar (sesi login tetap tersimpan di localStorage)
+                    window.location.replace(`${urlBersih}?_v=${Date.now()}`);
+                } else {
+                    if (manual) {
+                        showNotification("Aplikasi sudah menggunakan versi terbaru.", "success");
+                    }
+                }
+            } catch (err) {
+                // Lewati jika offline di jalan
+                console.log("Cek pembaruan dilewati:", err);
+                if (manual) showNotification("Gagal cek update: Periksa koneksi internet.", "error");
+            } finally {
+                isCekUpdateBerjalan = false;
+            }
+        }
+
         let currentUserInfo = null;
         let masterData = { resellers: [], barangJadi: [], bahanBaku: [] };
-        
+
         let globalDraftData = {};
         let globalKasbonData = {}; // Data Khusus Kasbon
-        
+
         let lastSavedGroupKey = null;
-        let lastSavedItems = null; 
+        let lastSavedItems = null;
         let isLastSavedKasbon = false; // Deteksi mode struk terakhir
         let itemToDelete = null; // Sistem hapus global
 
@@ -355,7 +1156,7 @@
             const activeTextK = ['text-emerald-600', 'dark:text-emerald-400'];
             const inactiveClass = ['text-gray-500', 'hover:text-gray-700', 'dark:text-gray-400', 'bg-transparent', 'border-transparent'];
 
-            if(tab === 'barang') {
+            if (tab === 'barang') {
                 areaB.classList.remove('hidden'); areaK.classList.add('hidden');
                 tabB.classList.add(...activeClass, ...activeTextB); tabB.classList.remove(...inactiveClass);
                 tabK.classList.add(...inactiveClass); tabK.classList.remove(...activeClass, ...activeTextK);
@@ -371,28 +1172,28 @@
             const htmlEl = document.documentElement;
             htmlEl.classList.toggle('dark');
             const isDark = htmlEl.classList.contains('dark');
-            
+
             document.getElementById('iconMoon').classList.toggle('hidden', isDark);
             document.getElementById('iconSun').classList.toggle('hidden', !isDark);
-            
+
             // Menyimpan settingan ke Local Storage
             localStorage.setItem('sbr_theme', isDark ? 'dark' : 'light');
         }
-		
-		function initTheme() {
+
+        function initTheme() {
             // Ambil data tema dari Local Storage
             const savedTheme = localStorage.getItem('sbr_theme');
-            
+
             // Cek apakah sistem menyimpan 'dark', jika iya terapkan isDark = true
             const isDark = savedTheme === 'dark';
-            
+
             const htmlEl = document.documentElement;
             if (isDark) {
                 htmlEl.classList.add('dark');
             } else {
                 htmlEl.classList.remove('dark');
             }
-            
+
             // Atur posisi ikon bulan/matahari yang sesuai
             const iconMoon = document.getElementById('iconMoon');
             const iconSun = document.getElementById('iconSun');
@@ -401,7 +1202,7 @@
                 iconSun.classList.toggle('hidden', !isDark);
             }
         }
-		
+
 
         function showNotification(message, type = 'success') {
             const container = document.getElementById('toastContainer');
@@ -416,24 +1217,37 @@
         }
 
         function formatHariTanggalID(dateStr) {
-            if(!dateStr) return '-';
+            if (!dateStr) return '-';
             const d = new Date(dateStr);
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const day = String(d.getDate()).padStart(2, '0');
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
             return `${days[d.getDay()]}, ${day}/${months[d.getMonth()]}/${String(d.getFullYear()).slice(-2)}`;
         }
-		
-		function formatRupiah(input) {
-			// Hapus semua karakter selain angka
-			let value = input.value.replace(/\D/g, '');
-			
-			// Tambahkan titik setiap 3 angka
-			let formatted = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-			
-			// Kembalikan nilai yang sudah diformat ke input
-			input.value = formatted;
-		}
+
+        function formatJamMenit(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return '';
+                const h = String(d.getHours()).padStart(2, '0');
+                const m = String(d.getMinutes()).padStart(2, '0');
+                return `${h}:${m}`;
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function formatRupiah(input) {
+            // Hapus semua karakter selain angka
+            let value = input.value.replace(/\D/g, '');
+
+            // Tambahkan titik setiap 3 angka
+            let formatted = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+            // Kembalikan nilai yang sudah diformat ke input
+            input.value = formatted;
+        }
 
         async function checkSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
@@ -445,14 +1259,14 @@
             const username = document.getElementById('loginUsername').value.trim().toLowerCase();
             const pin = document.getElementById('loginPin').value;
             const btn = document.getElementById('btnLogin');
-            if(!username || !pin) return showNotification("Username dan PIN wajib diisi!", "error");
+            if (!username || !pin) return showNotification("Username dan PIN wajib diisi!", "error");
             btn.innerHTML = `<i data-feather="loader" class="w-4 h-4 animate-spin"></i> Memeriksa...`; btn.disabled = true;
             try {
                 const { data, error } = await supabaseClient.auth.signInWithPassword({ email: `${username}@sbr.app`, password: pin });
                 if (error) throw error;
                 await setupUserDashboard(data.user.id);
                 document.getElementById('loginUsername').value = ''; document.getElementById('loginPin').value = '';
-            } catch (err) { showNotification("Gagal login! Periksa kembali Username/PIN.", "error"); } 
+            } catch (err) { showNotification("Gagal login! Periksa kembali Username/PIN.", "error"); }
             finally { btn.innerHTML = `<i data-feather="log-in" class="w-4 h-4"></i> Akses Catatan`; btn.disabled = false; feather.replace(); }
         }
 
@@ -481,17 +1295,17 @@
             const inputBy = document.getElementById('inputByPegawai');
             const selReseller = document.getElementById('inputResellerHarian');
             const selResellerK = document.getElementById('inputResellerKasbon');
-            
+
             inputBy.value = currentUserInfo.nama_lengkap;
             document.getElementById('labelRoleDisplay').innerText = `Role: ${currentUserInfo.role.toUpperCase()}`;
-			
-			// Atur visibilitas form kasbon khusus Karyawan
-			if (currentUserInfo.role === 'karyawan') {
-				if (formKasbonCard) formKasbonCard.classList.add('hidden'); // Karyawan tidak bisa input kasbon
-			} else {
-				if (formKasbonCard) formKasbonCard.classList.remove('hidden'); // Admin & Reseller bisa
-			}
-			
+
+            // Atur visibilitas form kasbon khusus Karyawan
+            if (currentUserInfo.role === 'karyawan') {
+                if (formKasbonCard) formKasbonCard.classList.add('hidden'); // Karyawan tidak bisa input kasbon
+            } else {
+                if (formKasbonCard) formKasbonCard.classList.remove('hidden'); // Admin & Reseller bisa
+            }
+
             if (currentUserInfo.role === 'admin') {
                 document.getElementById('btnAdminResetMenu').classList.remove('hidden');
                 document.getElementById('btnAdminMasterMenu').classList.remove('hidden');
@@ -519,25 +1333,539 @@
             }
         }
 
-        // --- MASTER DATA ADMIN ---
-        async function prosesTambahReseller() { /* Original logic */ }
-        async function prosesTambahPengguna() { /* Original logic */ }
+        // ==============================================================
+        // MASTER DATA KONTROL (ADMIN OPERASIONAL)
+        // ==============================================================
+        let currentBarangFilter = 'semua';
+
+        function tampilMasterHub() {
+            document.getElementById('masterHubView').classList.remove('hidden');
+            document.getElementById('masterSubReseller').classList.add('hidden');
+            document.getElementById('masterSubBarang').classList.add('hidden');
+            document.getElementById('masterSubOperasional').classList.add('hidden');
+            document.getElementById('masterSubPengguna').classList.add('hidden');
+            document.getElementById('btnBackMasterHub').classList.add('hidden');
+
+            document.getElementById('masterAdminTitle').innerHTML = '<i data-feather="database" class="w-3.5 h-3.5 mr-1.5 text-purple-600"></i> Master Data Kontrol';
+            document.getElementById('masterAdminSubtitle').innerText = 'Pengaturan Operasional Khusus Admin';
+            feather.replace();
+        }
+
+        function bukaSubMaster(subId) {
+            document.getElementById('masterHubView').classList.add('hidden');
+            document.getElementById('masterSubReseller').classList.add('hidden');
+            document.getElementById('masterSubBarang').classList.add('hidden');
+            document.getElementById('masterSubOperasional').classList.add('hidden');
+            document.getElementById('masterSubPengguna').classList.add('hidden');
+            document.getElementById('btnBackMasterHub').classList.remove('hidden');
+
+            if (subId === 'reseller') {
+                document.getElementById('masterSubReseller').classList.remove('hidden');
+                document.getElementById('masterAdminTitle').innerHTML = '<i data-feather="users" class="w-3.5 h-3.5 mr-1.5 text-emerald-600"></i> Kelola Reseller';
+                document.getElementById('masterAdminSubtitle').innerText = 'Tambah, edit, dan atur status aktif mitra agen';
+                batalEditMasterReseller();
+                renderMasterResellerList();
+            } else if (subId === 'barang') {
+                document.getElementById('masterSubBarang').classList.remove('hidden');
+                document.getElementById('masterAdminTitle').innerHTML = '<i data-feather="package" class="w-3.5 h-3.5 mr-1.5 text-blue-600"></i> Barang & Bahan Baku';
+                document.getElementById('masterAdminSubtitle').innerText = 'Katalog barang jadi [STR] & bahan baku [BHN]';
+                batalEditMasterBarang();
+                setFilterMasterBarang('semua');
+            } else if (subId === 'operasional') {
+                document.getElementById('masterSubOperasional').classList.remove('hidden');
+                document.getElementById('masterAdminTitle').innerHTML = '<i data-feather="lock" class="w-3.5 h-3.5 mr-1.5 text-amber-600"></i> Kunci Tanggal & Struk';
+                document.getElementById('masterAdminSubtitle').innerText = 'Tutup buku tanggal, limit kasbon & nota thermal';
+                muatPengaturanOperasional();
+            } else if (subId === 'pengguna') {
+                document.getElementById('masterSubPengguna').classList.remove('hidden');
+                document.getElementById('masterAdminTitle').innerHTML = '<i data-feather="key" class="w-3.5 h-3.5 mr-1.5 text-purple-600"></i> Pengguna & Reset PIN';
+                document.getElementById('masterAdminSubtitle').innerText = 'Kelola staf/reseller dan atur ulang PIN login';
+                renderMasterPenggunaList();
+            }
+            feather.replace();
+        }
+
+        // --- SUB 1: KELOLA RESELLER ---
+        function renderMasterResellerList(search = '') {
+            const container = document.getElementById('listMasterResellerContainer');
+            const badgeCount = document.getElementById('badgeCountReseller');
+            const hiddenResellers = JSON.parse(localStorage.getItem('sbr_hidden_resellers') || '[]');
+
+            let list = [...(masterData.resellers || [])];
+            if (search.trim()) {
+                const q = search.toLowerCase();
+                list = list.filter(r => r.nama.toLowerCase().includes(q));
+            }
+
+            if (badgeCount) badgeCount.innerText = `${list.length} Mitra`;
+
+            if (list.length === 0) {
+                container.innerHTML = '<div class="text-center py-4 text-xs text-gray-400 italic">Tidak ada data reseller.</div>';
+                return;
+            }
+
+            container.innerHTML = list.map(r => {
+                const isNonaktif = hiddenResellers.includes(r.id);
+                return `
+                <div class="p-2.5 bg-gray-50 dark:bg-slate-700/60 rounded-xl border border-gray-200 dark:border-slate-600 flex items-center justify-between gap-2">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-gray-800 dark:text-slate-100 truncate">${r.nama}</span>
+                            <span class="text-[9px] px-1.5 py-0.5 rounded font-bold ${isNonaktif ? 'bg-gray-200 dark:bg-slate-600 text-gray-500' : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300'}">
+                                ${isNonaktif ? 'Nonaktif' : 'Aktif'}
+                            </span>
+                        </div>
+                        <span class="text-[9px] text-gray-400">ID: ${r.id}</span>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="toggleStatusReseller(${r.id})" title="${isNonaktif ? 'Aktifkan' : 'Nonaktifkan'}" class="p-1.5 rounded-lg text-xs font-bold ${isNonaktif ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300' : 'bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-slate-300'}">
+                            <i data-feather="${isNonaktif ? 'eye' : 'eye-off'}" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="editMasterReseller(${r.id}, '${r.nama.replace(/'/g, "\\'")}')" class="p-1.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 rounded-lg hover:bg-blue-200">
+                            <i data-feather="edit-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="hapusMasterReseller(${r.id}, '${r.nama.replace(/'/g, "\\'")}')" class="p-1.5 bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-300 rounded-lg hover:bg-red-200">
+                            <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+            feather.replace();
+        }
+
+        async function simpanMasterReseller() {
+            const id = document.getElementById('inputMasterResellerId').value;
+            const nama = document.getElementById('inputMasterResellerNama').value.trim();
+            const btn = document.getElementById('btnSimpanMasterReseller');
+
+            if (!nama) return showNotification("Nama reseller tidak boleh kosong!", "error");
+            btn.disabled = true;
+            btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 mr-1.5 animate-spin"></i> Menyimpan...`;
+
+            try {
+                if (id) {
+                    const { error } = await supabaseClient.from('reseller').update({ nama_reseller: nama }).eq('id', id);
+                    if (error) throw error;
+                    showNotification("Data reseller berhasil diperbarui!", "success");
+                } else {
+                    const { error } = await supabaseClient.from('reseller').insert([{ nama_reseller: nama }]);
+                    if (error) throw error;
+                    showNotification("Reseller baru berhasil ditambahkan!", "success");
+                }
+                batalEditMasterReseller();
+                await loadMasterData();
+                renderMasterResellerList(document.getElementById('searchMasterReseller').value);
+            } catch (err) {
+                showNotification("Gagal: " + err.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-feather="check" class="w-3.5 h-3.5"></i> Simpan Reseller`;
+                feather.replace();
+            }
+        }
+
+        function editMasterReseller(id, nama) {
+            document.getElementById('inputMasterResellerId').value = id;
+            document.getElementById('inputMasterResellerNama').value = nama;
+            document.getElementById('labelFormMasterReseller').innerText = "Edit Nama Reseller";
+            document.getElementById('btnSimpanMasterReseller').innerHTML = `<i data-feather="check" class="w-3.5 h-3.5"></i> Perbarui Reseller`;
+            document.getElementById('btnBatalEditReseller').classList.remove('hidden');
+            document.getElementById('inputMasterResellerNama').focus();
+            feather.replace();
+        }
+
+        function batalEditMasterReseller() {
+            document.getElementById('inputMasterResellerId').value = '';
+            document.getElementById('inputMasterResellerNama').value = '';
+            document.getElementById('labelFormMasterReseller').innerText = "Tambah Reseller Baru";
+            document.getElementById('btnSimpanMasterReseller').innerHTML = `<i data-feather="check" class="w-3.5 h-3.5"></i> Simpan Reseller`;
+            document.getElementById('btnBatalEditReseller').classList.add('hidden');
+            feather.replace();
+        }
+
+        async function hapusMasterReseller(id, nama) {
+            if (!confirm(`Yakin ingin menghapus reseller "${nama}"?\nCatatan lama mungkin masih terhubung.`)) return;
+            try {
+                const { error } = await supabaseClient.from('reseller').delete().eq('id', id);
+                if (error) throw error;
+                showNotification(`Reseller "${nama}" telah dihapus!`, "success");
+                await loadMasterData();
+                renderMasterResellerList(document.getElementById('searchMasterReseller').value);
+            } catch (err) {
+                showNotification("Gagal menghapus: " + err.message, "error");
+            }
+        }
+
+        function toggleStatusReseller(id) {
+            let hidden = JSON.parse(localStorage.getItem('sbr_hidden_resellers') || '[]');
+            if (hidden.includes(id)) {
+                hidden = hidden.filter(x => x !== id);
+                showNotification("Reseller diaktifkan kembali!", "success");
+            } else {
+                hidden.push(id);
+                showNotification("Reseller dinonaktifkan dari form harian!", "info");
+            }
+            localStorage.setItem('sbr_hidden_resellers', JSON.stringify(hidden));
+            initDefaults();
+            renderMasterResellerList(document.getElementById('searchMasterReseller').value);
+        }
+
+        // --- SUB 2: KELOLA BARANG & BAHAN ---
+        function setFilterMasterBarang(tipe) {
+            currentBarangFilter = tipe;
+            const btnSemua = document.getElementById('btnFilterBarangSemua');
+            const btnJadi = document.getElementById('btnFilterBarangJadi');
+            const btnBahan = document.getElementById('btnFilterBarangBahan');
+            const activeClasses = ['bg-white', 'dark:bg-slate-600', 'shadow-sm', 'text-blue-600', 'dark:text-blue-300'];
+            const inactiveClasses = ['text-gray-500', 'dark:text-gray-300'];
+
+            if (btnSemua && btnJadi && btnBahan) {
+                [btnSemua, btnJadi, btnBahan].forEach(b => {
+                    b.classList.remove(...activeClasses);
+                    b.classList.add(...inactiveClasses);
+                });
+
+                if (tipe === 'semua') btnSemua.classList.add(...activeClasses);
+                else if (tipe === 'jadi') btnJadi.classList.add(...activeClasses);
+                else btnBahan.classList.add(...activeClasses);
+            }
+
+            renderMasterBarangList(tipe, document.getElementById('searchMasterBarang')?.value || '');
+        }
+
+        function renderMasterBarangList(tipeFilter = 'semua', search = '') {
+            const container = document.getElementById('listMasterBarangContainer');
+            const badgeCount = document.getElementById('badgeCountBarang');
+            const hiddenBarang = JSON.parse(localStorage.getItem('sbr_hidden_barang') || '[]');
+
+            let listJadi = (masterData.barangJadi || []).map(b => ({ ...b, tipe: 'jadi' }));
+            let listBahan = (masterData.bahanBaku || []).map(b => ({ ...b, tipe: 'bahan' }));
+            let all = [...listJadi, ...listBahan];
+
+            if (tipeFilter === 'jadi') all = listJadi;
+            else if (tipeFilter === 'bahan') all = listBahan;
+
+            if (search.trim()) {
+                const q = search.toLowerCase();
+                all = all.filter(b => b.nama.toLowerCase().includes(q) || String(b.id).toLowerCase().includes(q));
+            }
+
+            if (badgeCount) badgeCount.innerText = `${all.length} Item`;
+
+            if (all.length === 0) {
+                container.innerHTML = '<div class="text-center py-4 text-xs text-gray-400 italic">Tidak ada barang/bahan.</div>';
+                return;
+            }
+
+            container.innerHTML = all.map(b => {
+                const isNonaktif = hiddenBarang.includes(b.id);
+                const isJadi = b.tipe === 'jadi';
+                return `
+                <div class="p-2.5 bg-gray-50 dark:bg-slate-700/60 rounded-xl border border-gray-200 dark:border-slate-600 flex items-center justify-between gap-2">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-[9px] px-1.5 py-0.5 rounded font-black ${isJadi ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400'}">
+                                ${isJadi ? '[STR]' : '[BHN]'}
+                            </span>
+                            <span class="text-xs font-bold text-gray-800 dark:text-slate-100 truncate">${b.nama}</span>
+                            <span class="text-[8px] px-1 py-0.2 rounded font-bold ${isNonaktif ? 'bg-gray-200 dark:bg-slate-600 text-gray-500' : 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300'}">
+                                ${isNonaktif ? 'Disembunyikan' : 'Aktif'}
+                            </span>
+                        </div>
+                        <span class="text-[9px] text-gray-400">Kode: ${b.id}</span>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="toggleStatusBarang('${b.id}')" title="${isNonaktif ? 'Tampilkan di Form' : 'Sembunyikan dari Form'}" class="p-1.5 rounded-lg text-xs font-bold ${isNonaktif ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300' : 'bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-slate-300'}">
+                            <i data-feather="${isNonaktif ? 'eye' : 'eye-off'}" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="editMasterBarang('${b.id}', '${b.nama.replace(/'/g, "\\'")}', '${b.tipe}')" class="p-1.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 rounded-lg hover:bg-blue-200">
+                            <i data-feather="edit-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="hapusMasterBarang('${b.id}', '${b.nama.replace(/'/g, "\\'")}')" class="p-1.5 bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-300 rounded-lg hover:bg-red-200">
+                            <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+            feather.replace();
+        }
+
+        async function simpanMasterBarang() {
+            const id = document.getElementById('inputMasterBarangId').value;
+            const nama = document.getElementById('inputMasterBarangNama').value.trim();
+            const tipe = document.getElementById('inputMasterBarangTipe').value;
+            const btn = document.getElementById('btnSimpanMasterBarang');
+
+            if (!nama) return showNotification("Nama barang/bahan tidak boleh kosong!", "error");
+            btn.disabled = true;
+            btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 mr-1.5 animate-spin"></i> Menyimpan...`;
+
+            try {
+                if (id) {
+                    const { error } = await supabaseClient.from('barang').update({ nama_barang: nama, tipe: tipe }).eq('id', id);
+                    if (error) throw error;
+                    showNotification("Data barang berhasil diperbarui!", "success");
+                } else {
+                    const prefix = tipe === 'jadi' ? 'BJ' : 'BB';
+                    const itemsToScan = tipe === 'jadi' ? (masterData.barangJadi || []) : (masterData.bahanBaku || []);
+                    let maxUrutan = 0;
+                    itemsToScan.forEach(b => {
+                        const num = parseInt(String(b.id).replace(prefix, ''), 10);
+                        if (!isNaN(num) && num > maxUrutan) maxUrutan = num;
+                    });
+                    const newId = `${prefix}${maxUrutan + 1}`;
+                    const { error } = await supabaseClient.from('barang').insert([{ id: newId, nama_barang: nama, tipe: tipe }]);
+                    if (error) throw error;
+                    showNotification(`Barang baru ditambahkan dengan ID ${newId}!`, "success");
+                }
+                batalEditMasterBarang();
+                await loadMasterData();
+                renderMasterBarangList(currentBarangFilter, document.getElementById('searchMasterBarang')?.value || '');
+            } catch (err) {
+                showNotification("Gagal: " + err.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-feather="check" class="w-3.5 h-3.5"></i> Simpan Barang`;
+                feather.replace();
+            }
+        }
+
+        function editMasterBarang(id, nama, tipe) {
+            document.getElementById('inputMasterBarangId').value = id;
+            document.getElementById('inputMasterBarangNama').value = nama;
+            document.getElementById('inputMasterBarangTipe').value = tipe;
+            document.getElementById('labelFormMasterBarang').innerText = `Edit Barang (${id})`;
+            document.getElementById('btnSimpanMasterBarang').innerHTML = `<i data-feather="check" class="w-3.5 h-3.5"></i> Perbarui Barang`;
+            document.getElementById('btnBatalEditBarang').classList.remove('hidden');
+            document.getElementById('inputMasterBarangNama').focus();
+            feather.replace();
+        }
+
+        function batalEditMasterBarang() {
+            document.getElementById('inputMasterBarangId').value = '';
+            document.getElementById('inputMasterBarangNama').value = '';
+            document.getElementById('inputMasterBarangTipe').value = 'jadi';
+            document.getElementById('labelFormMasterBarang').innerText = "Tambah Barang / Bahan Baru";
+            document.getElementById('btnSimpanMasterBarang').innerHTML = `<i data-feather="check" class="w-3.5 h-3.5"></i> Simpan Barang`;
+            document.getElementById('btnBatalEditBarang').classList.add('hidden');
+            feather.replace();
+        }
+
+        async function hapusMasterBarang(id, nama) {
+            if (!confirm(`Hapus barang "${nama}" (${id})?\nPastikan tidak ada catatan aktif yang menggunakan barang ini.`)) return;
+            try {
+                const { error } = await supabaseClient.from('barang').delete().eq('id', id);
+                if (error) throw error;
+                showNotification(`Barang "${nama}" berhasil dihapus!`, "success");
+                await loadMasterData();
+                renderMasterBarangList(currentBarangFilter, document.getElementById('searchMasterBarang')?.value || '');
+            } catch (err) {
+                showNotification("Gagal menghapus: " + err.message, "error");
+            }
+        }
+
+        function toggleStatusBarang(id) {
+            let hidden = JSON.parse(localStorage.getItem('sbr_hidden_barang') || '[]');
+            if (hidden.includes(id)) {
+                hidden = hidden.filter(x => x !== id);
+                showNotification("Barang diaktifkan kembali!", "success");
+            } else {
+                hidden.push(id);
+                showNotification("Barang disembunyikan dari form harian!", "info");
+            }
+            localStorage.setItem('sbr_hidden_barang', JSON.stringify(hidden));
+            initDefaults();
+            renderMasterBarangList(currentBarangFilter, document.getElementById('searchMasterBarang')?.value || '');
+        }
+
+        // --- SUB 3: KONTROL OPERASIONAL & STRUK ---
+        function getOperasionalSettings() {
+            const defaults = {
+                isDateLockActive: false,
+                lockDateBefore: '',
+                maxKasbonLimit: 0,
+                strukHeader1: 'SBR PUTRA FOOD',
+                strukHeader2: 'Gudang & Reseller System',
+                strukFooter: 'Harap periksa barang sebelum keluar'
+            };
+            try {
+                const saved = JSON.parse(localStorage.getItem('sbr_operasional_settings') || '{}');
+                return { ...defaults, ...saved };
+            } catch (e) {
+                return defaults;
+            }
+        }
+
+        function muatPengaturanOperasional() {
+            const cfg = getOperasionalSettings();
+            document.getElementById('checkLockDateActive').checked = !!cfg.isDateLockActive;
+            document.getElementById('inputLockDateBefore').value = cfg.lockDateBefore || '';
+            document.getElementById('inputMaxKasbonLimit').value = cfg.maxKasbonLimit || '';
+            document.getElementById('inputStrukHeader1').value = cfg.strukHeader1 || 'SBR PUTRA FOOD';
+            document.getElementById('inputStrukHeader2').value = cfg.strukHeader2 || 'Gudang & Reseller System';
+            document.getElementById('inputStrukFooter').value = cfg.strukFooter || 'Harap periksa barang sebelum keluar';
+        }
+
+        function simpanPengaturanOperasional() {
+            const isLock = document.getElementById('checkLockDateActive').checked;
+            const lockDate = document.getElementById('inputLockDateBefore').value;
+            const maxKasbon = parseFloat(document.getElementById('inputMaxKasbonLimit').value) || 0;
+            const h1 = document.getElementById('inputStrukHeader1').value.trim() || 'SBR PUTRA FOOD';
+            const h2 = document.getElementById('inputStrukHeader2').value.trim();
+            const foot = document.getElementById('inputStrukFooter').value.trim() || 'Harap periksa barang sebelum keluar';
+
+            const settings = {
+                isDateLockActive: isLock,
+                lockDateBefore: lockDate,
+                maxKasbonLimit: maxKasbon,
+                strukHeader1: h1,
+                strukHeader2: h2,
+                strukFooter: foot
+            };
+
+            localStorage.setItem('sbr_operasional_settings', JSON.stringify(settings));
+            localStorage.setItem('sbr_struk_settings', JSON.stringify({ header1: h1, header2: h2, footer: foot }));
+            showNotification("Pengaturan operasional & struk berhasil disimpan!", "success");
+        }
+
+        function isTanggalTerkunci(tglStr) {
+            if (!tglStr) return false;
+            if (currentUserInfo && currentUserInfo.role === 'admin') return false; // Admin bypass
+            const cfg = getOperasionalSettings();
+            if (!cfg.isDateLockActive || !cfg.lockDateBefore) return false;
+            return tglStr < cfg.lockDateBefore;
+        }
+
+        function getStrukSettings() {
+            const cfg = getOperasionalSettings();
+            return {
+                header1: cfg.strukHeader1 || 'SBR PUTRA FOOD',
+                header2: cfg.strukHeader2 || 'Gudang & Reseller System',
+                footer: cfg.strukFooter || 'Harap periksa barang sebelum keluar'
+            };
+        }
+
+        // --- SUB 4: PENGGUNA & RESET PIN ---
+        async function renderMasterPenggunaList() {
+            const container = document.getElementById('listMasterPenggunaContainer');
+            const badgeCount = document.getElementById('badgeCountPengguna');
+            container.innerHTML = `<div class="text-center py-4 text-xs text-gray-400"><i data-feather="loader" class="w-4 h-4 animate-spin inline-block mr-1"></i> Memuat pengguna...</div>`;
+            feather.replace();
+
+            try {
+                const { data, error } = await supabaseClient.from('profil_pengguna').select('id, nama_lengkap, role').order('nama_lengkap');
+                if (error) throw error;
+
+                if (badgeCount) badgeCount.innerText = `${(data || []).length} User`;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="text-center py-4 text-xs text-gray-400 italic">Belum ada pengguna.</div>';
+                    return;
+                }
+
+                container.innerHTML = data.map(u => {
+                    const roleColor = u.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' :
+                        (u.role === 'karyawan' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300');
+                    return `
+                    <div class="p-2.5 bg-gray-50 dark:bg-slate-700/60 rounded-xl border border-gray-200 dark:border-slate-600 flex items-center justify-between gap-2">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-xs font-bold text-gray-800 dark:text-slate-100 truncate">${u.nama_lengkap}</span>
+                                <span class="text-[8px] px-1.5 py-0.5 rounded font-black uppercase ${roleColor}">${u.role}</span>
+                            </div>
+                            <span class="text-[9px] text-gray-400 truncate block">ID: ${u.id.slice(0, 13)}...</span>
+                        </div>
+                        <button onclick="quickResetPinPengguna('${u.id}', '${u.nama_lengkap.replace(/'/g, "\\'")}')" class="px-2.5 py-1.5 bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300 text-[10px] font-bold rounded-lg hover:bg-orange-200 transition shrink-0 flex items-center gap-1">
+                            <i data-feather="key" class="w-3 h-3"></i> Reset PIN
+                        </button>
+                    </div>`;
+                }).join('');
+                feather.replace();
+            } catch (err) {
+                container.innerHTML = `<div class="text-center py-3 text-xs text-red-500">Gagal memuat pengguna: ${err.message}</div>`;
+            }
+        }
+
+        async function simpanMasterPengguna() {
+            const username = document.getElementById('inputPenggunaUsername').value.trim().toLowerCase();
+            const nama = document.getElementById('inputPenggunaNama').value.trim();
+            const role = document.getElementById('inputPenggunaRole').value;
+            const pin = document.getElementById('inputPenggunaPin').value.trim();
+            const btn = document.getElementById('btnSimpanPengguna');
+
+            if (!username || !nama || !pin) return showNotification("Lengkapi semua isian pengguna!", "error");
+            if (pin.length !== 6 || isNaN(pin)) return showNotification("PIN harus 6 digit angka!", "error");
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 mr-1.5 animate-spin"></i> Mendaftarkan...`;
+
+            try {
+                const email = `${username}@sbr.app`;
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: pin,
+                    options: { data: { nama_lengkap: nama, role: role } }
+                });
+                if (error) throw error;
+
+                if (data?.user) {
+                    await supabaseClient.from('profil_pengguna').upsert({
+                        id: data.user.id,
+                        nama_lengkap: nama,
+                        role: role
+                    });
+                }
+
+                showNotification(`Pengguna "${nama}" berhasil didaftarkan!`, "success");
+                document.getElementById('inputPenggunaUsername').value = '';
+                document.getElementById('inputPenggunaNama').value = '';
+                document.getElementById('inputPenggunaPin').value = '';
+                renderMasterPenggunaList();
+            } catch (err) {
+                showNotification("Gagal: " + err.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-feather="user-plus" class="w-3.5 h-3.5"></i> Buat Akun Pengguna`;
+                feather.replace();
+            }
+        }
+
+        async function quickResetPinPengguna(targetId, namaUser) {
+            const newPin = prompt(`Masukkan 6 digit PIN baru untuk "${namaUser}":`);
+            if (newPin === null) return;
+            if (newPin.trim().length !== 6 || isNaN(newPin.trim())) {
+                return showNotification("PIN harus terdiri dari 6 angka!", "error");
+            }
+
+            try {
+                const { error } = await supabaseClient.rpc('admin_update_user_password', {
+                    target_user_id: targetId,
+                    new_password: newPin.trim()
+                });
+                if (error) throw error;
+                showNotification(`PIN untuk "${namaUser}" berhasil diubah ke ${newPin.trim()}!`, "success");
+            } catch (err) {
+                console.error(err);
+                showNotification("Gagal reset PIN: Pastikan fungsi RPC aktif.", "error");
+            }
+        }
+
         async function prosesGantiPIN() {
             const pinBaru = document.getElementById('inputPinBaru').value;
             const pinKonfirmasi = document.getElementById('inputPinKonfirmasi').value;
-            
-            if(!pinBaru || !pinKonfirmasi) return showNotification("Masukkan PIN baru dan konfirmasinya!", "error");
-            if(pinBaru.length !== 6) return showNotification("PIN harus 6 angka!", "error");
-            if(pinBaru !== pinKonfirmasi) return showNotification("PIN konfirmasi tidak cocok!", "error");
-            
+
+            if (!pinBaru || !pinKonfirmasi) return showNotification("Masukkan PIN baru dan konfirmasinya!", "error");
+            if (pinBaru.length !== 6) return showNotification("PIN harus 6 angka!", "error");
+            if (pinBaru !== pinKonfirmasi) return showNotification("PIN konfirmasi tidak cocok!", "error");
+
             const btn = document.getElementById('btnSimpanPin');
             btn.innerHTML = `Menyimpan...`; btn.disabled = true;
-            
+
             try {
-                // Update password untuk user yang sedang login[cite: 2]
+                // Update password untuk user yang sedang login
                 const { error } = await supabaseClient.auth.updateUser({ password: pinBaru });
-                if(error) throw error;
-                
+                if (error) throw error;
+
                 showNotification("PIN Anda berhasil diubah!", "success");
                 document.getElementById('inputPinBaru').value = '';
                 document.getElementById('inputPinKonfirmasi').value = '';
@@ -553,13 +1881,12 @@
             openFormModal('modalResetPinAdmin');
             const selectTarget = document.getElementById('resetTargetUser');
             selectTarget.innerHTML = '<option value="">Memuat pengguna...</option>';
-            
+
             try {
-                // Ambil daftar user untuk direset PIN-nya[cite: 2]
                 const { data, error } = await supabaseClient.from('profil_pengguna').select('id, nama_lengkap, role').order('nama_lengkap');
-                if(error) throw error;
-                
-                selectTarget.innerHTML = '<option value="">Pilih Pengguna...</option>' + 
+                if (error) throw error;
+
+                selectTarget.innerHTML = '<option value="">Pilih Pengguna...</option>' +
                     data.map(u => `<option value="${u.id}">${u.nama_lengkap} (${u.role.toUpperCase()})</option>`).join('');
             } catch (err) {
                 selectTarget.innerHTML = '<option value="">Gagal memuat data pengguna</option>';
@@ -569,22 +1896,21 @@
         async function prosesResetPinAdmin() {
             const targetId = document.getElementById('resetTargetUser').value;
             const newPin = document.getElementById('resetPinBaru').value;
-            
-            if(!targetId || !newPin) return showNotification("Pilih pengguna dan masukkan PIN baru!", "error");
-            if(newPin.length !== 6) return showNotification("PIN baru harus 6 angka!", "error");
-            
+
+            if (!targetId || !newPin) return showNotification("Pilih pengguna dan masukkan PIN baru!", "error");
+            if (newPin.length !== 6) return showNotification("PIN baru harus 6 angka!", "error");
+
             const btn = document.getElementById('btnAdminResetSubmit');
             btn.innerHTML = `Mereset...`; btn.disabled = true;
-            
+
             try {
-                // Memanggil fungsi SQL (RPC) untuk mem-bypass limitasi anon key[cite: 2]
-                const { error } = await supabaseClient.rpc('admin_update_user_password', { 
-                    target_user_id: targetId, 
-                    new_password: newPin 
+                const { error } = await supabaseClient.rpc('admin_update_user_password', {
+                    target_user_id: targetId,
+                    new_password: newPin
                 });
 
-                if(error) throw error;
-                
+                if (error) throw error;
+
                 showNotification("PIN Pengguna berhasil direset!", "success");
                 document.getElementById('resetPinBaru').value = '';
                 closeFormModal('modalResetPinAdmin');
@@ -614,8 +1940,8 @@
                 const statusConn = document.getElementById('status-connection');
                 statusConn.classList.replace('bg-yellow-50', 'bg-green-50');
                 statusConn.classList.replace('border-yellow-100', 'border-green-100');
-                if(statusConn.querySelector('.animate-ping')) statusConn.querySelector('.animate-ping').classList.replace('bg-yellow-400', 'bg-green-400');
-                if(statusConn.querySelector('.relative.inline-flex')) statusConn.querySelector('.relative.inline-flex').classList.replace('bg-yellow-500', 'bg-green-500');
+                if (statusConn.querySelector('.animate-ping')) statusConn.querySelector('.animate-ping').classList.replace('bg-yellow-400', 'bg-green-400');
+                if (statusConn.querySelector('.relative.inline-flex')) statusConn.querySelector('.relative.inline-flex').classList.replace('bg-yellow-500', 'bg-green-500');
                 document.getElementById('text-connection').innerText = 'Online';
                 document.getElementById('text-connection').className = 'text-[9px] font-semibold text-green-700 dark:text-green-400';
 
@@ -628,11 +1954,15 @@
             const selResKasbon = document.getElementById('inputResellerKasbon');
             selResHarian.innerHTML = '<option value="">Pilih...</option>';
             selResKasbon.innerHTML = '<option value="">Pilih...</option>';
-            
+
+            const hiddenResellers = JSON.parse(localStorage.getItem('sbr_hidden_resellers') || '[]');
             masterData.resellers.forEach(r => {
-                const opt = `<option value="${r.id}">${r.nama}</option>`;
-                selResHarian.innerHTML += opt;
-                selResKasbon.innerHTML += opt;
+                // Sembunyikan reseller nonaktif kecuali jika ini reseller milik user yang sedang login
+                if (!hiddenResellers.includes(r.id) || (currentUserInfo && currentUserInfo.reseller_id === r.id)) {
+                    const opt = `<option value="${r.id}">${r.nama}</option>`;
+                    selResHarian.innerHTML += opt;
+                    selResKasbon.innerHTML += opt;
+                }
             });
 
             const selGlobalResEdit = document.getElementById('editGlobalReseller');
@@ -653,8 +1983,8 @@
             document.getElementById('inputTglKasbon').value = today;
 
             document.getElementById('containerHarianRows').innerHTML = '';
-            for(let i=0; i<3; i++) { addRowHarian(); }
-            
+            for (let i = 0; i < 3; i++) { addRowHarian(); }
+
             updateOpsiHarian();
             fetchListHarian();
             fetchListKasbon();
@@ -663,14 +1993,23 @@
         // --- BARANG LOGIC (Asli) ---
         function getOptionsHarianHtmlWithSelected(selectedId = null, tipeFokus = 'semua') {
             let html = '<option value="">Pilih Barang / Bahan...</option>';
+            const hiddenBarang = JSON.parse(localStorage.getItem('sbr_hidden_barang') || '[]');
             if (tipeFokus === 'semua' || tipeFokus === 'jadi') {
                 html += '<optgroup label="📦 BARANG JADI">';
-                masterData.barangJadi.forEach(b => html += `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.nama}</option>`);
+                masterData.barangJadi.forEach(b => {
+                    if (!hiddenBarang.includes(b.id) || b.id === selectedId) {
+                        html += `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.nama}</option>`;
+                    }
+                });
                 html += '</optgroup>';
             }
             if (tipeFokus === 'semua' || tipeFokus === 'bahan') {
                 html += '<optgroup label="🛍️ BAHAN BAKU">';
-                masterData.bahanBaku.forEach(b => html += `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.nama}</option>`);
+                masterData.bahanBaku.forEach(b => {
+                    if (!hiddenBarang.includes(b.id) || b.id === selectedId) {
+                        html += `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.nama}</option>`;
+                    }
+                });
                 html += '</optgroup>';
             }
             return html;
@@ -683,7 +2022,7 @@
                 const currentVal = select.value;
                 select.innerHTML = newHtml;
                 const exists = Array.from(select.options).some(opt => opt.value === currentVal);
-                if(exists) select.value = currentVal;
+                if (exists) select.value = currentVal;
             });
         }
 
@@ -709,10 +2048,20 @@
         async function simpanCatatanHarian() {
             const tgl = document.getElementById('inputTglHarian').value;
             const rId = document.getElementById('inputResellerHarian').value;
-            const inputBy = document.getElementById('inputByPegawai').value; 
-            
-            if(!tgl || !rId || !inputBy) return showNotification("Lengkapi form!", "error");
-            
+            const inputBy = document.getElementById('inputByPegawai').value;
+
+            if (!tgl || !rId || !inputBy) return showNotification("Lengkapi form!", "error");
+
+            // Validasi Kunci Tanggal
+            if (isTanggalTerkunci(tgl)) {
+                return showNotification(`Tanggal ${formatHariTanggalID(tgl)} telah dikunci oleh Admin!`, "error");
+            }
+
+            // Tambahkan waktu saat simpan (contoh: by: Fatah - 19:48)
+            const now = new Date();
+            const jamMenit = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            const finalInputBy = (inputBy && !inputBy.includes(':')) ? `${inputBy} - ${jamMenit}` : (inputBy || 'Sistem');
+
             let dataToInsert = [];
             let statusInput = (currentUserInfo.role === 'reseller') ? 'pending' : 'approved';
             document.querySelectorAll('.row-input-harian').forEach(row => {
@@ -721,34 +2070,44 @@
                 const ket = row.querySelector('.keterangan-input')?.value || '';
                 if (bId && qty > 0) {
                     const tipeOtomatis = masterData.bahanBaku.some(b => b.id === bId) ? 'bahan' : 'jadi';
-                    dataToInsert.push({ reseller_id: rId, barang_id: bId, tanggal_setor: tgl, qty: qty, tipe: tipeOtomatis, keterangan: ket, is_paid: false, input_by: inputBy, status: statusInput });
+                    dataToInsert.push({
+                        reseller_id: rId,
+                        barang_id: bId,
+                        tanggal_setor: tgl,
+                        qty: qty,
+                        tipe: tipeOtomatis,
+                        keterangan: ket,
+                        is_paid: false,
+                        input_by: finalInputBy,
+                        status: statusInput
+                    });
                 }
             });
 
             if (dataToInsert.length === 0) return showNotification("Minimal isi 1 barang!", "error");
-            
+
             const btn = document.getElementById('btnSimpanHarian');
             btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 mr-1.5 animate-spin"></i> Menyimpan...`; btn.disabled = true;
 
             try {
                 const { data: savedData, error } = await supabaseClient.from('buku_harian').insert(dataToInsert).select();
-                if(error) throw error;
+                if (error) throw error;
                 showNotification(`${dataToInsert.length} catatan disimpan!`, "success");
-                
+
                 lastSavedGroupKey = { rId: rId, tgl: tgl };
-                lastSavedItems = savedData; 
+                lastSavedItems = savedData;
                 isLastSavedKasbon = false; // Flag bahwa ini barang
 
                 const tzOffset = (new Date()).getTimezoneOffset() * 60000;
                 document.getElementById('inputTglHarian').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
                 document.getElementById('containerHarianRows').innerHTML = '';
-                for(let i=0; i<3; i++) { addRowHarian(); }
-                
+                for (let i = 0; i < 3; i++) { addRowHarian(); }
+
                 await fetchListHarian();
                 document.getElementById('postSaveTitle').innerText = (statusInput === 'pending') ? "Menunggu Validasi" : "Tersimpan!";
                 document.getElementById('btnPostSavePrint').classList.toggle('hidden', statusInput === 'pending');
                 openFormModal('modalPostSave');
-            } catch (err) { showNotification("Gagal: " + err.message, "error"); } 
+            } catch (err) { showNotification("Gagal: " + err.message, "error"); }
             finally { btn.innerHTML = `<i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Catatan`; btn.disabled = false; feather.replace(); }
         }
 
@@ -761,26 +2120,26 @@
                 else if (currentUserInfo.role === 'karyawan') query = query.eq('tipe', 'bahan');
 
                 const { data, error } = await query;
-                if(error) throw error;
-                
+                if (error) throw error;
+
                 globalDraftData = {};
-                if(data && data.length > 0) {
+                if (data && data.length > 0) {
                     data.forEach(d => {
-                        if(!globalDraftData[d.reseller_id]) globalDraftData[d.reseller_id] = { reseller_id: d.reseller_id, reseller_name: masterData.resellers.find(r => r.id === d.reseller_id)?.nama || 'Unknown', dates: {} };
-                        if(!globalDraftData[d.reseller_id].dates[d.tanggal_setor]) globalDraftData[d.reseller_id].dates[d.tanggal_setor] = [];
+                        if (!globalDraftData[d.reseller_id]) globalDraftData[d.reseller_id] = { reseller_id: d.reseller_id, reseller_name: masterData.resellers.find(r => r.id === d.reseller_id)?.nama || 'Unknown', dates: {} };
+                        if (!globalDraftData[d.reseller_id].dates[d.tanggal_setor]) globalDraftData[d.reseller_id].dates[d.tanggal_setor] = [];
                         globalDraftData[d.reseller_id].dates[d.tanggal_setor].push(d);
                     });
                 }
-                
+
                 const selDraftAgen = document.getElementById('filterDraftAgen');
                 const currVal = selDraftAgen.value;
                 selDraftAgen.innerHTML = '<option value="">Semua Agen</option>';
                 if (currentUserInfo.role === 'reseller') {
                     let r = masterData.resellers.find(x => x.id === currentUserInfo.reseller_id);
-                    if(r) selDraftAgen.innerHTML += `<option value="${r.id}">${r.nama}</option>`;
+                    if (r) selDraftAgen.innerHTML += `<option value="${r.id}">${r.nama}</option>`;
                     selDraftAgen.disabled = true;
                 } else { masterData.resellers.forEach(r => selDraftAgen.innerHTML += `<option value="${r.id}">${r.nama}</option>`); selDraftAgen.disabled = false; }
-                selDraftAgen.value = currVal; 
+                selDraftAgen.value = currVal;
                 renderFilteredDrafts();
             } catch (err) { container.innerHTML = `<div class="text-center text-red-500 text-xs py-4">Gagal memuat: ${err.message}</div>`; }
         }
@@ -793,9 +2152,9 @@
 
         function renderFilteredDrafts() {
             const container = document.getElementById('listCatatanHarian');
-            if(Object.keys(globalDraftData).length === 0) { container.innerHTML = '<div class="text-center text-gray-400 text-xs py-6 italic">Belum ada draf.</div>'; return; }
+            if (Object.keys(globalDraftData).length === 0) { container.innerHTML = '<div class="text-center text-gray-400 text-xs py-6 italic">Belum ada draf.</div>'; return; }
             let html = '';
-            
+
             Object.keys(globalDraftData).forEach(rId => {
                 const group = globalDraftData[rId];
                 const filterAgen = document.getElementById('filterDraftAgen').value;
@@ -808,7 +2167,7 @@
                     validDates[tgl] = group.dates[tgl];
                 });
 
-                const totalHari = Object.keys(validDates).length; if(totalHari === 0) return;
+                const totalHari = Object.keys(validDates).length; if (totalHari === 0) return;
                 let isPending = Object.values(validDates).some(items => items.some(i => i.status === 'pending'));
 
                 html += `<div class="border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden bg-white dark:bg-slate-800 shadow-sm mb-2">
@@ -824,7 +2183,7 @@
                     </button>
                     <div id="accContent_${rId}" class="hidden border-t border-gray-100 dark:border-slate-700 p-2 space-y-1.5 bg-white dark:bg-slate-800">`;
 
-                Object.keys(validDates).sort((a,b) => new Date(b) - new Date(a)).forEach(tgl => {
+                Object.keys(validDates).sort((a, b) => new Date(b) - new Date(a)).forEach(tgl => {
                     const items = validDates[tgl]; const countPending = items.filter(i => i.status === 'pending').length;
                     html += `
                         <div class="flex justify-between items-center p-2 rounded-lg bg-gray-50/50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600">
@@ -850,11 +2209,11 @@
             li.querySelector('.edit-mode').classList.toggle('hidden');
         }
 
-        function bukaDetailDraft(rId, tgl) { /* (Fungsi Original Detail Draft Anda, tetap sama tidak ada yang dikurangi) */ 
-            if(!globalDraftData[rId] || !globalDraftData[rId].dates[tgl]) return;
+        function bukaDetailDraft(rId, tgl) { /* (Fungsi Original Detail Draft Anda, tetap sama tidak ada yang dikurangi) */
+            if (!globalDraftData[rId] || !globalDraftData[rId].dates[tgl]) return;
             const resellerName = globalDraftData[rId].reseller_name; const items = globalDraftData[rId].dates[tgl];
             const isGroupPending = items.some(i => i.status === 'pending'); const isAdmin = currentUserInfo.role === 'admin';
-            
+
             document.getElementById('headerDetailDraft').innerHTML = isAdmin ? `
                 <div class="flex flex-col gap-2 mb-3 bg-blue-50/50 dark:bg-slate-700/50 p-2.5 rounded-xl border border-blue-100 dark:border-slate-600">
                     <div class="flex justify-between items-center mb-1"><span class="text-[10px] font-black text-blue-600 dark:text-blue-400">Master Edit Mode</span>${isGroupPending ? `<span class="text-[9px] bg-orange-100 text-orange-600 dark:bg-orange-900/50 dark:text-orange-400 px-1.5 py-0.5 rounded font-bold">Menunggu Review</span>` : ``}</div>
@@ -862,18 +2221,56 @@
                     <div><label class="block text-[9px] font-bold text-gray-500 dark:text-slate-400 mb-0.5">Ubah Tanggal:</label><input type="date" id="editGlobalTanggal" class="w-full text-[11px] p-2 rounded-lg border border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-800 dark:text-white font-bold focus:border-blue-500" value="${tgl}"></div>
                 </div>` : `<div class="flex flex-col gap-1.5 mb-2"><div class="flex justify-between items-start"><div><span class="font-black text-sm block dark:text-slate-100">${resellerName}</span><span class="text-[10px] text-gray-500 dark:text-slate-400">Draf untuk: <b>${formatHariTanggalID(tgl)}</b></span></div></div></div>`;
 
+            // 1. Urutkan: Barang Setor ('jadi') berada di paling atas sebelum 'bahan'
+            const sortedItems = [...items].sort((a, b) => {
+                const orderA = a.tipe === 'jadi' ? 0 : 1;
+                const orderB = b.tipe === 'jadi' ? 0 : 1;
+                if (orderA !== orderB) return orderA - orderB;
+                if (a.created_at && b.created_at) {
+                    return new Date(a.created_at) - new Date(b.created_at);
+                }
+                return (a.id || 0) - (b.id || 0);
+            });
+
             let htmlList = '';
-            items.forEach(item => {
-                let badgeColor = item.tipe === 'bahan' ? 'bg-red-50 text-red-600 border-red-100 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50' : 'bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800/50';
-                let bName = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id)?.nama || 'Barang Dihapus';
-                
+            sortedItems.forEach(item => {
+                const isBahan = item.tipe === 'bahan';
+                const badgeColor = isBahan
+                    ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/60'
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60';
+                const badgeLabel = isBahan ? 'BHN' : 'STR';
+
+                const bName = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id)?.nama || 'Barang Dihapus';
+                const jamStr = item.created_at ? formatJamMenit(item.created_at) : '';
+                const infoBy = jamStr && !item.input_by?.includes(jamStr) ? `(by: ${item.input_by || 'Sistem'} - ${jamStr})` : `(by: ${item.input_by || 'Sistem'})`;
+
                 htmlList += `<li class="draft-edit-row flex flex-col bg-white dark:bg-slate-700/80 p-2.5 rounded-xl border ${item.status === 'pending' ? 'border-orange-300 animate-border-glow' : 'border-gray-200 dark:border-slate-600 shadow-sm'} transition-all" data-id="${item.id}">
                     <div class="view-mode flex flex-col w-full ${isAdmin && item.status === 'pending' ? 'hidden' : ''}">
-                        <div class="flex justify-between items-center w-full">
-                            <div class="flex items-center gap-1.5 w-8/12"><span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeColor}">${item.tipe}</span><span class="font-semibold text-xs truncate dark:text-slate-100">${bName} <span class="text-gray-400 dark:text-gray-500 font-normal text-[9.5px] italic ml-1">(by: ${item.input_by || 'Sistem'})</span></span></div>
-                            <div class="flex items-center gap-2 shrink-0"><span class="font-black text-blue-600 dark:text-blue-400 text-xs bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-800/50">Qty: ${item.qty}</span>${isAdmin ? `<button onclick="toggleEditRow(this)" class="text-amber-500 hover:text-amber-600 dark:text-amber-400 p-1 rounded-lg bg-amber-50 dark:bg-slate-800 border border-amber-100 dark:border-slate-600 shadow-sm"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>` : ''}</div>
+                        <!-- Baris 1: Chip/Badge Singkatan + Nama Barang (flex-1) & Qty + Edit Button (shrink-0) -->
+                        <div class="flex justify-between items-start gap-2 w-full">
+                            <div class="flex items-start gap-1.5 flex-1 min-w-0">
+                                <span class="inline-flex items-center text-[9px] font-black px-1.5 py-0.5 rounded border shrink-0 mt-0.5 tracking-wider ${badgeColor}">
+                                    ${badgeLabel}
+                                </span>
+                                <span class="font-bold text-xs text-gray-800 dark:text-slate-100 leading-snug break-words">
+                                    ${bName}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0 ml-1">
+                                <span class="font-black text-blue-600 dark:text-blue-400 text-xs bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-800/50">
+                                    Qty: ${item.qty}
+                                </span>
+                                ${isAdmin ? `<button onclick="toggleEditRow(this)" class="text-amber-500 hover:text-amber-600 dark:text-amber-400 p-1 rounded-lg bg-amber-50 dark:bg-slate-800 border border-amber-100 dark:border-slate-600 shadow-sm" title="Edit"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>` : ''}
+                            </div>
                         </div>
-                        ${item.keterangan ? `<div class="w-full mt-2 pt-2 border-t border-gray-100 dark:border-slate-600 flex items-start gap-1.5"><i data-feather="message-circle" class="w-3.5 h-3.5 text-gray-400 shrink-0 mt-[1px]"></i><span class="text-[10px] text-gray-500 dark:text-slate-300 italic leading-snug">${item.keterangan}</span></div>` : ''}
+
+                        <!-- Baris 2: Sub-info Penginput & Waktu (Selalu terbaca penuh, tidak terpotong) -->
+                        <div class="flex items-center gap-1 mt-1 ml-0.5 text-[9.5px] text-gray-400 dark:text-gray-500 font-normal">
+                            <span class="italic">${infoBy}</span>
+                        </div>
+
+                        <!-- Keterangan (jika ada) -->
+                        ${item.keterangan ? `<div class="w-full mt-1.5 pt-1.5 border-t border-gray-100 dark:border-slate-600 flex items-start gap-1.5"><i data-feather="message-circle" class="w-3 h-3 text-gray-400 shrink-0 mt-[1px]"></i><span class="text-[10px] text-gray-500 dark:text-slate-300 italic leading-snug">${item.keterangan}</span></div>` : ''}
                     </div>
                     ${isAdmin ? `
                     <div class="edit-mode flex flex-col w-full gap-1.5 ${item.status === 'pending' ? '' : 'hidden'}">
@@ -893,7 +2290,7 @@
                 </li>`;
             });
             document.getElementById('listDetailDraft').innerHTML = htmlList;
-            
+
             const footer = document.getElementById('footerDetailDraft');
             if (isAdmin) {
                 footer.innerHTML = `<button onclick="closeFormModal('modalDetailDraft')" class="flex-1 bg-gray-100 text-gray-700 text-[11px] font-bold py-2.5 rounded-xl border border-gray-200">Tutup</button>
@@ -907,6 +2304,11 @@
             const finalRId = document.getElementById('editGlobalReseller') ? document.getElementById('editGlobalReseller').value : oldRId;
             const finalTgl = document.getElementById('editGlobalTanggal') ? document.getElementById('editGlobalTanggal').value : oldTgl;
 
+            // Validasi Kunci Tanggal saat edit draft
+            if (isTanggalTerkunci(finalTgl)) {
+                return showNotification(`Tanggal ${formatHariTanggalID(finalTgl)} telah dikunci oleh Admin!`, "error");
+            }
+
             document.querySelectorAll('.draft-edit-row').forEach(row => {
                 const id = row.dataset.id; const bId = row.querySelector('.edit-brg').value; const qty = parseFloat(row.querySelector('.edit-qty').value) || 0;
                 if (!bId || qty <= 0) hasError = true;
@@ -919,40 +2321,58 @@
                 if (error) throw error;
                 showNotification("Draf harian diperbarui!", "success");
                 closeFormModal('modalDetailDraft'); await fetchListHarian();
-            } catch(e) { showNotification("Gagal: " + e.message, "error"); }
+            } catch (e) { showNotification("Gagal: " + e.message, "error"); }
         }
 
         // --- KASBON LOGIC ---
         async function simpanCatatanKasbon() {
             // Validasi tambahan: Cegah karyawan melakukan input kasbon
-			if (currentUserInfo && currentUserInfo.role === 'karyawan') {
-				return showNotification("Akses ditolak: Karyawan tidak diizinkan menginput kasbon!", "error");
-			}			
-			
-			const tgl = document.getElementById('inputTglKasbon').value;
+            if (currentUserInfo && currentUserInfo.role === 'karyawan') {
+                return showNotification("Akses ditolak: Karyawan tidak diizinkan menginput kasbon!", "error");
+            }
+
+            const tgl = document.getElementById('inputTglKasbon').value;
             const rId = document.getElementById('inputResellerKasbon').value;
-            
-			// Hilangkan titik terlebih dahulu sebelum diubah menjadi float/angka murni
-			const rawNominal = document.getElementById('inputNominalKasbon').value.replace(/\./g, '');
-			const nominal = parseFloat(rawNominal);
+
+            // Hilangkan titik terlebih dahulu sebelum diubah menjadi float/angka murni
+            const rawNominal = document.getElementById('inputNominalKasbon').value.replace(/\./g, '');
+            const nominal = parseFloat(rawNominal);
             const ket = document.getElementById('inputKetKasbon').value;
 
-            if(!tgl || !rId || !nominal || nominal <= 0) return showNotification("Lengkapi Tanggal, Agen & Nominal!", "error");
-            if(!ket) return showNotification("Keterangan wajib diisi!", "error");
+            if (!tgl || !rId || !nominal || nominal <= 0) return showNotification("Lengkapi Tanggal, Agen & Nominal!", "error");
+            if (!ket) return showNotification("Keterangan wajib diisi!", "error");
+
+            // Validasi Kunci Tanggal
+            if (isTanggalTerkunci(tgl)) {
+                return showNotification(`Tanggal ${formatHariTanggalID(tgl)} telah dikunci oleh Admin!`, "error");
+            }
+
+            // Validasi Plafon Limit Kasbon
+            const opSettings = getOperasionalSettings();
+            if (opSettings.maxKasbonLimit && opSettings.maxKasbonLimit > 0 && nominal > opSettings.maxKasbonLimit) {
+                if (currentUserInfo && currentUserInfo.role !== 'admin') {
+                    return showNotification(`Nominal melebihi limit kasbon harian (Maksimal Rp ${Number(opSettings.maxKasbonLimit).toLocaleString('id-ID')})!`, "error");
+                }
+            }
 
             const btn = document.getElementById('btnSimpanKasbon');
             btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 mr-1.5 animate-spin"></i> Menyimpan...`; btn.disabled = true;
 
             const statusInput = (currentUserInfo.role === 'reseller') ? 'pending' : 'approved';
-            const dataToInsert = { reseller_id: rId, tanggal_pengajuan: tgl, nominal: nominal, keterangan: ket, is_paid: false, input_by: currentUserInfo.nama_lengkap, status: statusInput };
+            const now = new Date();
+            const jamMenit = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            const kasbonInputBy = (currentUserInfo.nama_lengkap && !currentUserInfo.nama_lengkap.includes(':'))
+                ? `${currentUserInfo.nama_lengkap} - ${jamMenit}`
+                : (currentUserInfo.nama_lengkap || 'Admin');
+            const dataToInsert = { reseller_id: rId, tanggal_pengajuan: tgl, nominal: nominal, keterangan: ket, is_paid: false, input_by: kasbonInputBy, status: statusInput };
 
             try {
                 const { data: savedData, error } = await supabaseClient.from('kasbon_harian').insert([dataToInsert]).select();
-                if(error) throw error;
+                if (error) throw error;
                 showNotification("Kasbon berhasil dicatat!", "success");
-                
+
                 lastSavedGroupKey = { rId: rId, tgl: tgl };
-                lastSavedItems = savedData; 
+                lastSavedItems = savedData;
                 isLastSavedKasbon = true; // Flag bahwa ini adalah kasbon
 
                 document.getElementById('inputNominalKasbon').value = ''; document.getElementById('inputKetKasbon').value = '';
@@ -962,7 +2382,7 @@
                 document.getElementById('postSaveMsg').innerText = "Konfirmasi dan infokan juga kepada admin langsung ya";
                 document.getElementById('btnPostSavePrint').classList.toggle('hidden', statusInput === 'pending');
                 openFormModal('modalPostSave');
-            } catch(e) { showNotification("Gagal: " + e.message, "error"); }
+            } catch (e) { showNotification("Gagal: " + e.message, "error"); }
             finally { btn.innerHTML = `<i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Kasbon`; btn.disabled = false; feather.replace(); }
         }
 
@@ -972,16 +2392,16 @@
             try {
                 let query = supabaseClient.from('kasbon_harian').select('*').eq('is_paid', false).order('tanggal_pengajuan', { ascending: false });
                 if (currentUserInfo.role === 'reseller' && currentUserInfo.reseller_id) query = query.eq('reseller_id', currentUserInfo.reseller_id);
-                
+
                 const { data, error } = await query;
-                if(error) throw error;
+                if (error) throw error;
                 globalKasbonData = data || []; renderListKasbon();
             } catch (err) { container.innerHTML = `<div class="text-center text-red-500 text-xs py-4">Gagal memuat kasbon.</div>`; }
         }
 
         function renderListKasbon() {
             const container = document.getElementById('listCatatanKasbon');
-            if(globalKasbonData.length === 0) { container.innerHTML = '<div class="text-center text-gray-400 text-xs py-6 italic">Belum ada kasbon.</div>'; return; }
+            if (globalKasbonData.length === 0) { container.innerHTML = '<div class="text-center text-gray-400 text-xs py-6 italic">Belum ada kasbon.</div>'; return; }
             let html = '';
             globalKasbonData.forEach(item => {
                 let rName = masterData.resellers.find(r => r.id === item.reseller_id)?.nama || 'Unknown';
@@ -1009,87 +2429,96 @@
         async function setujuiKasbon(id) {
             try {
                 const { error } = await supabaseClient.from('kasbon_harian').update({ status: 'approved' }).eq('id', id);
-                if(error) throw error;
+                if (error) throw error;
                 showNotification("Kasbon disetujui!", "success"); fetchListKasbon();
-            } catch(e) { showNotification("Gagal update", "error"); }
+            } catch (e) { showNotification("Gagal update", "error"); }
         }
 
         // --- SISTEM HAPUS GLOBAL ---
         function hapusCatatanDatabase(id, type) {
-            if(currentUserInfo.role !== 'admin') return showNotification("Hanya Admin!", "error");
+            if (currentUserInfo.role !== 'admin') return showNotification("Hanya Admin!", "error");
             itemToDelete = { id, type }; document.getElementById('inputPinHapus').value = ''; openFormModal('modalPin');
         }
 
         async function prosesHapusDataValidasi() {
             const pin = document.getElementById('inputPinHapus').value;
             if (pin !== "942715") return showNotification("PIN Admin Salah!", "error");
-            if(!itemToDelete) return;
+            if (!itemToDelete) return;
             const { id, type } = itemToDelete; closeFormModal('modalPin');
             try {
                 const { error } = await supabaseClient.from(type === 'kasbon' ? 'kasbon_harian' : 'buku_harian').delete().eq('id', id);
-                if(error) throw error;
+                if (error) throw error;
                 showNotification("Data dihapus!", "success");
-                if(type === 'kasbon') fetchListKasbon(); else { closeFormModal('modalDetailDraft'); fetchListHarian(); }
+                if (type === 'kasbon') fetchListKasbon(); else { closeFormModal('modalDetailDraft'); fetchListHarian(); }
             } catch (err) { showNotification("Gagal menghapus", "error"); } finally { itemToDelete = null; }
         }
 
         // --- SISTEM CETAK BLUETOOTH ---
         async function cetakDraftTerakhir() {
             if (!lastSavedItems || lastSavedItems.length === 0) return;
-            if (isLastSavedKasbon) await prosesCetakKasbon(lastSavedItems[0]); 
+            if (isLastSavedKasbon) await prosesCetakKasbon(lastSavedItems[0]);
             else await prosesCetakBluetooth(lastSavedItems, lastSavedGroupKey.rId, lastSavedGroupKey.tgl);
             closeFormModal('modalPostSave');
         }
         async function cetakDraftKhusus(rId, tgl) { if (globalDraftData[rId] && globalDraftData[rId].dates[tgl]) await prosesCetakBluetooth(globalDraftData[rId].dates[tgl], rId, tgl); }
-        async function cetakSatuKasbon(id) { const item = globalKasbonData.find(k => String(k.id) === String(id)); if(item) await prosesCetakKasbon(item); }
+        async function cetakSatuKasbon(id) { const item = globalKasbonData.find(k => String(k.id) === String(id)); if (item) await prosesCetakKasbon(item); }
 
         async function prosesCetakBluetooth(items, rId, tgl) {
             let device; // Deklarasikan device di luar try agar bisa diakses blok finally
             try {
                 if (!navigator.bluetooth) throw new Error("Web Bluetooth tidak didukung browser ini.");
                 showNotification("Menghubungkan ke printer...", "info");
-                
-                device = await navigator.bluetooth.requestDevice({ 
-                    acceptAllDevices: true, 
-                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '0000ff00-0000-1000-8000-00805f9b34fb', '49535343-fe7d-4ae5-8fa9-9fafd205e455'] 
+
+                device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '0000ff00-0000-1000-8000-00805f9b34fb', '49535343-fe7d-4ae5-8fa9-9fafd205e455']
                 });
-                
-                const server = await device.gatt.connect(); 
+
+                const server = await device.gatt.connect();
                 const services = await server.getPrimaryServices();
                 let targetChar = null;
-                
-                for (let s of services) { 
-                    for (let c of await s.getCharacteristics()) { 
-                        if (c.properties.write || c.properties.writeWithoutResponse) { 
-                            targetChar = c; 
-                            break; 
-                        } 
-                    } 
-                    if (targetChar) break; 
+
+                for (let s of services) {
+                    for (let c of await s.getCharacteristics()) {
+                        if (c.properties.write || c.properties.writeWithoutResponse) {
+                            targetChar = c;
+                            break;
+                        }
+                    }
+                    if (targetChar) break;
                 }
                 if (!targetChar) throw new Error("Karakteristik Write printer tidak ditemukan.");
 
                 let enc = new TextEncoder(); let cmd = [];
-                cmd.push(0x1B, 0x40, 0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01); 
-                cmd.push(...enc.encode("SBR PUTRA FOOD\n")); cmd.push(0x1B, 0x45, 0x00); 
+                const strukCfg = getStrukSettings();
+                cmd.push(0x1B, 0x40, 0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01);
+                cmd.push(...enc.encode(`${strukCfg.header1}\n`)); cmd.push(0x1B, 0x45, 0x00);
+                if (strukCfg.header2) cmd.push(...enc.encode(`${strukCfg.header2}\n`));
                 cmd.push(...enc.encode("NOTA CATATAN HARIAN\n--------------------------------\n")); cmd.push(0x1B, 0x61, 0x00);
-                
+
                 let res = masterData.resellers.find(r => r.id === rId);
-                const w = new Date(); 
-                cmd.push(...enc.encode(`Nama    : ${res ? res.nama : '-'}\nJam/Tgl : ${String(w.getHours()).padStart(2,'0')}.${String(w.getMinutes()).padStart(2,'0')} ${formatHariTanggalID(tgl)}\n--------------------------------\nQTY | NAMA BARANG\n--------------------------------\n\n`));
-                
-                items.forEach(item => {
+                const w = new Date();
+                cmd.push(...enc.encode(`Nama    : ${res ? res.nama : '-'}\nJam/Tgl : ${String(w.getHours()).padStart(2, '0')}.${String(w.getMinutes()).padStart(2, '0')} ${formatHariTanggalID(tgl)}\n--------------------------------\nQTY | NAMA BARANG\n--------------------------------\n\n`));
+
+                const sortedPrintItems = [...items].sort((a, b) => {
+                    const orderA = a.tipe === 'jadi' ? 0 : 1;
+                    const orderB = b.tipe === 'jadi' ? 0 : 1;
+                    if (orderA !== orderB) return orderA - orderB;
+                    return (a.id || 0) - (b.id || 0);
+                });
+
+                sortedPrintItems.forEach(item => {
                     let brg = [...masterData.barangJadi, ...masterData.bahanBaku].find(b => b.id === item.barang_id);
                     cmd.push(...enc.encode(`${`${item.qty}x`.padEnd(4, ' ')}| ${brg ? brg.nama : 'Item'}\n`));
-                    if(item.keterangan) cmd.push(...enc.encode(`        Ket: ${item.keterangan}\n`));
+                    if (item.keterangan) cmd.push(...enc.encode(`        Ket: ${item.keterangan}\n`));
                 });
-                
-                cmd.push(...enc.encode("\n")); cmd.push(0x1B, 0x61, 0x01); 
-                cmd.push(...enc.encode(`Oleh: ${items[0]?.input_by || '-'}\n--------------------------------\nMOHON CEK KEMBALI\n\n\n\n`)); 
+
+                cmd.push(...enc.encode("\n")); cmd.push(0x1B, 0x61, 0x01);
+                cmd.push(...enc.encode(`Oleh: ${items[0]?.input_by || '-'}\n--------------------------------\n${strukCfg.footer}\n\n\n\n`));
                 cmd.push(0x1D, 0x56, 0x41, 0x03); // Perintah cut / feed kertas
 
-                const rawData = new Uint8Array(cmd); 
-                for (let i = 0; i < rawData.length; i += 64) { 
+                const rawData = new Uint8Array(cmd);
+                for (let i = 0; i < rawData.length; i += 64) {
                     let chunk = rawData.slice(i, i + 64);
                     // Prioritaskan writeWithoutResponse untuk perangkat thermal BLE
                     if (targetChar.properties.writeWithoutResponse) {
@@ -1097,11 +2526,11 @@
                     } else {
                         await targetChar.writeValue(chunk);
                     }
-                    await new Promise(r => setTimeout(r, 40)); 
+                    await new Promise(r => setTimeout(r, 40));
                 }
                 showNotification("Berhasil mencetak!", "success");
-            } catch (err) { 
-                showNotification("Gagal cetak: " + err.message, "error"); 
+            } catch (err) {
+                showNotification("Gagal cetak: " + err.message, "error");
             } finally {
                 // Membebaskan buffer Bluetooth setelah selesai atau terjadi error
                 if (device && device.gatt.connected) {
@@ -1115,55 +2544,57 @@
             try {
                 if (!navigator.bluetooth) throw new Error("Bluetooth Web tidak didukung browser ini.");
                 showNotification("Menghubungkan ke printer...", "info");
-                
-                device = await navigator.bluetooth.requestDevice({ 
-                    acceptAllDevices: true, 
-                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '0000ff00-0000-1000-8000-00805f9b34fb', '49535343-fe7d-4ae5-8fa9-9fafd205e455'] 
+
+                device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '0000ff00-0000-1000-8000-00805f9b34fb', '49535343-fe7d-4ae5-8fa9-9fafd205e455']
                 });
-                
-                const server = await device.gatt.connect(); 
+
+                const server = await device.gatt.connect();
                 const services = await server.getPrimaryServices();
                 let targetChar = null;
-                
-                for (let s of services) { 
-                    for (let c of await s.getCharacteristics()) { 
-                        if (c.properties.write || c.properties.writeWithoutResponse) { 
-                            targetChar = c; 
-                            break; 
-                        } 
-                    } 
-                    if (targetChar) break; 
+
+                for (let s of services) {
+                    for (let c of await s.getCharacteristics()) {
+                        if (c.properties.write || c.properties.writeWithoutResponse) {
+                            targetChar = c;
+                            break;
+                        }
+                    }
+                    if (targetChar) break;
                 }
                 if (!targetChar) throw new Error("Karakteristik Write printer tidak ditemukan.");
 
                 let enc = new TextEncoder(); let cmd = [];
-                cmd.push(0x1B, 0x40, 0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01); 
-                cmd.push(...enc.encode("SBR PUTRA FOOD\nBUKTI KASBON\n")); 
+                const strukCfg = getStrukSettings();
+                cmd.push(0x1B, 0x40, 0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01);
+                cmd.push(...enc.encode(`${strukCfg.header1}\nBUKTI KASBON\n`));
                 cmd.push(0x1B, 0x45, 0x00, 0x1B, 0x61, 0x00);
-                
+                if (strukCfg.header2) cmd.push(...enc.encode(`${strukCfg.header2}\n`));
+
                 let res = masterData.resellers.find(r => r.id === item.reseller_id);
                 cmd.push(...enc.encode(`--------------------------------\nTanggal : ${formatHariTanggalID(item.tanggal_pengajuan)}\nNama    : ${res ? res.nama : '-'}\nKet     : ${item.keterangan}\n--------------------------------\n`));
-                
+
                 cmd.push(...enc.encode(`NOMINAL :\n`));
                 cmd.push(0x1B, 0x61, 0x01, 0x1B, 0x45, 0x01, 0x1D, 0x21, 0x11);
                 cmd.push(...enc.encode(`Rp ${item.nominal.toLocaleString('id-ID')}\n`));
                 cmd.push(0x1D, 0x21, 0x00, 0x1B, 0x45, 0x00, 0x1B, 0x61, 0x00);
-                cmd.push(...enc.encode(`--------------------------------\n\n\n\n`));
+                cmd.push(...enc.encode(`--------------------------------\n${strukCfg.footer}\n\n\n\n`));
                 cmd.push(0x1D, 0x56, 0x41, 0x03);
-                
-                const rawData = new Uint8Array(cmd); 
-                for (let i = 0; i < rawData.length; i += 64) { 
+
+                const rawData = new Uint8Array(cmd);
+                for (let i = 0; i < rawData.length; i += 64) {
                     let chunk = rawData.slice(i, i + 64);
                     if (targetChar.properties.writeWithoutResponse) {
                         await targetChar.writeValueWithoutResponse(chunk);
                     } else {
                         await targetChar.writeValue(chunk);
                     }
-                    await new Promise(r => setTimeout(r, 40)); 
+                    await new Promise(r => setTimeout(r, 40));
                 }
                 showNotification("Berhasil mencetak kasbon!", "success");
-            } catch (err) { 
-                showNotification("Gagal cetak: " + err.message, "error"); 
+            } catch (err) {
+                showNotification("Gagal cetak: " + err.message, "error");
             } finally {
                 // Membebaskan buffer Bluetooth setelah selesai
                 if (device && device.gatt.connected) {
@@ -1171,23 +2602,44 @@
                 }
             }
         }
-        
-        function openFormModal(id) { document.getElementById(id).classList.remove('hidden'); feather.replace(); }
+
+        function openFormModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            if (id === 'modalMasterAdmin') tampilMasterHub();
+            feather.replace();
+        }
         function closeFormModal(id) { document.getElementById(id).classList.add('hidden'); }
-        
-		function toggleKeteranganEditAdmin(btn) {
+
+        function toggleKeteranganEditAdmin(btn) {
             const container = btn.closest('.edit-mode').querySelector('.keterangan-edit-container');
             container.classList.toggle('hidden');
-            
+
             // Otomatis fokus ke input jika baru dimunculkan
             if (!container.classList.contains('hidden')) {
                 container.querySelector('.edit-ket').focus();
             }
         }
-				window.onload = () => { 
+        window.onload = () => {
             initTheme(); // Memanggil tema dari Local Storage
-            checkSession(); 
+            checkSession();
+
+            // 1. Otomatis cek update saat pertama kali buka aplikasi
+            cekPembaruanAplikasiOtomatis();
         };
+
+        // 2. Cek update saat karyawan membuka kembali layar HP / beralih kembali dari WhatsApp
+        // Walaupun karyawan tidak pernah logout, update tetap terdeteksi otomatis
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                cekPembaruanAplikasiOtomatis();
+            }
+        });
+
+        // 3. Cek otomatis berkala setiap 15 menit jika aplikasi dibiarkan terbuka terus
+        setInterval(() => {
+            cekPembaruanAplikasiOtomatis();
+        }, 15 * 60 * 1000);
     </script>
 </body>
+
 </html>
