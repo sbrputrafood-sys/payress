@@ -1413,6 +1413,7 @@
 
         let riwayatTransactions = [];
         let modeEditTrxId = null;
+        let lastUpdatedTrxId = null;
         let currentDraftIds = [];
         let currentKasbonDraftIds = [];
         let currentViewTrxId = null;
@@ -3688,16 +3689,25 @@
                     }
                 }
 
+                const isRecentlyUpdated = String(trx.id) === String(lastUpdatedTrxId);
+                const highlightBorder = isRecentlyUpdated
+                    ? 'border-emerald-500 ring-2 ring-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/30'
+                    : 'border-gray-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 bg-white dark:bg-slate-700/60';
+
                 html += `
                     <li onclick="lihatPratinjauRiwayat('${trx.id}')"
+                        id="trxCard_${trx.id}"
                         data-nama="${resNama.toLowerCase()}"
-                        class="item-trx-reseller flex justify-between items-center p-3 bg-white dark:bg-slate-700/60 border border-gray-200 dark:border-slate-700 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md cursor-pointer transition group">
+                        class="item-trx-reseller flex justify-between items-center p-3 rounded-xl hover:shadow-md cursor-pointer transition group border ${highlightBorder}">
                         <div class="flex items-center gap-3 min-w-0">
-                            <div class="bg-blue-50 dark:bg-slate-600 p-2 rounded-xl text-blue-600 dark:text-slate-300 group-hover:scale-105 transition shrink-0">
-                                <i data-feather="user" class="w-4 h-4"></i>
+                            <div class="${isRecentlyUpdated ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/60 dark:text-emerald-300' : 'bg-blue-50 dark:bg-slate-600 text-blue-600 dark:text-slate-300'} p-2 rounded-xl group-hover:scale-105 transition shrink-0">
+                                <i data-feather="${isRecentlyUpdated ? 'check-circle' : 'user'}" class="w-4 h-4"></i>
                             </div>
                             <div class="min-w-0">
-                                <span class="font-bold text-xs text-gray-800 dark:text-slate-100 block truncate">${resNama}</span>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold text-xs text-gray-800 dark:text-slate-100 block truncate">${resNama}</span>
+                                    ${isRecentlyUpdated ? '<span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 border border-emerald-300">Baru Diupdate</span>' : ''}
+                                </div>
                                 <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-1 text-[10px] text-gray-500 dark:text-slate-400">
                                     <span>Setoran: ${formatRupiah(setoran)}</span>
                                     ${ambilBahan > 0 ? `<span class="text-amber-600 dark:text-amber-400 font-medium">Pengambilan bahan: -${formatRupiah(ambilBahan)}</span>` : ''}
@@ -3862,6 +3872,53 @@
             document.getElementById('btnSubmit').classList.replace('bg-amber-500', 'bg-blue-600');
             document.getElementById('btnGroupEdit').classList.add('hidden');
             jalankanReset();
+        }
+
+        async function arahkanKeRiwayatDanPratinjau(trxId, date) {
+            try {
+                // 1. Munculkan modal Riwayat dan overlay
+                const modalRiwayat = document.getElementById('modalRiwayat');
+                const overlay = document.getElementById('modalOverlay');
+                if (modalRiwayat) modalRiwayat.classList.remove('hidden');
+                if (overlay) overlay.classList.remove('hidden');
+
+                setTimeout(() => {
+                    if (modalRiwayat && modalRiwayat.children[0]) {
+                        modalRiwayat.children[0].classList.replace('scale-95', 'scale-100');
+                    }
+                }, 10);
+
+                // 2. Sesuaikan filter bulan jika ada tanggal transaksi
+                if (date) {
+                    const ym = date.substring(0, 7);
+                    currentRiwayatBulan = ym;
+                    if (riwayatMonthsList && !riwayatMonthsList.includes(ym)) {
+                        riwayatMonthsList.unshift(ym);
+                    }
+                    populateRiwayatMonthSelect();
+                    const selBulan = document.getElementById('selectRiwayatBulan');
+                    if (selBulan) selBulan.value = ym;
+                }
+
+                // 3. Muat data riwayat terbaru dari database
+                await fetchRiwayatData();
+
+                // 4. Buka tampilan daftar agen di tanggal tersebut pada modal riwayat
+                if (date) {
+                    renderRiwayatReseller(date);
+                    setTimeout(() => {
+                        const targetCard = document.getElementById(`trxCard_${trxId}`);
+                        if (targetCard) {
+                            targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
+                    }, 150);
+                }
+
+                // 5. Tampilkan pratinjau nota riwayat yang baru saja diperbarui
+                await lihatPratinjauRiwayat(trxId);
+            } catch (err) {
+                console.error("Gagal mengarahkan ke riwayat & pratinjau:", err);
+            }
         }
 
         function bukaPratinjau() {
@@ -4059,6 +4116,9 @@
 
             try {
                 let trxId;
+                const isEditMode = Boolean(modeEditTrxId);
+                const editedTgl = tgl;
+
                 if (modeEditTrxId) {
                     await supabaseClient.from('transaksi').update({
                         reseller_id: selectedResellerId,
@@ -4110,7 +4170,7 @@
                     }
                 }
 
-                const msgSuccess = modeEditTrxId ? "Perubahan transaksi & data susulan berhasil disimpan!" : "Transaksi Berhasil Disimpan!";
+                const msgSuccess = isEditMode ? "Perubahan transaksi & data susulan berhasil disimpan!" : "Transaksi Berhasil Disimpan!";
                 showNotification(msgSuccess, "success");
 
                 const btnSubmit = document.getElementById('btnSubmit');
@@ -4127,6 +4187,13 @@
                 await fetchRiwayatData();
                 cekNotifikasiPending();
                 feather.replace();
+
+                if (isEditMode && trxId) {
+                    lastUpdatedTrxId = trxId;
+                    setTimeout(async () => {
+                        await arahkanKeRiwayatDanPratinjau(trxId, editedTgl);
+                    }, 250);
+                }
             } catch (error) {
                 showNotification("Gagal menyimpan: " + error.message, "error");
             }
@@ -4134,10 +4201,25 @@
 
         function closeModal(id) {
             const modalEl = document.getElementById(id);
-            if (modalEl.children[0]) modalEl.children[0].classList.replace('scale-100', 'scale-95');
+            if (!modalEl) return;
+            const contentCard = (id === 'modalPratinjau') ? modalEl.children[1] : (modalEl.querySelector('.pointer-events-auto') || modalEl.children[0]);
+            if (contentCard && contentCard.classList.contains('scale-100')) {
+                contentCard.classList.replace('scale-100', 'scale-95');
+            }
             setTimeout(() => {
                 modalEl.classList.add('hidden');
-                document.getElementById('modalOverlay').classList.add('hidden');
+
+                // Jangan sembunyikan modalOverlay jika modalRiwayat atau modal lain masih terbuka
+                const otherModals = ['modalRiwayat', 'modalHarian', 'modalAgen', 'modalBarang', 'modalHarga'];
+                const isAnyOtherOpen = otherModals.some(mId => {
+                    const el = document.getElementById(mId);
+                    return el && !el.classList.contains('hidden');
+                });
+                if (!isAnyOtherOpen) {
+                    const overlay = document.getElementById('modalOverlay');
+                    if (overlay) overlay.classList.add('hidden');
+                }
+
                 if (id === 'modalPratinjau') { currentViewTrxId = null; }
             }, 200);
         }
