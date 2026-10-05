@@ -72,6 +72,91 @@
         .animate-border-glow {
             animation: borderGlowPulse 1s infinite ease-in-out;
         }
+
+        /* --- Calm pulse: latar kotak CATATAN ADMIN --- */
+        @keyframes noticeBackgroundPulseAmber {
+
+            0%,
+            100% {
+                background-color: #fffbeb;
+                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.0);
+            }
+
+            50% {
+                background-color: #fcd34d;
+                box-shadow: 0 0 14px 3px rgba(245, 158, 11, 0.45);
+            }
+        }
+
+        @keyframes noticeBackgroundPulseBlue {
+
+            0%,
+            100% {
+                background-color: #eff6ff;
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.0);
+            }
+
+            50% {
+                background-color: #93c5fd;
+                box-shadow: 0 0 14px 3px rgba(59, 130, 246, 0.45);
+            }
+        }
+
+        .notice-calm-pulse {
+            animation: noticeBackgroundPulseAmber 3s ease-in-out infinite;
+            will-change: background-color, box-shadow;
+        }
+
+        .notice-calm-pulse-blue {
+            animation: noticeBackgroundPulseBlue 3s ease-in-out infinite;
+            will-change: background-color, box-shadow;
+        }
+
+        /* Mode gelap: varian gelap masing-masing warna */
+        .dark .notice-calm-pulse {
+            animation-name: noticeBackgroundPulseAmberDark;
+        }
+
+        .dark .notice-calm-pulse-blue {
+            animation-name: noticeBackgroundPulseBlueDark;
+        }
+
+        @keyframes noticeBackgroundPulseAmberDark {
+
+            0%,
+            100% {
+                background-color: rgba(120, 53, 15, 0.22);
+                box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.04);
+            }
+
+            50% {
+                background-color: rgba(120, 53, 15, 0.58);
+                box-shadow: 0 0 10px 2px rgba(251, 191, 36, 0.16);
+            }
+        }
+
+        @keyframes noticeBackgroundPulseBlueDark {
+
+            0%,
+            100% {
+                background-color: rgba(30, 58, 138, 0.3);
+                box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.05);
+            }
+
+            50% {
+                background-color: rgba(30, 58, 138, 0.72);
+                box-shadow: 0 0 10px 2px rgba(96, 165, 250, 0.2);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .notice-calm-pulse,
+            .notice-calm-pulse-blue {
+                animation: none;
+                will-change: auto;
+            }
+        }
     </style>
 </head>
 
@@ -119,7 +204,7 @@
                 </button>
                 <div
                     class="mt-4 pt-3 border-t border-gray-100 dark:border-slate-700/60 flex justify-between items-center text-[10px] text-gray-400 dark:text-slate-500">
-                    <span class="font-medium">Versi 7.2 • SBR System</span>
+                    <span class="font-medium">Versi 7.4 • SBR System</span>
                     <button type="button" onclick="cekPembaruanAplikasiOtomatis(true)"
                         class="hover:text-blue-500 flex items-center gap-1 font-semibold transition active:scale-95">
                         <i data-feather="refresh-cw" class="w-3 h-3"></i> Cek Update
@@ -198,6 +283,90 @@
 
             <!-- ================= AREA BARANG ================= -->
             <div id="areaBarang" class="space-y-4 transition-all duration-300">
+
+                <!-- ================= RINGKASAN TOTAL BAHAN & SETOR (Admin & Reseller) ================= -->
+                <div id="cardSummaryTotal"
+                    class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 hidden">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="min-w-0">
+                            <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i
+                                    data-feather="bar-chart-2" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Ringkasan
+                                Total Bahan &amp; Setor</h3>
+                            <p id="summaryScopeLabel"
+                                class="text-[10px] text-gray-500 dark:text-slate-400 font-semibold mt-0.5 truncate"></p>
+                        </div>
+                        <button onclick="toggleSummaryCard()" class="text-gray-400 hover:text-blue-500 p-1 shrink-0"
+                            aria-label="Buka/tutup ringkasan">
+                            <i data-feather="chevron-up" id="iconSummaryChevron"
+                                class="w-4 h-4 transition-transform"></i>
+                        </button>
+                    </div>
+
+                    <div id="summaryBody" class="space-y-2.5">
+                        <!-- Chip Periode -->
+                        <div id="summaryPeriodChips" class="flex gap-1.5 overflow-x-auto custom-scroll pb-0.5">
+                            <button data-period="today" onclick="setSummaryPeriod('today')"
+                                class="summary-chip text-[10px] font-black px-2.5 py-1.5 rounded-lg border shrink-0 transition bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 border-transparent">Hari
+                                ini</button>
+                            <button data-period="all" onclick="setSummaryPeriod('all')"
+                                class="summary-chip text-[10px] font-black px-2.5 py-1.5 rounded-lg border shrink-0 transition bg-blue-600 text-white border-blue-600">Belum
+                                lunas</button>
+                        </div>
+
+                        <!-- Label Rentang Periode -->
+                        <p id="summaryRangeLabel"
+                            class="text-[10px] font-black text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/50 rounded-lg px-2 py-1.5 text-center">
+                        </p>
+
+                        <!-- Dua Kolom: Pengambilan Bahan & Setoran Barang -->
+                        <div class="grid grid-cols-2 gap-2" id="summaryListWrap">
+                            <div
+                                class="bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl p-2.5 min-w-0">
+                                <div
+                                    class="flex items-center gap-1.5 mb-1.5 pb-1.5 border-b border-gray-200 dark:border-slate-700">
+                                    <span
+                                        class="w-5 h-5 rounded-md bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                                        <i data-feather="package" class="w-3 h-3"></i></span>
+                                    <span
+                                        class="text-[9px] font-black text-gray-500 dark:text-slate-400 uppercase tracking-wider truncate">Pengambilan
+                                        Bahan</span>
+                                </div>
+                                <div id="summaryListBahan"
+                                    class="space-y-1 max-h-[220px] overflow-y-auto custom-scroll pr-0.5">
+                                    <div class="flex justify-center py-3"><i data-feather="loader"
+                                            class="w-4 h-4 animate-spin text-blue-500"></i></div>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl p-2.5 min-w-0">
+                                <div
+                                    class="flex items-center gap-1.5 mb-1.5 pb-1.5 border-b border-gray-200 dark:border-slate-700">
+                                    <span
+                                        class="w-5 h-5 rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                        <i data-feather="truck" class="w-3 h-3"></i></span>
+                                    <span
+                                        class="text-[9px] font-black text-gray-500 dark:text-slate-400 uppercase tracking-wider truncate">Setoran
+                                        Barang</span>
+                                </div>
+                                <div id="summaryListSetor"
+                                    class="space-y-1 max-h-[220px] overflow-y-auto custom-scroll pr-0.5">
+                                    <div class="flex justify-center py-3"><i data-feather="loader"
+                                            class="w-4 h-4 animate-spin text-blue-500"></i></div>
+                                </div>
+                                <div id="summaryStatusWrap"
+                                    class="mt-2 pt-2 border-t border-gray-200 dark:border-slate-700">
+                                    <div id="summaryStatusSetor"></div>
+                                    <!-- Catatan admin: hanya disentuh renderSummaryNote, tidak pernah oleh renderSummaryBahanSetor -->
+                                    <div id="summaryNoteBox" class="hidden mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rincian per Agen (Admin Only) -->
+                        <div id="summaryAgenBreakdown" class="hidden"></div>
+                    </div>
+                </div>
+
                 <div
                     class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 relative overflow-hidden">
                     <h2 class="text-xs font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center"><i
@@ -268,7 +437,7 @@
                             <button onclick="toggleFilterDraft()"
                                 class="text-gray-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1"><i
                                     data-feather="filter" class="w-3 h-3"></i> Filter</button>
-                            <button onclick="fetchListHarian()"
+                            <button onclick="refreshBarangData()"
                                 class="text-blue-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1"><i
                                     data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan</button>
                         </div>
@@ -726,7 +895,8 @@
         <div class="bg-white dark:bg-slate-800 w-full max-w-xs rounded-2xl shadow-2xl flex flex-col p-5 text-center">
             <div
                 class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
-                <i data-feather="check-circle" class="w-6 h-6"></i></div>
+                <i data-feather="check-circle" class="w-6 h-6"></i>
+            </div>
             <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 mb-1" id="postSaveTitle">Tersimpan!</h3>
             <p class="text-[11px] text-gray-500 dark:text-slate-400 mb-4" id="postSaveMsg">Cetak Ke BT Thermal 58mm ?
             </p>
@@ -1140,6 +1310,18 @@
         let globalDraftData = {};
         let globalKasbonData = {}; // Data Khusus Kasbon
 
+        // --- STATE RINGKASAN TOTAL BAHAN & SETOR ---
+        let summaryPeriod = 'all';              // 'today' | '7d' | 'month' | 'all'
+        let summaryCache = {};                  // cache per (periode + rentang + role)
+        const SUMMARY_CHIP_ACTIVE = ['bg-blue-600', 'text-white', 'border-blue-600'];
+        const SUMMARY_CHIP_INACTIVE = ['bg-gray-100', 'dark:bg-slate-700', 'text-gray-600', 'dark:text-slate-300', 'border-transparent'];
+
+        // --- CATATAN ADMIN: RINGKASAN SETOR (global, tersimpan di Supabase) ---
+        // Independen dari summaryCache (cache itu per-periode + berisi baris buku_harian).
+        let summaryNoteState = { isi: '', loaded: false, editing: false };
+        const SUMMARY_NOTE_KEY = 'ringkasan_setor';   // pk pada tabel catatan_ringkasan
+        const SUMMARY_NOTE_MAX = 200;                 // maxlength textarea
+
         let lastSavedGroupKey = null;
         let lastSavedItems = null;
         let isLastSavedKasbon = false; // Deteksi mode struk terakhir
@@ -1203,6 +1385,14 @@
             }
         }
 
+
+        // Escape string untuk disisipkan ke innerHTML (belum ada helper serupa di file ini)
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/[&<>"']/g, c => (
+                { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+            ));
+        }
 
         function showNotification(message, type = 'success') {
             const container = document.getElementById('toastContainer');
@@ -1273,6 +1463,7 @@
         async function prosesLogout() {
             await supabaseClient.auth.signOut();
             currentUserInfo = null;
+            resetSummaryNote();
             document.getElementById('dashboardArea').classList.add('hidden');
             document.getElementById('loginArea').classList.remove('hidden');
             showNotification("Berhasil keluar.", "success");
@@ -1304,6 +1495,13 @@
                 if (formKasbonCard) formKasbonCard.classList.add('hidden'); // Karyawan tidak bisa input kasbon
             } else {
                 if (formKasbonCard) formKasbonCard.classList.remove('hidden'); // Admin & Reseller bisa
+            }
+
+            // Atur visibilitas kartu Ringkasan Total Bahan & Setor (hanya Admin & Reseller)
+            const cardSummary = document.getElementById('cardSummaryTotal');
+            if (cardSummary) {
+                if (currentUserInfo.role === 'karyawan') cardSummary.classList.add('hidden');
+                else cardSummary.classList.remove('hidden');
             }
 
             if (currentUserInfo.role === 'admin') {
@@ -1988,6 +2186,16 @@
             updateOpsiHarian();
             fetchListHarian();
             fetchListKasbon();
+            // Ringkasan total (admin & reseller saja; fetchSummaryBahanSetor punya guard karyawan)
+            if (currentUserInfo && currentUserInfo.role !== 'karyawan') {
+                const collapsed = localStorage.getItem('sbr_summary_collapsed') === '1';
+                if (collapsed) {
+                    document.getElementById('summaryBody').classList.add('hidden');
+                    document.getElementById('iconSummaryChevron').classList.add('rotate-180');
+                }
+                fetchSummaryBahanSetor(true);
+                fetchSummaryNote(); // non-blocking; degradasi anggun bila tabel belum ada
+            }
         }
 
         // --- BARANG LOGIC (Asli) ---
@@ -2104,6 +2312,7 @@
                 for (let i = 0; i < 3; i++) { addRowHarian(); }
 
                 await fetchListHarian();
+                await fetchSummaryBahanSetor(true);
                 document.getElementById('postSaveTitle').innerText = (statusInput === 'pending') ? "Menunggu Validasi" : "Tersimpan!";
                 document.getElementById('btnPostSavePrint').classList.toggle('hidden', statusInput === 'pending');
                 openFormModal('modalPostSave');
@@ -2148,6 +2357,388 @@
         function toggleResellerAccordion(rId) {
             document.getElementById(`accContent_${rId}`).classList.toggle('hidden');
             document.getElementById(`iconAcc_${rId}`).classList.toggle('rotate-180');
+        }
+
+        // ==============================================================
+        // RINGKASAN TOTAL BAHAN & SETOR (Admin & Reseller)
+        // ==============================================================
+        function getSummaryDateRange(period) {
+            const tzOffset = (new Date()).getTimezoneOffset() * 60000;
+            const d = new Date(Date.now() - tzOffset);
+            const today = d.toISOString().slice(0, 10);
+            if (period === 'today') return { awal: today, akhir: today };
+            if (period === '7d') {
+                const awal = new Date(d.getTime() - 6 * 86400000).toISOString().slice(0, 10);
+                return { awal, akhir: today };
+            }
+            if (period === 'month') return { awal: today.slice(0, 8) + '01', akhir: today };
+            return { awal: null, akhir: null }; // 'all'
+        }
+
+        function aggregateSummaryRows(rows) {
+            const acc = {
+                bahan: [], setor: [],           // per-barang: { id, nama, qty }
+                pendingCount: 0,
+                // hitungan baris (transaksi) setoran per status validasi
+                setorApproved: 0, setorPending: 0,
+                perAgen: {}
+            };
+            const bahanMap = {}, setorMap = {};
+            rows.forEach(r => {
+                const qty = Number(r.qty) || 0;
+                const isBahan = r.tipe === 'bahan';
+                const map = isBahan ? bahanMap : setorMap;
+                const key = r.barang_id ?? 'unknown';
+                if (!map[key]) {
+                    const src = isBahan ? masterData.bahanBaku : masterData.barangJadi;
+                    map[key] = { id: key, nama: src.find(b => b.id === key)?.nama || 'Barang dihapus', qty: 0 };
+                }
+                map[key].qty += qty;
+                const isPending = r.status === 'pending';
+                if (isPending) acc.pendingCount++;
+                if (!isBahan) {
+                    if (isPending) acc.setorPending++;
+                    else acc.setorApproved++;
+                }
+                const rk = r.reseller_id;
+                if (!acc.perAgen[rk]) acc.perAgen[rk] = { setor: 0, bahan: 0, pending: 0 };
+                if (isBahan) acc.perAgen[rk].bahan += qty; else acc.perAgen[rk].setor += qty;
+                if (isPending) acc.perAgen[rk].pending++;
+            });
+            acc.bahan = Object.values(bahanMap).sort((a, b) => b.qty - a.qty);
+            acc.setor = Object.values(setorMap).sort((a, b) => b.qty - a.qty);
+            return acc;
+        }
+
+        // Label rentang periode ringkas, contoh: "28 Sep – 5 Okt 2026"
+        function formatSummaryRange(period, awal, akhir) {
+            if (period === 'all' || !awal || !akhir) return 'Semua Tanggal (Belum Lunas)';
+            const bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            const p = s => { const d = new Date(s); return { tgl: d.getDate(), bln: bulan[d.getMonth()], thn: d.getFullYear() }; };
+            const a = p(awal), b = p(akhir);
+            if (awal === akhir) return `${a.tgl} ${a.bln} ${a.thn}`;
+            if (a.thn === b.thn && a.bln === b.bln) return `${a.tgl}–${b.tgl} ${b.bln} ${b.thn}`;
+            if (a.thn === b.thn) return `${a.tgl} ${a.bln} – ${b.tgl} ${b.bln} ${b.thn}`;
+            return `${a.tgl} ${a.bln} ${a.thn} – ${b.tgl} ${b.bln} ${b.thn}`;
+        }
+
+        function renderSummaryItemRows(items, emptyMsg) {
+            if (!items.length) return `<div class="text-center text-gray-400 dark:text-slate-500 text-[10px] py-2 italic">${emptyMsg}</div>`;
+            const fmt = n => Number(n).toLocaleString('id-ID');
+            return items.map(it => `
+                <div class="flex justify-between items-center gap-1 leading-tight">
+                    <span class="text-[10px] font-semibold text-gray-700 dark:text-slate-300 truncate">${it.nama}</span>
+                    <span class="text-[11px] font-black text-gray-900 dark:text-slate-500 shrink-0">${fmt(it.qty)}</span>
+                </div>`).join('');
+        }
+
+        function renderSummaryBahanSetor(rows) {
+            const agg = aggregateSummaryRows(rows);
+            const fmt = n => Number(n).toLocaleString('id-ID');
+            const isReseller = currentUserInfo.role === 'reseller';
+
+            // Label scope: nama akun reseller untuk role reseller, info jumlah agen untuk admin
+            const scopeEl = document.getElementById('summaryScopeLabel');
+            if (isReseller) {
+                const rName = masterData.resellers.find(r => r.id === currentUserInfo.reseller_id)?.nama
+                    || currentUserInfo.nama_lengkap || 'Akun Anda';
+                scopeEl.innerHTML = `<span class="font-black text-blue-600 dark:text-blue-400">${rName}</span> · Data milik Anda`;
+            } else {
+                const agenCount = Object.keys(agg.perAgen).length;
+                scopeEl.textContent = `Semua Agen · ${agenCount} agen aktif`;
+            }
+
+            // Label rentang periode
+            const { awal, akhir } = getSummaryDateRange(summaryPeriod);
+            const rangeText = formatSummaryRange(summaryPeriod, awal, akhir);
+            document.getElementById('summaryRangeLabel').textContent =
+                summaryPeriod === 'all' ? rangeText : 'Periode ' + rangeText;
+
+            // Dua kolom list rincian (hanya belum lunas)
+            const listBahan = document.getElementById('summaryListBahan');
+            const listSetor = document.getElementById('summaryListSetor');
+            if (rows.length === 0) {
+                listBahan.innerHTML = `<div class="text-center text-gray-400 dark:text-slate-500 text-[10px] py-2 italic">Belum ada data.</div>`;
+                listSetor.innerHTML = listBahan.innerHTML;
+            } else {
+                listBahan.innerHTML = renderSummaryItemRows(agg.bahan, 'Belum ada pengambilan bahan.');
+                listSetor.innerHTML = renderSummaryItemRows(agg.setor, 'Belum ada setoran barang.');
+            }
+
+            // Status validasi khusus setoran barang; hitung jumlah baris transaksi.
+            document.getElementById('summaryStatusSetor').innerHTML = `
+                <div class="flex justify-between items-center gap-1 text-[10px] leading-tight">
+                    <span class="font-semibold text-emerald-700 dark:text-emerald-400">✓ Tervalidasi</span>
+                    <span class="font-black text-gray-900 dark:text-slate-100">${fmt(agg.setorApproved)} setoran</span>
+                </div>
+                <div class="flex justify-between items-center gap-1 text-[10px] leading-tight mt-1">
+                    <span class="font-semibold text-amber-600 dark:text-amber-400">◷ Menunggu persetujuan</span>
+                    <span class="font-black text-gray-900 dark:text-slate-100">${fmt(agg.setorPending)} setoran</span>
+                </div>`;
+
+            // Rincian per Agen (khusus admin, hanya data belum lunas)
+            const breakdown = document.getElementById('summaryAgenBreakdown');
+            if (currentUserInfo.role === 'admin' && rows.length > 0) {
+                breakdown.classList.remove('hidden');
+                const entries = Object.entries(agg.perAgen).sort((a, b) => b[1].setor - a[1].setor);
+                const rowsHtml = entries.map(([rId, v]) => {
+                    const name = masterData.resellers.find(r => r.id === rId)?.nama || 'Unknown';
+                    return `<div class="flex justify-between items-center py-1.5 border-b border-gray-50 dark:border-slate-700/50 last:border-0">
+                        <span class="text-[10px] font-bold text-gray-700 dark:text-slate-300 truncate mr-2">${name}</span>
+                        <span class="text-[9px] font-bold text-gray-500 dark:text-slate-400 shrink-0">Setor ${fmt(v.setor)} · Bahan ${fmt(v.bahan)}${v.pending ? ` · <span class="text-orange-500">${v.pending} pending</span>` : ''}</span>
+                    </div>`;
+                }).join('');
+                breakdown.innerHTML = `
+                    <button onclick="toggleSummaryAgen()" class="w-full flex justify-between items-center pt-1.5 text-[10px] font-black text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                        <span>Rincian per Agen</span>
+                        <i data-feather="chevron-down" id="iconSummaryAgen" class="w-3.5 h-3.5 transition-transform"></i>
+                    </button>
+                    <div id="summaryAgenContent" class="hidden pt-1">${rowsHtml}</div>`;
+            } else {
+                breakdown.classList.add('hidden');
+                breakdown.innerHTML = '';
+            }
+
+            feather.replace();
+        }
+
+        function toggleSummaryAgen() {
+            document.getElementById('summaryAgenContent').classList.toggle('hidden');
+            document.getElementById('iconSummaryAgen').classList.toggle('rotate-180');
+        }
+
+        async function fetchSummaryBahanSetor(force = false) {
+            if (!currentUserInfo || currentUserInfo.role === 'karyawan') return; // guard: karyawan tidak boleh akses
+            const listBahan = document.getElementById('summaryListBahan');
+            const listSetor = document.getElementById('summaryListSetor');
+            const { awal, akhir } = getSummaryDateRange(summaryPeriod);
+            const cacheKey = `${summaryPeriod}|${awal}|${akhir}|${currentUserInfo.role}`;
+
+            if (!force && summaryCache[cacheKey]) { renderSummaryBahanSetor(summaryCache[cacheKey]); return; }
+
+            const spinner = `<div class="flex justify-center py-3"><i data-feather="loader" class="w-4 h-4 animate-spin text-blue-500"></i></div>`;
+            listBahan.innerHTML = spinner; listSetor.innerHTML = spinner;
+            document.getElementById('summaryStatusSetor').innerHTML = '';
+            feather.replace();
+
+            try {
+                let query = supabaseClient.from('buku_harian')
+                    .select('id, reseller_id, barang_id, tanggal_setor, qty, tipe, status, is_paid')
+                    .eq('is_paid', false) // ringkasan hanya menampilkan yang belum lunas
+                    .order('tanggal_setor', { ascending: false });
+                // Scope role: reseller hanya lihat datanya sendiri (pola sama dengan fetchListHarian)
+                if (currentUserInfo.role === 'reseller' && currentUserInfo.reseller_id)
+                    query = query.eq('reseller_id', currentUserInfo.reseller_id);
+                if (awal) query = query.gte('tanggal_setor', awal);
+                if (akhir) query = query.lte('tanggal_setor', akhir);
+
+                const { data, error } = await query;
+                if (error) throw error;
+                summaryCache[cacheKey] = data || [];
+                renderSummaryBahanSetor(data || []);
+            } catch (err) {
+                const msg = `<div class="text-center text-red-500 text-[10px] py-3">Gagal memuat: ${err.message}</div>`;
+                listBahan.innerHTML = msg; listSetor.innerHTML = msg;
+            }
+        }
+
+        function setSummaryPeriod(period) {
+            summaryPeriod = period;
+            document.querySelectorAll('#summaryPeriodChips .summary-chip').forEach(btn => {
+                const active = btn.dataset.period === period;
+                btn.classList.remove(...SUMMARY_CHIP_ACTIVE, ...SUMMARY_CHIP_INACTIVE);
+                btn.classList.add(...(active ? SUMMARY_CHIP_ACTIVE : SUMMARY_CHIP_INACTIVE));
+            });
+            fetchSummaryBahanSetor(); // cache hit = instan
+        }
+
+        function toggleSummaryCard() {
+            const body = document.getElementById('summaryBody');
+            const icon = document.getElementById('iconSummaryChevron');
+            const collapsed = body.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180', collapsed);
+            localStorage.setItem('sbr_summary_collapsed', collapsed ? '1' : '0');
+            if (!collapsed) fetchSummaryNote(true); // tarik catatan terbaru saat kartu dibuka
+        }
+
+        // ==============================================================
+        // CATATAN ADMIN — RINGKASAN SETOR (tabel: catatan_ringkasan)
+        // Global (bukan per periode / per agen). RLS adalah peneguh;
+        // cek role di sini hanya UX (advisory).
+        // ==============================================================
+
+        // Tampilkan/sembunyikan kotak catatan + tombol edit. Idempoten.
+        function renderSummaryNote() {
+            const box = document.getElementById('summaryNoteBox');
+            if (!box || summaryNoteState.editing) return; // editor punya render sendiri
+            if (!currentUserInfo || currentUserInfo.role === 'karyawan') {
+                box.classList.add('hidden'); box.innerHTML = ''; return;
+            }
+            const isAdmin = currentUserInfo.role === 'admin';
+            const isi = summaryNoteState.isi || '';
+            const kosong = isi.trim() === '';
+
+            // Reseller tanpa catatan = tanpa kotak (bukan kotak kosong)
+            if (!isAdmin && kosong) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+
+            box.classList.remove('hidden');
+            if (isAdmin) {
+                // Admin SELALU melihat kotak, agar bisa menambah saat masih kosong
+                box.innerHTML = `
+                    <div class="rounded-lg bg-blue-50 dark:bg-blue-900/25 border border-blue-100 dark:border-blue-800/50 p-2 notice-calm-pulse-blue">
+                        <div class="flex items-center justify-between gap-1 mb-1">
+                            <span class="flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                                <i data-feather="sticky-note" class="w-3 h-3"></i> Catatan Admin
+                            </span>
+                            <button type="button" onclick="mulaiEditSummaryNote()"
+                                class="text-[9px] font-black text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-0.5">
+                                <i data-feather="edit-2" class="w-3 h-3"></i> ${kosong ? 'Tambah' : 'Ubah'}
+                            </button>
+                        </div>
+                        <p class="text-[10px] leading-snug text-blue-900 dark:text-blue-100 whitespace-pre-wrap break-words ${kosong ? 'italic opacity-60' : ''}">${kosong ? 'Belum ada catatan.' : escapeHtml(isi)}</p>
+                    </div>`;
+            } else {
+                // Reseller: read-only, tanpa affordance edit apa pun
+                box.innerHTML = `
+                    <div class="rounded-lg bg-amber-50 dark:bg-amber-900/25 border border-amber-100 dark:border-amber-800/50 p-2 notice-calm-pulse">
+                        <div class="flex items-center gap-1 mb-1 text-[9px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                            <i data-feather="info" class="w-3 h-3"></i> Catatan Admin
+                        </div>
+                        <p class="text-[10px] leading-snug text-amber-900 dark:text-amber-100 whitespace-pre-wrap break-words">${escapeHtml(isi)}</p>
+                    </div>`;
+            }
+            feather.replace();
+        }
+
+        // Ambil catatan. TIDAK PERNAH melempar error; kalau tabel belum dibuat
+        // (SQL belum dijalankan) dianggap "tidak ada catatan" dan kartu tetap normal.
+        async function fetchSummaryNote(force = false) {
+            try {
+                if (!currentUserInfo || currentUserInfo.role === 'karyawan') return;
+                if (!force && summaryNoteState.loaded) { renderSummaryNote(); return; }
+
+                const { data, error } = await supabaseClient
+                    .from('catatan_ringkasan')
+                    .select('isi')
+                    .eq('kode', SUMMARY_NOTE_KEY)
+                    .maybeSingle();
+
+                if (error) {
+                    // Degradasi anggun: tabel belum ada / belum masuk schema cache PostgREST
+                    const missing = error.code === '42P01' || error.code === 'PGRST205'
+                        || /catatan_ringkasan|does not exist|Could not find the table/i.test(error.message || '');
+                    if (!missing) console.warn('[catatan ringkasan] gagal dimuat:', error);
+                    summaryNoteState.isi = '';
+                    summaryNoteState.loaded = true;
+                    renderSummaryNote();
+                    return;
+                }
+
+                summaryNoteState.isi = (data && typeof data.isi === 'string') ? data.isi : '';
+                summaryNoteState.loaded = true;
+                renderSummaryNote();
+            } catch (e) {
+                console.warn('[catatan ringkasan] catch:', e);
+                summaryNoteState.loaded = true;
+                renderSummaryNote();
+            }
+        }
+
+        // Mode edit inline (admin saja; guard di sini bersifat advisory)
+        function mulaiEditSummaryNote() {
+            if (!currentUserInfo || currentUserInfo.role !== 'admin') return;
+            const box = document.getElementById('summaryNoteBox');
+            if (!box) return;
+            summaryNoteState.editing = true;
+            box.classList.remove('hidden');
+            box.innerHTML = `
+                <div class="rounded-lg bg-blue-50 dark:bg-blue-900/25 border border-blue-100 dark:border-blue-800/50 p-2">
+                    <div class="flex items-center gap-1 mb-1 text-[9px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                        <i data-feather="sticky-note" class="w-3 h-3"></i> Catatan Admin
+                    </div>
+                    <textarea id="summaryNoteInput" rows="3" maxlength="${SUMMARY_NOTE_MAX}"
+                        placeholder="Tulis catatan singkat untuk reseller…"
+                        class="w-full text-[10px] leading-snug rounded-lg border border-blue-200 dark:border-blue-700 bg-white dark:bg-slate-900 text-gray-800 dark:text-slate-100 p-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"></textarea>
+                    <div class="flex items-center justify-between gap-1 mt-1">
+                        <span id="summaryNoteCount" class="text-[9px] font-bold text-blue-500 dark:text-blue-400">0/${SUMMARY_NOTE_MAX}</span>
+                        <span class="flex gap-1">
+                            <button type="button" onclick="batalEditSummaryNote()"
+                                class="text-[9px] font-black px-2 py-1 rounded-md bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300">Batal</button>
+                            <button type="button" id="btnSimpanSummaryNote" onclick="simpanSummaryNote()"
+                                class="text-[9px] font-black px-2 py-1 rounded-md bg-blue-600 text-white flex items-center gap-1">
+                                <i data-feather="save" class="w-3 h-3"></i> Simpan</button>
+                        </span>
+                    </div>
+                </div>`;
+            const ta = document.getElementById('summaryNoteInput');
+            // Isi via properti .value (bukan interpolasi template) agar aman dari escaping
+            ta.value = summaryNoteState.isi;
+            const cnt = document.getElementById('summaryNoteCount');
+            cnt.textContent = `${ta.value.length}/${SUMMARY_NOTE_MAX}`;
+            ta.addEventListener('input', () => {
+                cnt.textContent = `${ta.value.length}/${SUMMARY_NOTE_MAX}`;
+            });
+            ta.focus();
+            ta.setSelectionRange(ta.value.length, ta.value.length);
+            feather.replace();
+        }
+
+        function batalEditSummaryNote() {
+            summaryNoteState.editing = false;
+            renderSummaryNote();
+        }
+
+        // Simpan (upsert = INSERT ... ON CONFLICT DO UPDATE; butuh policy INSERT DAN UPDATE)
+        async function simpanSummaryNote() {
+            if (!currentUserInfo || currentUserInfo.role !== 'admin') return;
+            const ta = document.getElementById('summaryNoteInput');
+            const btn = document.getElementById('btnSimpanSummaryNote');
+            if (!ta || !btn) return;
+
+            const isi = ta.value.trim().slice(0, SUMMARY_NOTE_MAX);
+            btn.disabled = true;
+            btn.innerHTML = `<i data-feather="loader" class="w-3 h-3 animate-spin"></i> Menyimpan`;
+            feather.replace();
+
+            try {
+                const { error } = await supabaseClient.from('catatan_ringkasan').upsert({
+                    kode: SUMMARY_NOTE_KEY,
+                    isi: isi,
+                    diubah_oleh: currentUserInfo.id,   // === Supabase Auth user id
+                    diperbarui_pada: new Date().toISOString()
+                }, { onConflict: 'kode' });
+                if (error) throw error;
+
+                summaryNoteState.isi = isi;
+                summaryNoteState.loaded = true;
+                summaryNoteState.editing = false;
+                renderSummaryNote();
+                showNotification('Catatan ringkasan berhasil disimpan!', 'success');
+            } catch (err) {
+                const msg = err.message || String(err);
+                const missing = err.code === '42P01' || err.code === 'PGRST205'
+                    || /catatan_ringkasan|does not exist/i.test(msg);
+                const rls = err.code === '42501' || /row-level security|permission denied/i.test(msg);
+                showNotification(
+                    missing ? 'Tabel catatan_ringkasan belum dibuat. Jalankan catatan_ringkasan.sql dulu lalu reload halaman.'
+                        : rls ? 'Gagal: hak akses ditolak (RLS). Pastikan Anda login sebagai admin.'
+                            : 'Gagal menyimpan catatan: ' + escapeHtml(msg),
+                    'error'
+                );
+                summaryNoteState.editing = false; // kembali ke mode baca
+                summaryNoteState.loaded = false;
+                renderSummaryNote();
+            }
+        }
+
+        // Dipanggil saat logout agar user berikutnya tidak mewarisi catatan session sebelumnya
+        function resetSummaryNote() {
+            summaryNoteState = { isi: '', loaded: false, editing: false };
+        }
+
+        function refreshBarangData() {
+            fetchListHarian();
+            fetchSummaryBahanSetor(true); // cache-bust
         }
 
         function renderFilteredDrafts() {
@@ -2320,7 +2911,7 @@
                 const { error } = await supabaseClient.from('buku_harian').upsert(updates);
                 if (error) throw error;
                 showNotification("Draf harian diperbarui!", "success");
-                closeFormModal('modalDetailDraft'); await fetchListHarian();
+                closeFormModal('modalDetailDraft'); await fetchListHarian(); fetchSummaryBahanSetor(true);
             } catch (e) { showNotification("Gagal: " + e.message, "error"); }
         }
 
@@ -2449,7 +3040,7 @@
                 const { error } = await supabaseClient.from(type === 'kasbon' ? 'kasbon_harian' : 'buku_harian').delete().eq('id', id);
                 if (error) throw error;
                 showNotification("Data dihapus!", "success");
-                if (type === 'kasbon') fetchListKasbon(); else { closeFormModal('modalDetailDraft'); fetchListHarian(); }
+                if (type === 'kasbon') fetchListKasbon(); else { closeFormModal('modalDetailDraft'); fetchListHarian(); fetchSummaryBahanSetor(true); }
             } catch (err) { showNotification("Gagal menghapus", "error"); } finally { itemToDelete = null; }
         }
 
