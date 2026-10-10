@@ -2577,21 +2577,26 @@
             feather.replace();
 
             try {
-                // Rollback status catatan harian dan kasbon harian terkait agar tidak terkunci
-                await supabaseClient.from('buku_harian').update({ is_paid: false, transaksi_id: null }).eq('transaksi_id', targetHapusId);
-                try {
-                    await supabaseClient.from('kasbon_harian').update({ is_paid: false, transaksi_id: null }).eq('transaksi_id', targetHapusId);
-                } catch (e) { }
+                // Urutan penting (sama seperti void): hapus transaksi dulu, baru rollback status.
+                const { error: errDetail } = await supabaseClient.from('transaksi_detail').delete().eq('transaksi_id', targetHapusId);
+                if (errDetail) throw errDetail;
 
-                await supabaseClient.from('transaksi_detail').delete().eq('transaksi_id', targetHapusId);
                 const { error } = await supabaseClient.from('transaksi').delete().eq('id', targetHapusId);
                 if (error) throw error;
 
-                showNotification("Riwayat transaksi berhasil dihapus & catatan harian dikembalikan ke status draft!", "success");
+                const { critical, bestEffort } = await rollbackHarianDraft(targetHapusId);
+                if (bestEffort.length > 0) console.warn("Lepas tautan catatan harian (best effort):", bestEffort);
+                if (critical.length > 0) {
+                    showNotification("Riwayat dihapus, tetapi mengembalikan catatan harian gagal. Detail: " + critical.join('; '), "error");
+                    console.error("Rollback catatan harian gagal:", critical, "trxId:", targetHapusId);
+                } else {
+                    showNotification("Riwayat transaksi berhasil dihapus & catatan harian dikembalikan ke status draft!", "success");
+                }
 
                 closeFormModal('modalPin');
                 closeModal('modalPratinjau');
-                fetchRiwayatData();
+                await fetchRiwayatData();
+                await fetchListHarian();
                 cekNotifikasiPending();
             } catch (err) {
                 showNotification("Gagal menghapus riwayat: " + err.message, "error");
@@ -2619,6 +2624,31 @@
             openFormModal('modalVoid');
         }
 
+        // Kembalikan catatan harian & kasbon ke status draft (belum dibayar) untuk satu transaksi.
+        // Kolom transaksi_id di buku_harian berbentuk NOT NULL, sehingga langkah "lepas tautan"
+        // (set null) selalu ditolak Postgres. Karena itu langkah WAJIB hanya mereset is_paid;
+        // melepas tautan diperlakukan best effort (tampilan Catatan Harian hanya membaca is_paid).
+        async function rollbackHarianDraft(trxId) {
+            const critical = [];   // reset status gagal -> catatan tetap terkunci di status lunas
+            const bestEffort = []; // lepas tautan gagal -> tidak berdampak pada tampilan
+
+            const resetStatus = async (table, label) => {
+                const { error } = await supabaseClient.from(table).update({ is_paid: false }).eq('transaksi_id', trxId);
+                if (error) critical.push(label + ": " + error.message);
+            };
+            const lepasTautan = async (table, label) => {
+                const { error } = await supabaseClient.from(table).update({ transaksi_id: null }).eq('transaksi_id', trxId);
+                if (error) bestEffort.push(label + ": " + error.message);
+            };
+
+            await resetStatus('buku_harian', 'buku_harian');
+            await lepasTautan('buku_harian', 'buku_harian');
+            await resetStatus('kasbon_harian', 'kasbon_harian');
+            await lepasTautan('kasbon_harian', 'kasbon_harian');
+
+            return { critical, bestEffort };
+        }
+
         async function eksekusiVoidTransaksi() {
             if (!targetVoidTrxId) return;
 
@@ -2635,29 +2665,24 @@
             const resId = trx ? trx.reseller_id : null;
 
             try {
-                // 1. Rollback buku_harian: set is_paid = false, transaksi_id = null
-                const { error: errBuku } = await supabaseClient.from('buku_harian')
-                    .update({ is_paid: false, transaksi_id: null })
-                    .eq('transaksi_id', trxId);
-                if (errBuku) console.warn("Rollback buku_harian:", errBuku);
+                // Urutan penting: hapus transaksi dulu, baru kembalikan status catatan harian.
+                // Tiap panggilan Supabase = transaksi DB sendiri. Jika catatan sudah direset
+                // tetapi penghapusan nota gagal, catatan tampil sebagai draft padahal nota
+                // masih ada di Riwayat -> bisa ter-rekap dua kali.
+                const { error: errDetail } = await supabaseClient.from('transaksi_detail').delete().eq('transaksi_id', trxId);
+                if (errDetail) throw errDetail;
 
-                // 2. Rollback kasbon_harian
-                try {
-                    await supabaseClient.from('kasbon_harian')
-                        .update({ is_paid: false, transaksi_id: null })
-                        .eq('transaksi_id', trxId);
-                } catch (e) {
-                    console.warn("Rollback kasbon_harian:", e);
-                }
-
-                // 3. Hapus transaksi_detail
-                await supabaseClient.from('transaksi_detail').delete().eq('transaksi_id', trxId);
-
-                // 4. Hapus transaksi utama
                 const { error: errTrx } = await supabaseClient.from('transaksi').delete().eq('id', trxId);
                 if (errTrx) throw errTrx;
 
-                showNotification("Nota berhasil di-VOID! Semua catatan harian dikembalikan ke status belum dibayar (Draft).", "success");
+                const { critical, bestEffort } = await rollbackHarianDraft(trxId);
+                if (bestEffort.length > 0) console.warn("Lepas tautan catatan harian (best effort):", bestEffort);
+                if (critical.length > 0) {
+                    showNotification("Nota berhasil di-VOID, tetapi mengembalikan catatan harian gagal. Hubungi admin. Detail: " + critical.join('; '), "error");
+                    console.error("Rollback catatan harian gagal:", critical, "trxId:", trxId);
+                } else {
+                    showNotification("Nota berhasil di-VOID! Semua catatan harian dikembalikan ke status belum dibayar (Draft).", "success");
+                }
 
                 closeFormModal('modalVoid');
                 closeModal('modalPratinjau');
@@ -2679,6 +2704,7 @@
                 }
 
                 await fetchRiwayatData();
+                await fetchListHarian();
                 cekNotifikasiPending();
 
             } catch (err) {
@@ -3878,18 +3904,17 @@
 
             try {
                 // Ambil ID catatan harian yang saat ini sudah tertaut pada transaksi ini
-                try {
-                    const { data: linkedBuku } = await supabaseClient.from('buku_harian').select('id').eq('transaksi_id', trx.id);
-                    currentDraftIds = (linkedBuku && linkedBuku.length > 0) ? linkedBuku.map(b => String(b.id)) : [];
+                const { data: linkedBuku, error: errLinkedBuku } = await supabaseClient.from('buku_harian').select('id').eq('transaksi_id', trx.id);
+                if (errLinkedBuku) throw errLinkedBuku;
+                currentDraftIds = (linkedBuku && linkedBuku.length > 0) ? linkedBuku.map(b => String(b.id)) : [];
 
-                    const { data: linkedKasbon } = await supabaseClient.from('kasbon_harian').select('id').eq('transaksi_id', trx.id);
-                    currentKasbonDraftIds = (linkedKasbon && linkedKasbon.length > 0) ? linkedKasbon.map(k => String(k.id)) : [];
-                } catch (e) {
-                    console.warn("Load linked drafts:", e);
-                }
+                const { data: linkedKasbon, error: errLinkedKasbon } = await supabaseClient.from('kasbon_harian').select('id').eq('transaksi_id', trx.id);
+                if (errLinkedKasbon) throw errLinkedKasbon;
+                currentKasbonDraftIds = (linkedKasbon && linkedKasbon.length > 0) ? linkedKasbon.map(k => String(k.id)) : [];
 
-                const { data: details } = await supabaseClient.from('transaksi_detail').select('*').eq('transaksi_id', trx.id);
-                details.forEach(d => {
+                const { data: details, error: errDetails } = await supabaseClient.from('transaksi_detail').select('*').eq('transaksi_id', trx.id);
+                if (errDetails) throw errDetails;
+                (details || []).forEach(d => {
                     const isBahan = masterData.bahanBaku.some(b => String(b.id) === String(d.barang_id));
                     if (isBahan) addRow('bahanBaku', d.barang_id, d.qty); else addRow('barangJadi', d.barang_id, d.qty);
                 });
@@ -4209,18 +4234,19 @@
                 if (detailData.length > 0) await supabaseClient.from('transaksi_detail').insert(detailData);
 
                 if (currentDraftIds.length > 0) {
-                    const { error: errUpdate } = await supabaseClient.from('buku_harian').update({ is_paid: true, transaksi_id: trxId }).in('id', currentDraftIds);
-                    if (errUpdate) {
-                        await supabaseClient.from('buku_harian').update({ is_paid: true }).in('id', currentDraftIds);
-                    }
+                    // Tanpa fallback "is_paid saja": baris lunas tanpa transaksi_id tidak akan
+                    // pernah ditemukan lagi oleh void/hapus riwayat, jadi kegagalan harus terlihat.
+                    const { error: errUpdate } = await supabaseClient.from('buku_harian')
+                        .update({ is_paid: true, transaksi_id: trxId })
+                        .in('id', currentDraftIds);
+                    if (errUpdate) throw errUpdate;
                 }
 
                 if (currentKasbonDraftIds.length > 0) {
-                    try {
-                        await supabaseClient.from('kasbon_harian').update({ is_paid: true, transaksi_id: trxId }).in('id', currentKasbonDraftIds);
-                    } catch (e) {
-                        await supabaseClient.from('kasbon_harian').update({ is_paid: true }).in('id', currentKasbonDraftIds);
-                    }
+                    const { error: errKasbonUpdate } = await supabaseClient.from('kasbon_harian')
+                        .update({ is_paid: true, transaksi_id: trxId })
+                        .in('id', currentKasbonDraftIds);
+                    if (errKasbonUpdate) throw errKasbonUpdate;
                 }
 
                 const msgSuccess = isEditMode ? "Perubahan transaksi & data susulan berhasil disimpan!" : "Transaksi Berhasil Disimpan!";
@@ -4237,7 +4263,7 @@
 
                 jalankanReset();
                 closeModal('modalPratinjau');
-                await fetchRiwayatData();
+                await Promise.all([fetchRiwayatData(), fetchListHarian()]);
                 cekNotifikasiPending();
                 feather.replace();
 
