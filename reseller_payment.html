@@ -22,6 +22,8 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <!-- html2canvas untuk Save as PNG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Chart.js untuk Visualisasi Analitik -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body {
@@ -218,6 +220,12 @@
                                         data-feather="clock"
                                         class="w-3.5 h-3.5 mr-3 text-gray-400 group-hover:text-blue-500"></i> Riwayat
                                     Pembayaran</a>
+                                <a href="#" onclick="openModal('modalAnalitik'); return false;"
+                                    class="group flex items-center px-4 py-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-slate-700 transition"><i
+                                        data-feather="bar-chart-2"
+                                        class="w-3.5 h-3.5 mr-3 text-indigo-500 group-hover:text-indigo-600"></i> Analitik Data Bulanan
+                                    <span
+                                        class="ml-auto bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-xs">Baru</span></a>
                             </div>
                         </div>
                     </div>
@@ -1135,6 +1143,320 @@
         </div>
     </div>
 
+    <!-- Modal Analitik & Laporan Periode Bulanan -->
+    <div id="modalAnalitik"
+        class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-2 sm:p-4">
+        <div
+            class="bg-white dark:bg-slate-800 w-full max-w-5xl rounded-2xl shadow-2xl pointer-events-auto flex flex-col max-h-[92vh] border border-gray-100 dark:border-slate-700 overflow-hidden transform scale-95 transition-all duration-200">
+            <!-- Modal Header -->
+            <div
+                class="flex flex-wrap justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-slate-700 bg-gray-50/80 dark:bg-slate-800/90 gap-2">
+                <div class="flex items-center gap-2.5">
+                    <span
+                        class="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 inline-flex items-center justify-center shadow-xs">
+                        <i data-feather="bar-chart-2" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-xs sm:text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center gap-2">
+                            Analitik Data & Rekap Bulanan
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 font-semibold">SBR Putra Food</span>
+                        </h3>
+                        <p class="text-[10px] sm:text-[11px] text-gray-500 dark:text-slate-400 mt-0.5">Analisis Pembayaran, Setoran Barang Jadi, dan Pengambilan Bahan Baku</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="exportAnalitikCSV()"
+                        class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-1.5 transition shadow-xs"
+                        title="Download Rekap CSV / Excel">
+                        <i data-feather="download" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">Export CSV</span>
+                    </button>
+                    <button onclick="closeModal('modalAnalitik')"
+                        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1.5 bg-gray-100/70 hover:bg-gray-200/70 dark:bg-slate-700 rounded-lg transition">
+                        <i data-feather="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sticky Filter Panel -->
+            <div
+                class="px-4 py-2.5 bg-gray-50/60 dark:bg-slate-800/70 border-b border-gray-100 dark:border-slate-700 flex flex-wrap items-center justify-between gap-2.5">
+                <!-- Baris Navigasi Bulan -->
+                <div class="flex items-center gap-1.5 flex-1 min-w-[200px]">
+                    <label class="text-[11px] font-bold text-gray-500 dark:text-slate-400 shrink-0 flex items-center gap-1">
+                        <i data-feather="calendar" class="w-3 h-3 text-indigo-500"></i> Periode:
+                    </label>
+                    <div
+                        class="flex items-center bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl p-0.5 shadow-xs">
+                        <button type="button" onclick="gantiBulanAnalitik(-1)" title="Bulan Sebelumnya"
+                            class="p-1 text-gray-500 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-600 rounded-lg transition">
+                            <i data-feather="chevron-left" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <select id="selectBulanAnalitik" onchange="onBulanAnalitikChange()"
+                            class="bg-transparent text-xs font-bold text-gray-800 dark:text-slate-100 text-center px-2 py-0.5 outline-none cursor-pointer">
+                        </select>
+                        <button type="button" onclick="gantiBulanAnalitik(1)" title="Bulan Berikutnya"
+                            class="p-1 text-gray-500 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-slate-600 rounded-lg transition">
+                            <i data-feather="chevron-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Reseller & Refresh -->
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1.5">
+                        <label class="text-[11px] font-bold text-gray-500 dark:text-slate-400 shrink-0">Reseller:</label>
+                        <select id="selectResellerAnalitik" onchange="onResellerAnalitikChange()"
+                            class="bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl px-2.5 py-1 text-xs text-gray-800 dark:text-slate-100 font-medium outline-none focus:border-indigo-500 shadow-xs cursor-pointer max-w-[170px] sm:max-w-[220px]">
+                            <option value="">Semua Agen Reseller</option>
+                        </select>
+                    </div>
+                    <button type="button" onclick="fetchAnalitikData()" title="Segarkan Data"
+                        class="p-1.5 text-gray-500 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 hover:bg-gray-100 rounded-xl transition shadow-xs">
+                        <i data-feather="rotate-cw" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Navigation Bar -->
+            <div class="px-4 pt-2 border-b border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 flex overflow-x-auto gap-1 custom-scroll">
+                <button type="button" id="tabBtnAnalitikRingkasan" onclick="switchAnalitikTab('ringkasan')"
+                    class="px-3 py-1.5 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 transition whitespace-nowrap">
+                    <i data-feather="pie-chart" class="w-3.5 h-3.5"></i> Ringkasan & Tren
+                </button>
+                <button type="button" id="tabBtnAnalitikSetoran" onclick="switchAnalitikTab('setoran')"
+                    class="px-3 py-1.5 text-xs font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-200 flex items-center gap-1.5 transition whitespace-nowrap">
+                    <i data-feather="package" class="w-3.5 h-3.5"></i> Setoran Barang Jadi
+                </button>
+                <button type="button" id="tabBtnAnalitikPengambilan" onclick="switchAnalitikTab('pengambilan')"
+                    class="px-3 py-1.5 text-xs font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-200 flex items-center gap-1.5 transition whitespace-nowrap">
+                    <i data-feather="shopping-bag" class="w-3.5 h-3.5"></i> Pengambilan Bahan Baku
+                </button>
+                <button type="button" id="tabBtnAnalitikPerforma" onclick="switchAnalitikTab('performa')"
+                    class="px-3 py-1.5 text-xs font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-200 flex items-center gap-1.5 transition whitespace-nowrap">
+                    <i data-feather="users" class="w-3.5 h-3.5"></i> Performa Agen
+                </button>
+            </div>
+
+            <!-- Content Container -->
+            <div class="p-3 sm:p-4 overflow-y-auto space-y-4 flex-1 custom-scroll" id="containerAnalitikContent">
+                
+                <!-- 4 KPI Summary Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+                    <!-- KPI 1: Net Pembayaran -->
+                    <div class="bg-gradient-to-br from-emerald-50 to-teal-50/50 dark:from-emerald-950/20 dark:to-slate-800 p-3 rounded-xl border border-emerald-100 dark:border-emerald-800/40 shadow-xs flex flex-col justify-between">
+                        <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400 mb-1">
+                            <span class="text-[11px] font-bold uppercase tracking-wider">Net Pembayaran</span>
+                            <span class="p-1 rounded-lg bg-emerald-100/70 dark:bg-emerald-900/50"><i data-feather="credit-card" class="w-3.5 h-3.5"></i></span>
+                        </div>
+                        <div>
+                            <div id="kpiNetPembayaran" class="text-base sm:text-lg font-black text-gray-900 dark:text-slate-100 leading-tight">Rp 0</div>
+                            <div id="kpiSesiPembayaran" class="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">0 nota pembayaran</div>
+                        </div>
+                    </div>
+
+                    <!-- KPI 2: Nilai Setoran Kotor -->
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50/50 dark:from-blue-950/20 dark:to-slate-800 p-3 rounded-xl border border-blue-100 dark:border-blue-800/40 shadow-xs flex flex-col justify-between">
+                        <div class="flex items-center justify-between text-blue-600 dark:text-blue-400 mb-1">
+                            <span class="text-[11px] font-bold uppercase tracking-wider">Nilai Setoran Kotor</span>
+                            <span class="p-1 rounded-lg bg-blue-100/70 dark:bg-blue-900/50"><i data-feather="arrow-down-left" class="w-3.5 h-3.5"></i></span>
+                        </div>
+                        <div>
+                            <div id="kpiTotalSetoran" class="text-base sm:text-lg font-black text-gray-900 dark:text-slate-100 leading-tight">Rp 0</div>
+                            <div id="kpiPcsSetoran" class="text-[10px] text-blue-700 dark:text-blue-400 font-medium mt-0.5">0 pcs barang jadi</div>
+                        </div>
+                    </div>
+
+                    <!-- KPI 3: Pengambilan Bahan Baku -->
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-50/50 dark:from-amber-950/20 dark:to-slate-800 p-3 rounded-xl border border-amber-100 dark:border-amber-800/40 shadow-xs flex flex-col justify-between">
+                        <div class="flex items-center justify-between text-amber-600 dark:text-amber-400 mb-1">
+                            <span class="text-[11px] font-bold uppercase tracking-wider">Bahan Baku Diambil</span>
+                            <span class="p-1 rounded-lg bg-amber-100/70 dark:bg-amber-900/50"><i data-feather="package" class="w-3.5 h-3.5"></i></span>
+                        </div>
+                        <div>
+                            <div id="kpiTotalBahanBaku" class="text-base sm:text-lg font-black text-gray-900 dark:text-slate-100 leading-tight">0 Pcs</div>
+                            <div id="kpiFrekuensiBahan" class="text-[10px] text-amber-700 dark:text-amber-400 font-medium mt-0.5">0 pengambilan</div>
+                        </div>
+                    </div>
+
+                    <!-- KPI 4: Total Potongan -->
+                    <div class="bg-gradient-to-br from-rose-50 to-pink-50/50 dark:from-rose-950/20 dark:to-slate-800 p-3 rounded-xl border border-rose-100 dark:border-rose-800/40 shadow-xs flex flex-col justify-between">
+                        <div class="flex items-center justify-between text-rose-600 dark:text-rose-400 mb-1">
+                            <span class="text-[11px] font-bold uppercase tracking-wider">Total Potongan</span>
+                            <span class="p-1 rounded-lg bg-rose-100/70 dark:bg-rose-900/50"><i data-feather="scissors" class="w-3.5 h-3.5"></i></span>
+                        </div>
+                        <div>
+                            <div id="kpiTotalPotongan" class="text-base sm:text-lg font-black text-gray-900 dark:text-slate-100 leading-tight">Rp 0</div>
+                            <div id="kpiRincianPotongan" class="text-[10px] text-rose-700 dark:text-rose-400 font-medium mt-0.5">Bahan baku & Kasbon</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 1: Ringkasan & Tren -->
+                <div id="panelTabRingkasan" class="space-y-4">
+                    <!-- Grid Dua Grafik -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
+                        <!-- Grafik Tren Harian Pembayaran & Setoran -->
+                        <div class="lg:col-span-7 bg-white dark:bg-slate-800/90 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700 shadow-xs flex flex-col">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-xs font-bold text-gray-800 dark:text-slate-200 flex items-center gap-1.5">
+                                    <i data-feather="trending-up" class="w-3.5 h-3.5 text-indigo-500"></i> Tren Pembayaran Harian
+                                </h4>
+                                <span class="text-[10px] text-gray-400 dark:text-slate-400">Net Pembayaran (Rp)</span>
+                            </div>
+                            <div class="relative h-60 w-full">
+                                <canvas id="chartAnalitikTren"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Grafik Top Produk Disetor -->
+                        <div class="lg:col-span-5 bg-white dark:bg-slate-800/90 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700 shadow-xs flex flex-col">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-xs font-bold text-gray-800 dark:text-slate-200 flex items-center gap-1.5">
+                                    <i data-feather="pie-chart" class="w-3.5 h-3.5 text-blue-500"></i> Proporsi Setoran Barang
+                                </h4>
+                                <span class="text-[10px] text-gray-400 dark:text-slate-400">Berdasarkan Qty</span>
+                            </div>
+                            <div class="relative h-60 w-full flex items-center justify-center">
+                                <canvas id="chartAnalitikProduk"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Highlight Insights (4 Kartu) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-700/40 border border-gray-100 dark:border-slate-700 flex items-start gap-2.5">
+                            <span class="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 shrink-0"><i data-feather="award" class="w-4 h-4"></i></span>
+                            <div>
+                                <span class="text-[10px] font-bold text-gray-500 dark:text-slate-400 block uppercase">Agen Teraktif / Top Setoran</span>
+                                <span id="insightTopAgen" class="text-xs font-bold text-gray-800 dark:text-slate-100">-</span>
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-700/40 border border-gray-100 dark:border-slate-700 flex items-start gap-2.5">
+                            <span class="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 shrink-0"><i data-feather="percent" class="w-4 h-4"></i></span>
+                            <div>
+                                <span class="text-[10px] font-bold text-gray-500 dark:text-slate-400 block uppercase">Rasio Potongan Operasional</span>
+                                <span id="insightRasioPotongan" class="text-xs font-bold text-purple-600 dark:text-purple-400">0%</span>
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-700/40 border border-gray-100 dark:border-slate-700 flex items-start gap-2.5">
+                            <span class="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 shrink-0"><i data-feather="shopping-bag" class="w-4 h-4"></i></span>
+                            <div>
+                                <span class="text-[10px] font-bold text-gray-500 dark:text-slate-400 block uppercase">Rata-rata Setoran Bruto / Nota</span>
+                                <span id="insightAvgBruto" class="text-xs font-bold text-blue-600 dark:text-blue-400">Rp 0</span>
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-slate-700/40 border border-gray-100 dark:border-slate-700 flex items-start gap-2.5">
+                            <span class="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 shrink-0"><i data-feather="dollar-sign" class="w-4 h-4"></i></span>
+                            <div>
+                                <span class="text-[10px] font-bold text-gray-500 dark:text-slate-400 block uppercase">Rata-rata Payout / Nota</span>
+                                <span id="insightAvgPayout" class="text-xs font-bold text-gray-800 dark:text-slate-100">Rp 0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: Setoran Barang Jadi -->
+                <div id="panelTabSetoran" class="hidden space-y-3">
+                    <div class="bg-white dark:bg-slate-800/90 rounded-xl border border-gray-100 dark:border-slate-700 overflow-hidden shadow-xs">
+                        <div class="px-4 py-2.5 border-b border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-700/30 flex justify-between items-center">
+                            <h4 class="text-xs font-bold text-gray-800 dark:text-slate-200 flex items-center gap-1.5">
+                                <i data-feather="check-circle" class="w-3.5 h-3.5 text-blue-500"></i> Rincian Barang Jadi yang Disetor Reseller
+                            </h4>
+                            <span id="badgeTotalVarianSetor" class="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold">0 Varian</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left">
+                                <thead class="bg-gray-50/80 dark:bg-slate-700/50 text-[11px] text-gray-500 dark:text-slate-400 font-bold border-b border-gray-100 dark:border-slate-700">
+                                    <tr>
+                                        <th class="p-2.5">No</th>
+                                        <th class="p-2.5">Nama Produk Jadi</th>
+                                        <th class="p-2.5 text-right">Total Disetor (Qty)</th>
+                                        <th class="p-2.5 text-right">Kontribusi %</th>
+                                        <th class="p-2.5 text-right">Estimasi Nilai Bruto</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyAnalitikSetoranBarang" class="divide-y divide-gray-100 dark:divide-slate-700 text-gray-700 dark:text-slate-200">
+                                    <tr><td colspan="5" class="p-4 text-center text-gray-400">Memuat data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: Pengambilan Bahan Baku -->
+                <div id="panelTabPengambilan" class="hidden space-y-3">
+                    <div class="bg-white dark:bg-slate-800/90 rounded-xl border border-gray-100 dark:border-slate-700 overflow-hidden shadow-xs">
+                        <div class="px-4 py-2.5 border-b border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-700/30 flex justify-between items-center">
+                            <h4 class="text-xs font-bold text-gray-800 dark:text-slate-200 flex items-center gap-1.5">
+                                <i data-feather="truck" class="w-3.5 h-3.5 text-amber-500"></i> Rincian Bahan Baku yang Diambil Reseller
+                            </h4>
+                            <span id="badgeTotalVarianBahan" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-bold">0 Jenis Bahan</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left">
+                                <thead class="bg-gray-50/80 dark:bg-slate-700/50 text-[11px] text-gray-500 dark:text-slate-400 font-bold border-b border-gray-100 dark:border-slate-700">
+                                    <tr>
+                                        <th class="p-2.5">No</th>
+                                        <th class="p-2.5">Nama Bahan Baku</th>
+                                        <th class="p-2.5 text-right">Total Diambil (Qty)</th>
+                                        <th class="p-2.5 text-right">Frekuensi Ambil</th>
+                                        <th class="p-2.5 text-right">Estimasi Nilai Potongan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyAnalitikBahanBaku" class="divide-y divide-gray-100 dark:divide-slate-700 text-gray-700 dark:text-slate-200">
+                                    <tr><td colspan="5" class="p-4 text-center text-gray-400">Memuat data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: Performa Reseller -->
+                <div id="panelTabPerforma" class="hidden space-y-3">
+                    <div class="bg-white dark:bg-slate-800/90 rounded-xl border border-gray-100 dark:border-slate-700 overflow-hidden shadow-xs">
+                        <div class="px-4 py-2.5 border-b border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-700/30 flex justify-between items-center">
+                            <h4 class="text-xs font-bold text-gray-800 dark:text-slate-200 flex items-center gap-1.5">
+                                <i data-feather="users" class="w-3.5 h-3.5 text-emerald-500"></i> Rekapitulasi Performa & Pembayaran Seluruh Agen
+                            </h4>
+                            <span id="badgeTotalAgenAktif" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold">0 Agen Aktif</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left">
+                                <thead class="bg-gray-50/80 dark:bg-slate-700/50 text-[11px] text-gray-500 dark:text-slate-400 font-bold border-b border-gray-100 dark:border-slate-700">
+                                    <tr>
+                                        <th class="p-2.5">Agen / Reseller</th>
+                                        <th class="p-2.5 text-right">Setor Jadi (Pcs)</th>
+                                        <th class="p-2.5 text-right">Ambil Bahan (Pcs)</th>
+                                        <th class="p-2.5 text-right">Nilai Setoran (Rp)</th>
+                                        <th class="p-2.5 text-right">Potongan (Rp)</th>
+                                        <th class="p-2.5 text-right font-black text-emerald-600 dark:text-emerald-400">Net Pembayaran (Rp)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyAnalitikPerformaAgen" class="divide-y divide-gray-100 dark:divide-slate-700 text-gray-700 dark:text-slate-200">
+                                    <tr><td colspan="6" class="p-4 text-center text-gray-400">Memuat data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-4 py-2.5 bg-gray-50/80 dark:bg-slate-800/90 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center text-[11px] text-gray-500 dark:text-slate-400">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span id="labelAnalitikStatus">Sinkronisasi otomatis dengan database</span>
+                </div>
+                <button onclick="closeModal('modalAnalitik')"
+                    class="px-3 py-1 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-200 font-semibold hover:bg-gray-300 dark:hover:bg-slate-600 transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Form Agen -->
     <div id="modalFormAgen" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="closeFormModal('modalFormAgen')"></div>
@@ -1334,6 +1656,9 @@
             } else {
                 document.getElementById('iconMoon').classList.remove('hidden');
                 document.getElementById('iconSun').classList.add('hidden');
+            }
+            if (typeof updateAnalitikChartTheme === 'function') {
+                updateAnalitikChartTheme();
             }
         }
 
@@ -4289,7 +4614,7 @@
                 modalEl.classList.add('hidden');
 
                 // Jangan sembunyikan modalOverlay jika modalRiwayat atau modal lain masih terbuka
-                const otherModals = ['modalRiwayat', 'modalHarian', 'modalAgen', 'modalBarang', 'modalHarga'];
+                const otherModals = ['modalRiwayat', 'modalHarian', 'modalAgen', 'modalBarang', 'modalHarga', 'modalAnalitik'];
                 const isAnyOtherOpen = otherModals.some(mId => {
                     const el = document.getElementById(mId);
                     return el && !el.classList.contains('hidden');
@@ -4358,7 +4683,686 @@
                 renderMasterHargaKhususList();
             }
             if (id === 'modalRiwayat') initModalRiwayat();
+            if (id === 'modalAnalitik') initModalAnalitik();
             feather.replace();
+        }
+
+        // ==========================================
+        // FITUR ANALITIK & REKAP PERIODE BULANAN
+        // ==========================================
+        let currentAnalitikBulan = '';
+        let currentAnalitikReseller = '';
+        let analitikMonthsList = [];
+        let chartAnalitikTrenInstance = null;
+        let chartAnalitikProdukInstance = null;
+        let currentAnalitikTab = 'ringkasan';
+        let currentAnalitikDataCache = { trx: [], buku: [], kasbon: [] };
+
+        function getAnalitikThemeColors() {
+            const isDark = document.body.classList.contains('dark') || document.documentElement.classList.contains('dark');
+            return {
+                text: isDark ? '#94a3b8' : '#64748b',
+                grid: isDark ? 'rgba(51, 65, 85, 0.4)' : 'rgba(226, 232, 240, 0.8)',
+                tooltipBg: isDark ? '#1e293b' : '#ffffff',
+                tooltipText: isDark ? '#f8fafc' : '#0f172a'
+            };
+        }
+
+        function updateAnalitikChartTheme() {
+            const theme = getAnalitikThemeColors();
+            const isDark = document.body.classList.contains('dark') || document.documentElement.classList.contains('dark');
+            if (chartAnalitikTrenInstance) {
+                chartAnalitikTrenInstance.options.scales.x.ticks.color = theme.text;
+                chartAnalitikTrenInstance.options.scales.x.grid.color = theme.grid;
+                chartAnalitikTrenInstance.options.scales.y.ticks.color = theme.text;
+                chartAnalitikTrenInstance.options.scales.y.grid.color = theme.grid;
+                chartAnalitikTrenInstance.update();
+            }
+            if (chartAnalitikProdukInstance) {
+                chartAnalitikProdukInstance.options.plugins.legend.labels.color = theme.text;
+                if (chartAnalitikProdukInstance.data && chartAnalitikProdukInstance.data.datasets[0]) {
+                    chartAnalitikProdukInstance.data.datasets[0].borderColor = isDark ? '#1e293b' : '#ffffff';
+                }
+                chartAnalitikProdukInstance.update();
+            }
+        }
+
+        async function initModalAnalitik() {
+            // Isi dropdown reseller jika belum terisi
+            const selRes = document.getElementById('selectResellerAnalitik');
+            if (selRes) {
+                selRes.innerHTML = '<option value="">Semua Agen Reseller</option>';
+                masterData.resellers.forEach(r => {
+                    selRes.innerHTML += `<option value="${r.id}">${r.nama}</option>`;
+                });
+                selRes.value = currentAnalitikReseller || '';
+            }
+
+            // Muat daftar bulan yang tersedia dari transaksi
+            try {
+                const { data } = await supabaseClient
+                    .from('transaksi')
+                    .select('tanggal_transaksi')
+                    .order('tanggal_transaksi', { ascending: false });
+
+                const monthsSet = new Set();
+                const tzOffset = (new Date()).getTimezoneOffset() * 60000;
+                const nowYm = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 7);
+                monthsSet.add(nowYm);
+
+                if (data && data.length > 0) {
+                    data.forEach(t => {
+                        if (t.tanggal_transaksi) monthsSet.add(t.tanggal_transaksi.substring(0, 7));
+                    });
+                }
+
+                analitikMonthsList = Array.from(monthsSet).sort().reverse();
+                if (!currentAnalitikBulan) {
+                    currentAnalitikBulan = nowYm;
+                }
+            } catch (e) {
+                console.warn("Gagal load bulan analitik:", e);
+                const tzOffset = (new Date()).getTimezoneOffset() * 60000;
+                currentAnalitikBulan = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 7);
+                analitikMonthsList = [currentAnalitikBulan];
+            }
+
+            populateAnalitikMonthSelect();
+            switchAnalitikTab(currentAnalitikTab || 'ringkasan');
+            await fetchAnalitikData();
+            feather.replace();
+        }
+
+        function populateAnalitikMonthSelect() {
+            const sel = document.getElementById('selectBulanAnalitik');
+            if (!sel) return;
+            sel.innerHTML = '';
+            analitikMonthsList.forEach(ym => {
+                const opt = document.createElement('option');
+                opt.value = ym;
+                opt.innerText = formatBulanTahunID(ym);
+                opt.className = 'text-gray-800 dark:bg-slate-700 dark:text-slate-100 font-semibold';
+                if (ym === currentAnalitikBulan) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        }
+
+        function gantiBulanAnalitik(delta) {
+            if (!analitikMonthsList || analitikMonthsList.length === 0) return;
+            let currentIdx = analitikMonthsList.indexOf(currentAnalitikBulan);
+            if (currentIdx === -1) currentIdx = 0;
+            let nextIdx = currentIdx;
+            if (delta === 1) nextIdx = currentIdx - 1; // bulan berikutnya (ke masa depan)
+            if (delta === -1) nextIdx = currentIdx + 1; // bulan sebelumnya (ke masa lalu)
+
+            if (nextIdx >= 0 && nextIdx < analitikMonthsList.length) {
+                currentAnalitikBulan = analitikMonthsList[nextIdx];
+                const sel = document.getElementById('selectBulanAnalitik');
+                if (sel) sel.value = currentAnalitikBulan;
+                fetchAnalitikData();
+            }
+        }
+
+        function onBulanAnalitikChange() {
+            const sel = document.getElementById('selectBulanAnalitik');
+            if (sel) {
+                currentAnalitikBulan = sel.value;
+                fetchAnalitikData();
+            }
+        }
+
+        function onResellerAnalitikChange() {
+            const sel = document.getElementById('selectResellerAnalitik');
+            if (sel) {
+                currentAnalitikReseller = sel.value;
+                fetchAnalitikData();
+            }
+        }
+
+        function switchAnalitikTab(tabName) {
+            currentAnalitikTab = tabName;
+            const tabs = ['ringkasan', 'setoran', 'pengambilan', 'performa'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tabBtnAnalitik${t.charAt(0).toUpperCase() + t.slice(1)}`);
+                const panel = document.getElementById(`panelTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+                if (t === tabName) {
+                    if (btn) {
+                        btn.className = "px-3 py-1.5 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 transition whitespace-nowrap";
+                    }
+                    if (panel) panel.classList.remove('hidden');
+                } else {
+                    if (btn) {
+                        btn.className = "px-3 py-1.5 text-xs font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-200 flex items-center gap-1.5 transition whitespace-nowrap";
+                    }
+                    if (panel) panel.classList.add('hidden');
+                }
+            });
+            feather.replace();
+        }
+
+        async function fetchAnalitikData() {
+            const statusEl = document.getElementById('labelAnalitikStatus');
+            if (statusEl) statusEl.innerText = "Memuat data dari database...";
+
+            if (!currentAnalitikBulan) {
+                const tzOffset = (new Date()).getTimezoneOffset() * 60000;
+                currentAnalitikBulan = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 7);
+            }
+
+            const [y, m] = currentAnalitikBulan.split('-').map(Number);
+            const lastDay = new Date(y, m, 0).getDate();
+            const startOfMonth = `${currentAnalitikBulan}-01`;
+            const endOfMonth = `${currentAnalitikBulan}-${String(lastDay).padStart(2, '0')}`;
+
+            try {
+                // 1. Query Transaksi Pembayaran
+                let qTrx = supabaseClient.from('transaksi').select('*')
+                    .gte('tanggal_transaksi', startOfMonth)
+                    .lte('tanggal_transaksi', endOfMonth);
+                if (currentAnalitikReseller) qTrx = qTrx.eq('reseller_id', currentAnalitikReseller);
+
+                // 2. Query Buku Harian (Setoran & Pengambilan)
+                let qBuku = supabaseClient.from('buku_harian').select('*')
+                    .gte('tanggal_setor', startOfMonth)
+                    .lte('tanggal_setor', endOfMonth);
+                if (currentAnalitikReseller) qBuku = qBuku.eq('reseller_id', currentAnalitikReseller);
+
+                // 3. Query Kasbon Harian
+                let qKasbon = supabaseClient.from('kasbon_harian').select('*')
+                    .gte('tanggal_pengajuan', startOfMonth)
+                    .lte('tanggal_pengajuan', endOfMonth);
+                if (currentAnalitikReseller) qKasbon = qKasbon.eq('reseller_id', currentAnalitikReseller);
+
+                const [resTrx, resBuku, resKasbon] = await Promise.all([qTrx, qBuku, qKasbon]);
+
+                if (resTrx.error) throw resTrx.error;
+                if (resBuku.error) throw resBuku.error;
+                if (resKasbon.error) throw resKasbon.error;
+
+                const dataTrx = resTrx.data || [];
+                const dataBuku = resBuku.data || [];
+                const dataKasbon = resKasbon.data || [];
+
+                currentAnalitikDataCache = { trx: dataTrx, buku: dataBuku, kasbon: dataKasbon, lastDay: lastDay };
+
+                renderAnalitikUI(currentAnalitikDataCache);
+
+                const now = new Date();
+                const jam = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                if (statusEl) statusEl.innerText = `Sinkronisasi terakhir pukul ${jam} • ${dataTrx.length} nota pembayaran, ${dataBuku.length} catatan harian`;
+            } catch (err) {
+                console.error("Error analitik:", err);
+                if (statusEl) statusEl.innerText = "Gagal memuat: " + err.message;
+                showNotification("Gagal memuat analitik: " + err.message, "error");
+            }
+        }
+
+        function renderAnalitikUI(cache) {
+            const { trx, buku, kasbon, lastDay } = cache;
+
+            // 1. Hitung Akumulasi KPI
+            let sumNet = 0;
+            let sumSetoran = 0;
+            let sumPotongan = 0;
+            trx.forEach(t => {
+                sumNet += (Number(t.net_pembayaran) || 0);
+                sumSetoran += (Number(t.total_setoran) || 0);
+                sumPotongan += (Number(t.total_kasbon_bahan) || 0);
+            });
+
+            let totalQtyJadi = 0;
+            let totalQtyBahan = 0;
+            let frekuensiBahan = 0;
+
+            const mapBarangJadi = {};
+            const mapBahanBaku = {};
+            const mapResellerPerforma = {};
+
+            // Inisialisasi map reseller
+            masterData.resellers.forEach(r => {
+                mapResellerPerforma[r.id] = {
+                    nama: r.nama,
+                    qtyJadi: 0,
+                    qtyBahan: 0,
+                    totalSetoranRp: 0,
+                    totalPotonganRp: 0,
+                    netPembayaranRp: 0,
+                    notaCount: 0
+                };
+            });
+
+            // Map transaksi ke performa reseller
+            trx.forEach(t => {
+                const rId = t.reseller_id;
+                if (!mapResellerPerforma[rId]) {
+                    const rObj = masterData.resellers.find(r => String(r.id) === String(rId));
+                    mapResellerPerforma[rId] = {
+                        nama: rObj ? rObj.nama : `Reseller #${rId}`,
+                        qtyJadi: 0,
+                        qtyBahan: 0,
+                        totalSetoranRp: 0,
+                        totalPotonganRp: 0,
+                        netPembayaranRp: 0,
+                        notaCount: 0
+                    };
+                }
+                mapResellerPerforma[rId].totalSetoranRp += (Number(t.total_setoran) || 0);
+                mapResellerPerforma[rId].totalPotonganRp += (Number(t.total_kasbon_bahan) || 0);
+                mapResellerPerforma[rId].netPembayaranRp += (Number(t.net_pembayaran) || 0);
+                mapResellerPerforma[rId].notaCount += 1;
+            });
+
+            // Olah catatan buku_harian
+            buku.forEach(b => {
+                const qty = parseFloat(String(b.qty !== undefined && b.qty !== null ? b.qty : (b.jumlah || 0)).replace(/,/g, '.')) || 0;
+                const bId = b.barang_id;
+                const rId = b.reseller_id;
+
+                // Cari harga satuan dari harga khusus agen atau harga default
+                let unitPrice = 0;
+                if (rId && masterData.hargaKhusus && masterData.hargaKhusus[`${rId}_${bId}`] !== undefined) {
+                    unitPrice = Number(masterData.hargaKhusus[`${rId}_${bId}`]) || 0;
+                } else if (masterData.hargaDefault && masterData.hargaDefault[bId] !== undefined) {
+                    unitPrice = Number(masterData.hargaDefault[bId]) || 0;
+                }
+
+                if (b.tipe === 'jadi') {
+                    totalQtyJadi += qty;
+                    if (!mapBarangJadi[bId]) {
+                        const itemObj = masterData.barangJadi.find(x => String(x.id) === String(bId));
+                        mapBarangJadi[bId] = {
+                            nama: itemObj ? itemObj.nama : `Barang #${bId}`,
+                            qty: 0,
+                            hargaDefault: unitPrice || (masterData.hargaDefault ? masterData.hargaDefault[bId] : 0) || 0,
+                            totalNilaiRp: 0
+                        };
+                    }
+                    mapBarangJadi[bId].qty += qty;
+                    mapBarangJadi[bId].totalNilaiRp += (qty * (unitPrice || mapBarangJadi[bId].hargaDefault || 0));
+                    if (mapResellerPerforma[rId]) {
+                        mapResellerPerforma[rId].qtyJadi += qty;
+                    }
+                } else if (b.tipe === 'bahan') {
+                    totalQtyBahan += qty;
+                    frekuensiBahan += 1;
+                    if (!mapBahanBaku[bId]) {
+                        const itemObj = masterData.bahanBaku.find(x => String(x.id) === String(bId));
+                        mapBahanBaku[bId] = {
+                            nama: itemObj ? itemObj.nama : `Bahan #${bId}`,
+                            qty: 0,
+                            frekuensi: 0,
+                            hargaDefault: unitPrice || (masterData.hargaDefault ? masterData.hargaDefault[bId] : 0) || 0,
+                            totalNilaiRp: 0
+                        };
+                    }
+                    mapBahanBaku[bId].qty += qty;
+                    mapBahanBaku[bId].frekuensi += 1;
+                    mapBahanBaku[bId].totalNilaiRp += (qty * (unitPrice || mapBahanBaku[bId].hargaDefault || 0));
+                    if (mapResellerPerforma[rId]) {
+                        mapResellerPerforma[rId].qtyBahan += qty;
+                    }
+                }
+            });
+
+            // Update Kartu KPI
+            document.getElementById('kpiNetPembayaran').innerText = formatRupiah(sumNet);
+            document.getElementById('kpiSesiPembayaran').innerText = `${trx.length} nota pembayaran lunas`;
+
+            document.getElementById('kpiTotalSetoran').innerText = formatRupiah(sumSetoran);
+            document.getElementById('kpiPcsSetoran').innerText = `${new Intl.NumberFormat('id-ID').format(totalQtyJadi)} pcs barang jadi`;
+
+            document.getElementById('kpiTotalBahanBaku').innerText = `${new Intl.NumberFormat('id-ID').format(totalQtyBahan)} Pcs`;
+            document.getElementById('kpiFrekuensiBahan').innerText = `${frekuensiBahan} kali pengambilan`;
+
+            document.getElementById('kpiTotalPotongan').innerText = formatRupiah(sumPotongan);
+            document.getElementById('kpiRincianPotongan').innerText = sumSetoran > 0 ? `${((sumPotongan / sumSetoran) * 100).toFixed(1)}% dari nilai setoran` : 'Bahan & Kasbon';
+
+            // Insights (4 Kartu)
+            const arrReseller = Object.values(mapResellerPerforma).filter(r => (r.qtyJadi > 0 || r.totalSetoranRp > 0 || r.qtyBahan > 0));
+            arrReseller.sort((a, b) => b.totalSetoranRp - a.totalSetoranRp);
+            const topAgen = arrReseller.length > 0 ? `${arrReseller[0].nama} (${formatRupiah(arrReseller[0].totalSetoranRp)})` : '-';
+            const elTopAgen = document.getElementById('insightTopAgen');
+            if (elTopAgen) elTopAgen.innerText = topAgen;
+
+            // 1. Rasio Potongan Operasional (%)
+            const rasioPotonganPct = sumSetoran > 0 ? ((sumPotongan / sumSetoran) * 100).toFixed(1) : '0';
+            const elRasioPotongan = document.getElementById('insightRasioPotongan');
+            if (elRasioPotongan) {
+                elRasioPotongan.innerText = sumSetoran > 0 ? `${rasioPotonganPct}% (${formatRupiah(sumPotongan)})` : '0%';
+            }
+
+            // 2. Rata-rata Setoran Bruto / Nota (Opsi 5)
+            const avgBruto = trx.length > 0 ? Math.round(sumSetoran / trx.length) : 0;
+            const elAvgBruto = document.getElementById('insightAvgBruto');
+            if (elAvgBruto) elAvgBruto.innerText = formatRupiah(avgBruto);
+            const elTotalKasbon = document.getElementById('insightTotalKasbon');
+            if (elTotalKasbon) elTotalKasbon.innerText = formatRupiah(avgBruto);
+
+            const avgPayout = trx.length > 0 ? Math.round(sumNet / trx.length) : 0;
+            const elAvgPayout = document.getElementById('insightAvgPayout');
+            if (elAvgPayout) elAvgPayout.innerText = formatRupiah(avgPayout);
+
+            const arrBarangJadi = Object.values(mapBarangJadi).sort((a, b) => b.qty - a.qty);
+            const arrBahanBaku = Object.values(mapBahanBaku).sort((a, b) => (b.qty - a.qty) || (b.frekuensi - a.frekuensi));
+            const elTopBahan = document.getElementById('insightTopBahan');
+            if (elTopBahan && arrBahanBaku.length > 0) elTopBahan.innerText = `${arrBahanBaku[0].nama} (${new Intl.NumberFormat('id-ID').format(arrBahanBaku[0].qty)} pcs)`;
+
+            // Render Tab 2: Tabel Setoran Barang Jadi
+            const tbodySetoran = document.getElementById('tbodyAnalitikSetoranBarang');
+            document.getElementById('badgeTotalVarianSetor').innerText = `${arrBarangJadi.length} Varian`;
+            if (arrBarangJadi.length === 0) {
+                tbodySetoran.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400 italic">Tidak ada catatan setoran barang jadi pada periode ini.</td></tr>`;
+            } else {
+                tbodySetoran.innerHTML = arrBarangJadi.map((item, idx) => {
+                    const pct = totalQtyJadi > 0 ? ((item.qty / totalQtyJadi) * 100).toFixed(1) : '0';
+                    const estBruto = item.totalNilaiRp > 0 ? item.totalNilaiRp : (item.qty * item.hargaDefault);
+                    return `
+                        <tr class="hover:bg-gray-50/70 dark:hover:bg-slate-700/50 transition">
+                            <td class="p-2.5 font-bold text-gray-400 w-10">${idx + 1}</td>
+                            <td class="p-2.5 font-semibold text-gray-900 dark:text-slate-100">${item.nama}</td>
+                            <td class="p-2.5 text-right font-black text-blue-600 dark:text-blue-400">${new Intl.NumberFormat('id-ID').format(item.qty)} pcs</td>
+                            <td class="p-2.5 text-right text-gray-500 font-medium">
+                                <span class="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-bold">${pct}%</span>
+                            </td>
+                            <td class="p-2.5 text-right font-bold text-gray-800 dark:text-slate-200">${estBruto > 0 ? formatRupiah(estBruto) : '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Render Tab 3: Tabel Pengambilan Bahan Baku
+            const tbodyBahan = document.getElementById('tbodyAnalitikBahanBaku');
+            document.getElementById('badgeTotalVarianBahan').innerText = `${arrBahanBaku.length} Jenis Bahan`;
+            if (arrBahanBaku.length === 0) {
+                tbodyBahan.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400 italic">Tidak ada catatan pengambilan bahan baku pada periode ini.</td></tr>`;
+            } else {
+                tbodyBahan.innerHTML = arrBahanBaku.map((item, idx) => {
+                    const estNilai = item.totalNilaiRp > 0 ? item.totalNilaiRp : (item.qty * item.hargaDefault);
+                    return `
+                        <tr class="hover:bg-gray-50/70 dark:hover:bg-slate-700/50 transition">
+                            <td class="p-2.5 font-bold text-gray-400 w-10">${idx + 1}</td>
+                            <td class="p-2.5 font-semibold text-gray-900 dark:text-slate-100">${item.nama}</td>
+                            <td class="p-2.5 text-right font-black text-amber-600 dark:text-amber-400">${new Intl.NumberFormat('id-ID').format(item.qty)} pcs</td>
+                            <td class="p-2.5 text-right text-gray-500 font-medium">${item.frekuensi} kali</td>
+                            <td class="p-2.5 text-right font-bold text-gray-800 dark:text-slate-200">${estNilai > 0 ? formatRupiah(estNilai) : '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Render Tab 4: Tabel Performa Reseller
+            const tbodyPerforma = document.getElementById('tbodyAnalitikPerformaAgen');
+            document.getElementById('badgeTotalAgenAktif').innerText = `${arrReseller.length} Agen Aktif`;
+            if (arrReseller.length === 0) {
+                tbodyPerforma.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400 italic">Tidak ada data transaksi agen pada periode ini.</td></tr>`;
+            } else {
+                tbodyPerforma.innerHTML = arrReseller.map(item => {
+                    return `
+                        <tr class="hover:bg-gray-50/70 dark:hover:bg-slate-700/50 transition">
+                            <td class="p-2.5 font-bold text-gray-800 dark:text-slate-100 flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> ${item.nama}
+                            </td>
+                            <td class="p-2.5 text-right font-semibold text-blue-600 dark:text-blue-400">${new Intl.NumberFormat('id-ID').format(item.qtyJadi)}</td>
+                            <td class="p-2.5 text-right font-semibold text-amber-600 dark:text-amber-400">${new Intl.NumberFormat('id-ID').format(item.qtyBahan)}</td>
+                            <td class="p-2.5 text-right font-medium text-gray-700 dark:text-slate-300">${formatRupiah(item.totalSetoranRp)}</td>
+                            <td class="p-2.5 text-right font-medium text-rose-600 dark:text-rose-400">${formatRupiah(item.totalPotonganRp)}</td>
+                            <td class="p-2.5 text-right font-black text-emerald-600 dark:text-emerald-400">${formatRupiah(item.netPembayaranRp)}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Render Charts
+            renderAnalitikCharts(trx, arrBarangJadi, lastDay);
+        }
+
+        function getSatuanBarangJadi(nama) {
+            if (!nama) return 'Pcs';
+            const lower = nama.toLowerCase();
+            if (lower.includes('simping')) return 'Toros';
+            if (lower.includes('aro')) return 'Ball';
+            return 'Pcs';
+        }
+
+        function renderAnalitikCharts(trx, arrBarangJadi, lastDay) {
+            const theme = getAnalitikThemeColors();
+
+            // 1. Data Tren Harian (Hanya tampilkan tanggal ketika Net Bayar > 0)
+            const mapDailyNet = {};
+            trx.forEach(t => {
+                if (t.tanggal_transaksi) {
+                    mapDailyNet[t.tanggal_transaksi] = (mapDailyNet[t.tanggal_transaksi] || 0) + (Number(t.net_pembayaran) || 0);
+                }
+            });
+
+            // Ambil dan urutkan hanya tanggal yang memiliki nilai pembayaran > 0
+            const activeDates = Object.keys(mapDailyNet)
+                .filter(dateStr => mapDailyNet[dateStr] > 0)
+                .sort();
+
+            let daysLabels = [];
+            let dailyNetValues = [];
+
+            if (activeDates.length === 0) {
+                daysLabels = ['Belum ada transaksi'];
+                dailyNetValues = [0];
+            } else {
+                daysLabels = activeDates.map(dateStr => {
+                    const dayPart = dateStr.slice(-2);
+                    return `Tgl ${dayPart}`;
+                });
+                dailyNetValues = activeDates.map(dateStr => mapDailyNet[dateStr]);
+            }
+
+            // Canvas Tren
+            const ctxTren = document.getElementById('chartAnalitikTren');
+            if (ctxTren) {
+                if (chartAnalitikTrenInstance) chartAnalitikTrenInstance.destroy();
+                chartAnalitikTrenInstance = new Chart(ctxTren.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: daysLabels,
+                        datasets: [{
+                            label: 'Net Pembayaran (Rp)',
+                            data: dailyNetValues,
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.12)',
+                            borderWidth: 3,
+                            tension: 0.35,
+                            fill: true,
+                            pointRadius: 4.5,
+                            pointHoverRadius: 7.5,
+                            pointBackgroundColor: '#4f46e5'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: theme.tooltipBg,
+                                titleColor: theme.tooltipText,
+                                bodyColor: theme.tooltipText,
+                                callbacks: {
+                                    label: (ctx) => `Net Bayar: ${formatRupiah(ctx.raw)}`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: theme.text, font: { size: 10, weight: 'bold' } },
+                                grid: { color: theme.grid, drawBorder: false }
+                            },
+                            y: {
+                                ticks: {
+                                    color: theme.text,
+                                    font: { size: 10 },
+                                    callback: (val) => val >= 1000000 ? (val / 1000000).toFixed(1) + 'M' : val >= 1000 ? (val / 1000).toFixed(0) + 'k' : val
+                                },
+                                grid: { color: theme.grid, drawBorder: false }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 2. Canvas Proporsi Produk Jadi (Top 5 + Lainnya)
+            const ctxProduk = document.getElementById('chartAnalitikProduk');
+            if (ctxProduk) {
+                if (chartAnalitikProdukInstance) chartAnalitikProdukInstance.destroy();
+
+                const top5 = arrBarangJadi.slice(0, 5);
+                const sisa = arrBarangJadi.slice(5).reduce((acc, curr) => acc + curr.qty, 0);
+                const totalAllQty = arrBarangJadi.reduce((acc, curr) => acc + (Number(curr.qty) || 0), 0);
+
+                const values = top5.map(x => x.qty);
+                const labels = top5.map(x => {
+                    const satuan = getSatuanBarangJadi(x.nama);
+                    const pct = totalAllQty > 0 ? Math.round((x.qty / totalAllQty) * 100) : 0;
+                    const formattedQty = new Intl.NumberFormat('id-ID').format(x.qty);
+                    return `${x.nama} (${formattedQty} ${satuan}/${pct}%)`;
+                });
+
+                if (sisa > 0) {
+                    const pctSisa = totalAllQty > 0 ? Math.round((sisa / totalAllQty) * 100) : 0;
+                    const formattedSisa = new Intl.NumberFormat('id-ID').format(sisa);
+                    labels.push(`Lainnya (${formattedSisa} Pcs/${pctSisa}%)`);
+                    values.push(sisa);
+                }
+
+                // Warna khusus mencolok sesuai permintaan:
+                // Aro B12 = Pink (#ec4899), Aro B10 = Ungu (#8b5cf6), Simping = Kuning (#eab308)
+                const colors = labels.map((labelStr, idx) => {
+                    const lower = (labelStr || '').toLowerCase();
+                    if (lower.includes('b12') || lower.includes('aro b12')) return '#ec4899'; // Pink mencolok
+                    if (lower.includes('b10') || lower.includes('aro b10')) return '#8b5cf6'; // Ungu cerah
+                    if (lower.includes('simping')) return '#eab308'; // Kuning mencolok
+                    if (lower.includes('lainnya')) return '#94a3b8'; // Abu-abu netral
+                    const fallback = ['#06b6d4', '#10b981', '#f97316', '#3b82f6'];
+                    return fallback[idx % fallback.length];
+                });
+
+                const isDark = document.body.classList.contains('dark') || document.documentElement.classList.contains('dark');
+
+                chartAnalitikProdukInstance = new Chart(ctxProduk.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels.length > 0 ? labels : ['Belum ada setoran'],
+                        datasets: [{
+                            data: values.length > 0 ? values : [1],
+                            backgroundColor: values.length > 0 ? colors : ['#cbd5e1'],
+                            borderWidth: 2,
+                            borderColor: isDark ? '#1e293b' : '#ffffff',
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: theme.text,
+                                    font: { size: 10, weight: 'bold' },
+                                    boxWidth: 12,
+                                    padding: 8
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: theme.tooltipBg,
+                                titleColor: theme.tooltipText,
+                                bodyColor: theme.tooltipText,
+                                callbacks: {
+                                    label: (ctx) => `${ctx.label}`
+                                }
+                            }
+                        },
+                        cutout: '62%'
+                    }
+                });
+            }
+        }
+
+        function exportAnalitikCSV() {
+            const cache = currentAnalitikDataCache;
+            if (!cache || !cache.trx) return showNotification("Belum ada data untuk diekspor!", "warning-flash");
+
+            let csvContent = "\uFEFF"; // UTF-8 BOM agar rapi di Microsoft Excel
+            csvContent += `LAPORAN ANALITIK BULANAN - SBR PUTRA FOOD\r\n`;
+            csvContent += `Periode;${formatBulanTahunID(currentAnalitikBulan)}\r\n`;
+            csvContent += `Filter Reseller;${currentAnalitikReseller ? (masterData.resellers.find(r => String(r.id) === String(currentAnalitikReseller))?.nama || currentAnalitikReseller) : 'Semua Reseller'}\r\n\r\n`;
+
+            // Ringkasan KPI
+            let sumNet = cache.trx.reduce((a, c) => a + (Number(c.net_pembayaran) || 0), 0);
+            let sumSetoran = cache.trx.reduce((a, c) => a + (Number(c.total_setoran) || 0), 0);
+            let sumPotongan = cache.trx.reduce((a, c) => a + (Number(c.total_kasbon_bahan) || 0), 0);
+            csvContent += `RINGKASAN UTAMA\r\n`;
+            csvContent += `Total Net Pembayaran;Rp ${sumNet}\r\n`;
+            csvContent += `Total Nilai Setoran Kotor;Rp ${sumSetoran}\r\n`;
+            csvContent += `Total Potongan;Rp ${sumPotongan}\r\n`;
+            csvContent += `Total Nota Lunas;${cache.trx.length}\r\n\r\n`;
+
+            // Rincian Performa Reseller
+            csvContent += `PERFORMA RESELLER\r\n`;
+            csvContent += `Nama Reseller;Setor Jadi (Pcs);Ambil Bahan (Pcs);Nilai Setoran (Rp);Potongan (Rp);Net Pembayaran (Rp)\r\n`;
+            const performaRows = document.querySelectorAll('#tbodyAnalitikPerformaAgen tr');
+            performaRows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if (cols.length >= 6) {
+                    const rNama = cols[0].innerText.trim();
+                    const rJadi = cols[1].innerText.trim().replace(/\./g, '');
+                    const rBahan = cols[2].innerText.trim().replace(/\./g, '');
+                    const rSetor = cols[3].innerText.trim().replace(/[^0-9]/g, '');
+                    const rPotong = cols[4].innerText.trim().replace(/[^0-9]/g, '');
+                    const rNet = cols[5].innerText.trim().replace(/[^0-9]/g, '');
+                    csvContent += `"${rNama}";${rJadi};${rBahan};${rSetor};${rPotong};${rNet}\r\n`;
+                }
+            });
+
+            // Rincian Setoran Barang Jadi
+            csvContent += `\r\nRINCIAN SETORAN BARANG JADI\r\n`;
+            csvContent += `No;Nama Produk Jadi;Total Qty (Pcs);Kontribusi;Estimasi Nilai Bruto\r\n`;
+            const setoranRows = document.querySelectorAll('#tbodyAnalitikSetoranBarang tr');
+            setoranRows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if (cols.length >= 5) {
+                    const no = cols[0].innerText.trim();
+                    const nama = cols[1].innerText.trim();
+                    const qty = cols[2].innerText.trim();
+                    const pct = cols[3].innerText.trim();
+                    const bruto = cols[4].innerText.trim();
+                    csvContent += `${no};"${nama}";${qty};${pct};${bruto}\r\n`;
+                }
+            });
+
+            // Rincian Pengambilan Bahan Baku
+            csvContent += `\r\nRINCIAN PENGAMBILAN BAHAN BAKU\r\n`;
+            csvContent += `No;Nama Bahan Baku;Total Qty (Pcs);Frekuensi Ambil;Estimasi Nilai Potongan\r\n`;
+            const bahanRows = document.querySelectorAll('#tbodyAnalitikBahanBaku tr');
+            bahanRows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if (cols.length >= 5) {
+                    const no = cols[0].innerText.trim();
+                    const nama = cols[1].innerText.trim();
+                    const qty = cols[2].innerText.trim();
+                    const frek = cols[3].innerText.trim();
+                    const potongan = cols[4].innerText.trim();
+                    csvContent += `${no};"${nama}";${qty};${frek};${potongan}\r\n`;
+                }
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Analitik_Bulanan_${currentAnalitikBulan}_SBR.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification("Rekap analitik berhasil didownload sebagai CSV!", "success");
         }
 
         window.onload = () => {
