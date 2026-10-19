@@ -85,16 +85,18 @@
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 5mm 12mm 12mm 12mm;
+                margin: 0mm !important;
             }
 
             body,
             html {
                 background-color: white !important;
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                height: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
 
             body>*:not(#modalPratinjau) {
@@ -112,9 +114,12 @@
                 left: 0 !important;
                 top: 0 !important;
                 display: block !important;
-                width: 100% !important;
+                width: 210mm !important;
+                height: 148.5mm !important;
                 padding: 0 !important;
+                margin: 0 !important;
                 background: white !important;
+                overflow: hidden !important;
             }
 
             #modalPratinjau>div:first-child {
@@ -123,19 +128,69 @@
 
             #modalPratinjau>div:last-child {
                 position: relative !important;
-                max-width: 100% !important;
-                width: 100% !important;
+                max-width: 210mm !important;
+                width: 210mm !important;
+                height: 148.5mm !important;
+                max-height: 148.5mm !important;
                 box-shadow: none !important;
                 border: none !important;
+                border-radius: 0 !important;
                 transform: none !important;
-                max-height: none !important;
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+            }
+
+            /* Area Cetak: Tepat separuh ATAS kertas A4 (Ukuran A5 = 210mm x 148.5mm) */
+            #areaPrint {
+                width: 210mm !important;
+                height: 148.5mm !important;
+                max-height: 148.5mm !important;
+                padding: 7mm 12mm 1.5mm 12mm !important;
+                margin: 0 auto !important;
+                box-sizing: border-box !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                overflow: hidden !important;
                 background: white !important;
             }
 
-            #areaPrint {
-                overflow: visible !important;
-                height: auto !important;
-                padding: 5mm 8mm 0 8mm !important;
+            #printContentBody {
+                width: 100% !important;
+                transform-origin: top center !important;
+            }
+
+            #printContentBody > div:first-child {
+                padding-bottom: 6px !important;
+                margin-bottom: 8px !important;
+            }
+
+            #printContentBody > div:nth-child(2) {
+                margin-bottom: 10px !important;
+            }
+
+            #printFooterInfo {
+                margin-top: auto !important;
+                padding-top: 4px !important;
+                padding-bottom: 2px !important;
+            }
+
+            /* Garis Potong Tepat di Tengah Kertas A4 (148.5mm dari atas) */
+            #printCutLine {
+                display: flex !important;
+                width: 100% !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                border-bottom: 1.2px dashed #94a3b8 !important;
+                padding-top: 3px !important;
+                padding-bottom: 1px !important;
+                font-size: 8px !important;
+                font-weight: 700 !important;
+                color: #64748b !important;
+                letter-spacing: 0.08em !important;
+                flex-shrink: 0 !important;
             }
 
             .no-print {
@@ -491,7 +546,7 @@
                     <button onclick="simpanPNG()"
                         class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i
                             data-feather="image" class="w-3 h-3 mr-1"></i> Simpan PNG</button>
-                    <button onclick="window.print()"
+                    <button onclick="cetakNotaA4()"
                         class="bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800/50 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i
                             data-feather="printer" class="w-3 h-3 mr-1"></i> Cetak A4</button>
                     <button onclick="closeModal('modalPratinjau')"
@@ -501,59 +556,34 @@
             </div>
 
             <div id="areaPrint" class="bg-white text-gray-900 p-6 md:p-8 overflow-y-auto w-full">
-                <div class="border-b-2 border-gray-800 pb-3 mb-4 text-center">
-                    <h2 class="text-xl font-black text-gray-900 uppercase tracking-wide">SBR Putra Food</h2>
-                    <p class="text-[10px] font-medium text-gray-500 mt-0.5">Lembang, Bandung Barat 40391</p>
-                    <p
-                        class="text-xs font-bold text-gray-800 mt-2 bg-gray-100 inline-block px-3 py-1 rounded border border-gray-200">
-                        NOTA PEMBAYARAN RESELLER</p>
-                </div>
-
-                <div class="flex justify-between items-end mb-6 text-xs font-medium text-gray-700">
-                    <div>
-                        <p class="text-gray-500 mb-0.5">Agen / Reseller:</p>
-                        <p id="notaNama" class="text-sm font-bold text-gray-900">-</p>
+                <div id="printContentBody">
+                    <div class="border-b-2 border-gray-800 pb-3 mb-4 text-center">
+                        <h2 class="text-xl font-black text-gray-900 uppercase tracking-wide">SBR Putra Food</h2>
+                        <p class="text-[10px] font-medium text-gray-500 mt-0.5">Lembang, Bandung Barat 40391</p>
+                        <p
+                            class="text-xs font-bold text-gray-800 mt-2 bg-gray-100 inline-block px-3 py-1 rounded border border-gray-200">
+                            NOTA PEMBAYARAN RESELLER</p>
                     </div>
-                    <div class="text-right">
-                        <p class="text-gray-500 mb-0.5">Tanggal Di Cetak:</p>
-                        <p id="notaTgl" class="font-bold text-gray-900">-</p>
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-4 items-start">
-                    <div>
-                        <div
-                            class="text-[11px] font-bold text-gray-800 bg-red-50 border border-red-100 px-2 py-1.5 mb-2 rounded flex items-center justify-between">
-                            <span class="flex items-center"><i data-feather="arrow-up-right"
-                                    class="w-3 h-3 mr-1 text-red-500"></i> PENGAMBILAN BAHAN BAKU</span>
-                            <button id="btnHistoryBahan" onclick="bukaHistoryHarian('bahan')"
-                                class="no-print hidden text-[9px] bg-white border border-red-200 text-red-600 px-1.5 py-0.5 rounded shadow-sm hover:bg-red-50 transition items-center gap-1"><i
-                                    data-feather="clock" class="w-3 h-3"></i> Rincian</button>
+                    <div class="flex justify-between items-end mb-6 text-xs font-medium text-gray-700">
+                        <div>
+                            <p class="text-gray-500 mb-0.5">Agen / Reseller:</p>
+                            <p id="notaNama" class="text-sm font-bold text-gray-900">-</p>
                         </div>
-                        <table class="w-full text-xs text-left mb-2">
-                            <thead>
-                                <tr class="border-b border-gray-200 text-gray-500">
-                                    <th class="pb-1 font-semibold text-center w-8">Qty</th>
-                                    <th class="pb-1 font-semibold pl-1 w-full">Item</th>
-                                    <th class="pb-1 font-semibold text-right whitespace-nowrap pl-2">Harga</th>
-                                    <th class="pb-1 font-semibold text-right whitespace-nowrap pl-2">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody id="notaListBahan" class="text-gray-700"></tbody>
-                        </table>
-                        <div class="flex justify-end text-[11px] font-bold text-red-600 border-t border-gray-200 pt-1">
-                            Subtotal: <span id="notaSubBahan" class="ml-4">- Rp 0</span>
+                        <div class="text-right">
+                            <p class="text-gray-500 mb-0.5">Tanggal Di Cetak:</p>
+                            <p id="notaTgl" class="font-bold text-gray-900">-</p>
                         </div>
                     </div>
 
-                    <div class="flex flex-col gap-3">
+                    <div class="grid grid-cols-2 gap-4 mb-4 items-start">
                         <div>
                             <div
-                                class="text-[11px] font-bold text-gray-800 bg-blue-50 border border-blue-100 px-2 py-1.5 mb-2 rounded flex items-center justify-between">
-                                <span class="flex items-center"><i data-feather="arrow-down-left"
-                                        class="w-3 h-3 mr-1 text-blue-500"></i> SETORAN BARANG JADI</span>
-                                <button id="btnHistoryJadi" onclick="bukaHistoryHarian('jadi')"
-                                    class="no-print hidden text-[9px] bg-white border border-blue-200 text-blue-600 px-1.5 py-0.5 rounded shadow-sm hover:bg-blue-50 transition items-center gap-1"><i
+                                class="text-[11px] font-bold text-gray-800 bg-red-50 border border-red-100 px-2 py-1.5 mb-2 rounded flex items-center justify-between">
+                                <span class="flex items-center"><i data-feather="arrow-up-right"
+                                        class="w-3 h-3 mr-1 text-red-500"></i> PENGAMBILAN BAHAN BAKU</span>
+                                <button id="btnHistoryBahan" onclick="bukaHistoryHarian('bahan')"
+                                    class="no-print hidden text-[9px] bg-white border border-red-200 text-red-600 px-1.5 py-0.5 rounded shadow-sm hover:bg-red-50 transition items-center gap-1"><i
                                         data-feather="clock" class="w-3 h-3"></i> Rincian</button>
                             </div>
                             <table class="w-full text-xs text-left mb-2">
@@ -565,54 +595,87 @@
                                         <th class="pb-1 font-semibold text-right whitespace-nowrap pl-2">Total</th>
                                     </tr>
                                 </thead>
-                                <tbody id="notaListSetoran" class="text-gray-700"></tbody>
+                                <tbody id="notaListBahan" class="text-gray-700"></tbody>
                             </table>
-                            <div
-                                class="flex justify-end text-[11px] font-bold text-blue-700 border-t border-gray-200 pt-1">
-                                Subtotal: <span id="notaSubSetoran" class="ml-4">Rp 0</span>
+                            <div class="flex justify-end text-[11px] font-bold text-red-600 border-t border-gray-200 pt-1">
+                                Subtotal: <span id="notaSubBahan" class="ml-4">- Rp 0</span>
                             </div>
                         </div>
 
-                        <div class="bg-gray-50 p-3 rounded border border-gray-200 mt-auto">
-                            <div class="mb-2 space-y-0.5 border-b border-gray-300 pb-1.5">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[11px] font-bold text-gray-600">Total Setoran Barang Jadi</span>
-                                    <span id="notaSummarySetoran" class="text-[11px] font-bold text-blue-600">Rp
-                                        0</span>
+                        <div class="flex flex-col gap-3">
+                            <div>
+                                <div
+                                    class="text-[11px] font-bold text-gray-800 bg-blue-50 border border-blue-100 px-2 py-1.5 mb-2 rounded flex items-center justify-between">
+                                    <span class="flex items-center"><i data-feather="arrow-down-left"
+                                            class="w-3 h-3 mr-1 text-blue-500"></i> SETORAN BARANG JADI</span>
+                                    <button id="btnHistoryJadi" onclick="bukaHistoryHarian('jadi')"
+                                        class="no-print hidden text-[9px] bg-white border border-blue-200 text-blue-600 px-1.5 py-0.5 rounded shadow-sm hover:bg-blue-50 transition items-center gap-1"><i
+                                            data-feather="clock" class="w-3 h-3"></i> Rincian</button>
                                 </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[11px] font-bold text-gray-600">Total Pengambilan Bahan
-                                        Baku</span>
-                                    <span id="notaSummaryKasbon" class="text-[11px] font-bold text-red-500">- Rp
-                                        0</span>
-                                </div>
-                            </div>
-
-                            <div id="notaContainerManual" class="mb-2">
-                                <h4 class="text-[10px] font-bold text-gray-800 border-b border-gray-300 pb-0.5 mb-1">
-                                    PINJAMAN / KASBON UANG LAINNYA</h4>
-                                <table class="w-full text-[11px] text-left mb-1">
-                                    <tbody id="notaListManual" class="text-gray-700"></tbody>
+                                <table class="w-full text-xs text-left mb-2">
+                                    <thead>
+                                        <tr class="border-b border-gray-200 text-gray-500">
+                                            <th class="pb-1 font-semibold text-center w-8">Qty</th>
+                                            <th class="pb-1 font-semibold pl-1 w-full">Item</th>
+                                            <th class="pb-1 font-semibold text-right whitespace-nowrap pl-2">Harga</th>
+                                            <th class="pb-1 font-semibold text-right whitespace-nowrap pl-2">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="notaListSetoran" class="text-gray-700"></tbody>
                                 </table>
                                 <div
-                                    class="flex justify-end text-[10px] font-bold text-red-600 border-t border-gray-200 pt-1">
-                                    Total Kasbon Uang: <span id="notaSubManual" class="ml-4">- Rp 0</span></div>
+                                    class="flex justify-end text-[11px] font-bold text-blue-700 border-t border-gray-200 pt-1">
+                                    Subtotal: <span id="notaSubSetoran" class="ml-4">Rp 0</span>
+                                </div>
                             </div>
 
-                            <div
-                                class="border-t-2 border-dashed border-gray-300 pt-2 flex justify-between items-center">
-                                <span class="text-xs font-black text-gray-700 uppercase tracking-wide">Total Net
-                                    Pembayaran</span>
-                                <span id="notaGrandTotal" class="text-lg font-black text-gray-900">Rp 0</span>
+                            <div class="bg-gray-50 p-3 rounded border border-gray-200 mt-auto">
+                                <div class="mb-2 space-y-0.5 border-b border-gray-300 pb-1.5">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[11px] font-bold text-gray-600">Total Setoran Barang Jadi</span>
+                                        <span id="notaSummarySetoran" class="text-[11px] font-bold text-blue-600">Rp
+                                            0</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[11px] font-bold text-gray-600">Total Pengambilan Bahan
+                                            Baku</span>
+                                        <span id="notaSummaryKasbon" class="text-[11px] font-bold text-red-500">- Rp
+                                            0</span>
+                                    </div>
+                                </div>
+
+                                <div id="notaContainerManual" class="mb-2">
+                                    <h4 class="text-[10px] font-bold text-gray-800 border-b border-gray-300 pb-0.5 mb-1">
+                                        PINJAMAN / KASBON UANG LAINNYA</h4>
+                                    <table class="w-full text-[11px] text-left mb-1">
+                                        <tbody id="notaListManual" class="text-gray-700"></tbody>
+                                    </table>
+                                    <div
+                                        class="flex justify-end text-[10px] font-bold text-red-600 border-t border-gray-200 pt-1">
+                                        Total Kasbon Uang: <span id="notaSubManual" class="ml-4">- Rp 0</span></div>
+                                </div>
+
+                                <div
+                                    class="border-t-2 border-dashed border-gray-300 pt-2 flex justify-between items-center">
+                                    <span class="text-xs font-black text-gray-700 uppercase tracking-wide">Total Net
+                                        Pembayaran</span>
+                                    <span id="notaGrandTotal" class="text-lg font-black text-gray-900">Rp 0</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-6 text-center text-[9px] text-gray-400 font-medium">
+                <div id="printFooterInfo" class="mt-6 text-center text-[9px] text-gray-400 font-medium">
                     <p>HATUR NUHUN, CEK KEMBALI</p>
                     <p>Mulus Rahayu, Berkah Salamet</p>
                     <p>SBR Putra Food Sistems &copy; 2026</p>
+                </div>
+
+                <!-- Garis Potong Tengah Kertas A4 (Batas A5 / 148.5mm) -->
+                <div id="printCutLine" class="hidden">
+                    <span>✂️ GARIS POTONG (A4/2 — UKURAN A5)</span>
+                    <span>✂️</span>
                 </div>
             </div>
         </div>
@@ -5003,6 +5066,60 @@
             modal.classList.remove('hidden');
             setTimeout(() => { modal.children[1].classList.replace('scale-95', 'scale-100'); }, 10);
             feather.replace();
+        }
+
+        // --- FUNGSI CETAK LANGSUNG DI PRINTER A4 (POSISI SEPARUH ATAS / A5 + GARIS POTONG TENGAH) ---
+        function cetakNotaA4() {
+            const areaPrint = document.getElementById('areaPrint');
+            const contentBody = document.getElementById('printContentBody');
+            const footerInfo = document.getElementById('printFooterInfo');
+            const cutLine = document.getElementById('printCutLine');
+
+            if (!areaPrint || !contentBody) {
+                window.print();
+                return;
+            }
+
+            const prevAreaStyle = areaPrint.getAttribute('style') || '';
+            const prevBodyStyle = contentBody.getAttribute('style') || '';
+            const prevCutClass = cutLine ? cutLine.className : '';
+
+            // Tampilkan sementara garis potong untuk mengukur tinggi aktual terhadap batas setengah A4 (148.5mm ~ 561px)
+            if (cutLine) {
+                cutLine.className = 'flex w-full items-center justify-between border-b border-dashed border-gray-400 text-[9px] text-gray-400 font-bold tracking-wider pt-1.5 mt-2';
+            }
+
+            areaPrint.style.width = '794px'; // 210mm pada 96 DPI
+            areaPrint.style.padding = '26px 45px 6px 45px';
+            areaPrint.style.boxSizing = 'border-box';
+            contentBody.style.zoom = '1';
+
+            const targetHalfA4Px = 561; // 148.5mm (tepat separuh tinggi kertas A4 297mm)
+            const footerH = (footerInfo ? footerInfo.offsetHeight : 36) + (cutLine ? cutLine.offsetHeight : 22) + 40;
+            const availableBodyH = targetHalfA4Px - footerH;
+            const actualBodyH = contentBody.scrollHeight;
+
+            // Jika rincian barang cukup panjang, sesuaikan skala secara halus agar tetap muat rapi di separuh atas A4 (A5)
+            if (actualBodyH > availableBodyH && actualBodyH > 0) {
+                const scaleFactor = Math.max(0.62, (availableBodyH / actualBodyH) * 0.96);
+                contentBody.style.zoom = scaleFactor.toFixed(3);
+            }
+
+            // Kembalikan inline style container agar aturan @media print CSS (210mm x 148.5mm) bekerja penuh
+            areaPrint.setAttribute('style', prevAreaStyle);
+
+            const cleanupAfterPrint = () => {
+                contentBody.setAttribute('style', prevBodyStyle);
+                if (cutLine) cutLine.className = prevCutClass;
+                window.removeEventListener('afterprint', cleanupAfterPrint);
+            };
+            window.addEventListener('afterprint', cleanupAfterPrint);
+
+            setTimeout(() => {
+                window.print();
+                // Fallback pemulihan tampilan layar setelah dialog print selesai
+                setTimeout(cleanupAfterPrint, 800);
+            }, 60);
         }
 
         async function simpanPNG() {
