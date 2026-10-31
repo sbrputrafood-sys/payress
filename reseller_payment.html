@@ -221,7 +221,14 @@
                     </div>
                 </div>
 
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3">
+                    <button id="btnBleNav" onclick="bukaModalBluetooth()"
+                        class="relative text-gray-400 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400 p-1.5 rounded-lg transition"
+                        title="Printer Bluetooth: Belum Terhubung">
+                        <i data-feather="printer" class="w-4 h-4"></i>
+                        <span id="bleNavDot" class="absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-white dark:ring-slate-900"></span>
+                    </button>
+
                     <button onclick="toggleTheme()"
                         class="text-gray-400 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 p-1.5 rounded-lg transition"
                         title="Toggle Tema">
@@ -525,33 +532,137 @@
         <div
             class="bg-gray-100 dark:bg-slate-800 w-full max-w-4xl rounded-xl shadow-2xl pointer-events-auto transform scale-95 transition-transform duration-200 relative overflow-hidden flex flex-col max-h-[95vh]">
             <div
-                class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 py-3 flex justify-between items-center no-print sticky top-0 z-10">
-                <h3 class="text-sm font-bold text-gray-700 dark:text-slate-200">Pratinjau Nota</h3>
-                <div class="flex gap-2">
+                class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 py-2.5 flex justify-between items-center no-print sticky top-0 z-20">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-primary-50 dark:bg-primary-950/50 text-primary-600 dark:text-primary-400 flex items-center justify-center">
+                        <i data-feather="file-text" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-800 dark:text-slate-100 leading-none">Pratinjau Nota</h3>
+                        <p class="text-[10px] text-gray-400 dark:text-slate-400 mt-0.5 font-medium">SBR Putra Food</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <!-- Tombol Simpan ke Riwayat (Draft Mode) -->
                     <button id="btnSimpanPratinjau" onclick="simpanTransaksi()"
-                        class="bg-emerald-600 text-white hover:bg-emerald-500 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"><i
-                            data-feather="check-circle" class="w-3 h-3 mr-1"></i> Simpan ke Riwayat</button>
+                        class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold py-1.5 px-3 rounded-lg flex items-center transition shadow-sm">
+                        <i data-feather="check-circle" class="w-3.5 h-3.5 mr-1.5"></i> Simpan ke Riwayat
+                    </button>
+
+                    <!-- Tombol Edit Data (History Mode) -->
                     <button id="btnEditRiwayat" onclick=""
-                        class="hidden bg-amber-500 text-white hover:bg-amber-400 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"
-                        title="Edit nota ini atau tarik catatan harian susulan"><i data-feather="edit"
-                            class="w-3 h-3 mr-1"></i> Edit Data</button>
-                    <button id="btnVoidRiwayat" onclick=""
-                        class="hidden bg-rose-600 text-white hover:bg-rose-500 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"
-                        title="Batalkan nota ini dan kembalikan semua catatan harian ke draft belum dibayar"><i
-                            data-feather="rotate-ccw" class="w-3 h-3 mr-1"></i> Void / Batal Nota</button>
-                    <button id="btnHapusRiwayat" onclick=""
-                        class="hidden bg-slate-600 text-white hover:bg-slate-500 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition shadow-sm"
-                        title="Hapus riwayat permanen dengan PIN"><i data-feather="trash-2" class="w-3 h-3 mr-1"></i>
-                        Hapus Riwayat</button>
+                        class="hidden bg-amber-500 hover:bg-amber-400 text-white text-[11px] font-bold py-1.5 px-3 rounded-lg flex items-center transition shadow-sm"
+                        title="Edit nota ini atau tarik catatan harian susulan">
+                        <i data-feather="edit" class="w-3.5 h-3.5 mr-1.5"></i> Edit Data
+                    </button>
+
+                    <!-- Dropdown Kelola Nota (Void & Hapus) (History Mode) -->
+                    <div id="groupDropdownKelolaNota" class="relative hidden">
+                        <button id="btnToggleKelolaNota" type="button" onclick="toggleDropdownKelolaNota(event)"
+                            class="bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 text-[11px] font-bold py-1.5 px-2.5 rounded-lg flex items-center transition shadow-sm"
+                            title="Menu pembatalan & penghapusan nota">
+                            <i data-feather="more-horizontal" class="w-3.5 h-3.5 mr-1.5 text-gray-500 dark:text-slate-300"></i>
+                            <span>Kelola</span>
+                            <i data-feather="chevron-down" class="w-3 h-3 ml-1 text-gray-400"></i>
+                        </button>
+                        <div id="menuDropdownKelolaNota"
+                            class="hidden absolute right-0 mt-1.5 w-52 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-xl py-1 z-30 divide-y divide-gray-100 dark:divide-slate-700/60">
+                            <div class="py-1">
+                                <button id="btnVoidRiwayat" onclick=""
+                                    class="hidden w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center transition"
+                                    title="Batalkan nota ini dan kembalikan semua catatan harian ke draft belum dibayar">
+                                    <i data-feather="rotate-ccw" class="w-3.5 h-3.5 mr-2.5 text-rose-500 flex-shrink-0"></i>
+                                    <div>
+                                        <div class="font-bold">Void / Batal Nota</div>
+                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Kembalikan ke draft harian</div>
+                                    </div>
+                                </button>
+                            </div>
+                            <div class="py-1">
+                                <button id="btnHapusRiwayat" onclick=""
+                                    class="hidden w-full text-left px-3 py-2 text-xs font-semibold text-gray-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400 flex items-center transition"
+                                    title="Hapus riwayat permanen dengan PIN">
+                                    <i data-feather="trash-2" class="w-3.5 h-3.5 mr-2.5 text-slate-400 flex-shrink-0"></i>
+                                    <div>
+                                        <div class="font-bold">Hapus Riwayat</div>
+                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Hapus permanen (PIN)</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="h-5 w-px bg-gray-200 dark:bg-slate-700 mx-0.5 hidden sm:block"></div>
+
+                    <!-- Tombol Simpan PNG -->
                     <button onclick="simpanPNG()"
-                        class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i
-                            data-feather="image" class="w-3 h-3 mr-1"></i> Simpan PNG</button>
-                    <button onclick="cetakNotaA4()"
-                        class="bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800/50 text-[11px] font-bold py-1.5 px-3 rounded flex items-center transition"><i
-                            data-feather="printer" class="w-3 h-3 mr-1"></i> Cetak A4</button>
+                        class="bg-white dark:bg-slate-700/80 text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-600 border border-gray-300 dark:border-slate-600 text-[11px] font-bold py-1.5 px-2.5 rounded-lg flex items-center transition shadow-sm"
+                        title="Simpan nota sebagai berkas gambar PNG">
+                        <i data-feather="image" class="w-3.5 h-3.5 mr-1 text-slate-500 dark:text-slate-400"></i>
+                        <span>PNG</span>
+                    </button>
+
+                    <!-- Split-Button Cetak [ Cetak BT | ▾ ] -->
+                    <div class="relative inline-flex rounded-lg shadow-sm">
+                        <button id="btnCetakBluetooth" onclick="bukaModalPilihanCetakBT()"
+                            class="bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-bold py-1.5 px-3 rounded-l-lg flex items-center transition border-r border-sky-500/50"
+                            title="Cetak struk nota ke thermal printer Bluetooth (58mm / 80mm / 58mm Admin)">
+                            <i data-feather="printer" class="w-3.5 h-3.5 mr-1.5"></i>
+                            <span>Cetak BT</span>
+                        </button>
+                        <button id="btnToggleMenuPrint" type="button" onclick="toggleDropdownPrint(event)"
+                            class="bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-bold px-2 rounded-r-lg flex items-center transition"
+                            title="Pilihan cetak lainnya (A4, Bluetooth, Pengaturan)">
+                            <i data-feather="chevron-down" class="w-3.5 h-3.5"></i>
+                        </button>
+
+                        <!-- Dropdown Menu Cetak -->
+                        <div id="menuDropdownPrint"
+                            class="hidden absolute right-0 top-full mt-1.5 w-56 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-xl py-1 z-30 divide-y divide-gray-100 dark:divide-slate-700/60">
+                            <div class="py-1">
+                                <button onclick="tutupSemuaDropdownPratinjau(); bukaModalPilihanCetakBT();"
+                                    class="w-full text-left px-3 py-2 text-xs font-semibold text-gray-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:text-sky-600 dark:hover:text-sky-400 flex items-center transition">
+                                    <div class="w-6 h-6 rounded-md bg-sky-100 dark:bg-sky-900/50 flex items-center justify-center mr-2.5 text-sky-600 dark:text-sky-400 flex-shrink-0">
+                                        <i data-feather="printer" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold">Cetak Struk BT</div>
+                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Thermal 58mm / 80mm</div>
+                                    </div>
+                                </button>
+                                <button onclick="tutupSemuaDropdownPratinjau(); cetakNotaA4();"
+                                    class="w-full text-left px-3 py-2 text-xs font-semibold text-gray-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 flex items-center transition">
+                                    <div class="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mr-2.5 text-blue-600 dark:text-blue-400 flex-shrink-0">
+                                        <i data-feather="file-text" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold">Cetak Kertas A4</div>
+                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Browser print dialog</div>
+                                    </div>
+                                </button>
+                            </div>
+                            <div class="py-1">
+                                <button onclick="tutupSemuaDropdownPratinjau(); bukaModalBluetooth();"
+                                    class="w-full text-left px-3 py-2 text-xs font-semibold text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center transition">
+                                    <div class="w-6 h-6 rounded-md bg-gray-100 dark:bg-slate-700 flex items-center justify-center mr-2.5 text-gray-600 dark:text-slate-300 flex-shrink-0">
+                                        <i data-feather="bluetooth" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold">Pengaturan Printer BT</div>
+                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Status koneksi & uji cetak</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Tutup -->
                     <button onclick="closeModal('modalPratinjau')"
-                        class="bg-gray-50 dark:bg-slate-700 text-gray-500 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600 border border-gray-200 dark:border-slate-600 p-1.5 rounded transition"><i
-                            data-feather="x" class="w-4 h-4"></i></button>
+                        class="bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600 border border-gray-200 dark:border-slate-600 p-1.5 rounded-lg transition"
+                        title="Tutup">
+                        <i data-feather="x" class="w-4 h-4"></i>
+                    </button>
                 </div>
             </div>
 
@@ -677,6 +788,186 @@
                     <span>✂️ GARIS POTONG (A4/2 — UKURAN A5)</span>
                     <span>✂️</span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: PILIH MODE CETAK BLUETOOTH (3 PILIHAN) ==================== -->
+    <div id="modalPrintChoicesBT" onclick="if(event.target === this) tutupModalPilihanCetakBT()"
+        class="no-print fixed inset-0 z-[120] hidden bg-black/60 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-4 shadow-2xl space-y-3 border border-gray-100 dark:border-slate-700">
+            <div class="flex items-center justify-between border-b border-gray-100 dark:border-slate-700 pb-2.5">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-full bg-stone-900 text-sky-400 flex items-center justify-center shrink-0">
+                        <i data-feather="printer" class="w-4 h-4"></i>
+                    </span>
+                    <div>
+                        <h3 class="font-bold text-sm text-gray-900 dark:text-white">Pilih Mode Cetak Bluetooth</h3>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Pilih sesuai ukuran kertas &amp; printer yang digunakan</p>
+                    </div>
+                </div>
+                <button type="button" onclick="tutupModalPilihanCetakBT()"
+                    class="w-7 h-7 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex items-center justify-center transition">
+                    <i data-feather="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="space-y-2.5">
+                <!-- Pilihan 1: Kertas 58mm -->
+                <button type="button" onclick="eksekusiCetakBluetooth('58mm')"
+                    class="w-full p-3 rounded-xl border-2 border-stone-200 dark:border-slate-700 hover:border-[#ba5d4f] dark:hover:border-[#ba5d4f] hover:bg-stone-50 dark:hover:bg-slate-700/50 text-left flex items-center justify-between gap-2 transition group">
+                    <div>
+                        <div class="font-bold text-sm text-stone-900 dark:text-white group-hover:text-[#ba5d4f]">1. Kertas 58mm</div>
+                        <div class="text-[11px] text-stone-500 dark:text-gray-400">Lebar standar 32 karakter pada printer 58mm</div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg bg-stone-900 dark:bg-stone-700 text-white text-xs font-bold shrink-0 flex items-center gap-1.5 shadow-sm">
+                        <i data-feather="printer" class="w-3.5 h-3.5"></i>
+                        <span>58mm</span>
+                    </span>
+                </button>
+
+                <!-- Pilihan 2: Kertas 80mm -->
+                <button type="button" onclick="eksekusiCetakBluetooth('80mm')"
+                    class="w-full p-3 rounded-xl border-2 border-stone-200 dark:border-slate-700 hover:border-[#ba5d4f] dark:hover:border-[#ba5d4f] hover:bg-stone-50 dark:hover:bg-slate-700/50 text-left flex items-center justify-between gap-2 transition group">
+                    <div>
+                        <div class="font-bold text-sm text-stone-900 dark:text-white group-hover:text-[#ba5d4f]">2. Kertas 80mm</div>
+                        <div class="text-[11px] text-stone-500 dark:text-gray-400">Lebar penuh 48 karakter pada printer 80mm</div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg bg-stone-900 dark:bg-stone-700 text-white text-xs font-bold shrink-0 flex items-center gap-1.5 shadow-sm">
+                        <i data-feather="printer" class="w-3.5 h-3.5"></i>
+                        <span>80mm</span>
+                    </span>
+                </button>
+
+                <!-- Pilihan 3: Kertas 58mm Admin (di Printer 80mm - Geser Kanan) -->
+                <div class="p-3 rounded-xl border-2 border-amber-300 dark:border-amber-500/60 bg-amber-50/60 dark:bg-amber-950/20 space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <div>
+                            <div class="font-bold text-sm text-amber-950 dark:text-amber-300 flex items-center gap-1.5">
+                                <span>3. Kertas 58mm Admin</span>
+                                <span class="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded bg-amber-200 dark:bg-amber-800/80 text-amber-950 dark:text-amber-200 font-extrabold">
+                                    <i data-feather="scissors" class="w-3 h-3"></i> Auto-Cutter
+                                </span>
+                            </div>
+                            <div class="text-[11px] text-amber-800 dark:text-amber-400/90 leading-tight mt-0.5">
+                                Kertas lebar 58mm (32 karakter) dipasang di printer Bluetooth 80mm (posisi cetak digeser ke kanan)
+                            </div>
+                        </div>
+                        <button type="button" onclick="eksekusiCetakBluetooth('58mm_admin')"
+                            class="px-3 py-2 rounded-lg bg-[#ba5d4f] hover:bg-[#99463a] active:scale-95 text-white text-xs font-bold shrink-0 shadow-sm flex items-center gap-1.5 transition">
+                            <i data-feather="printer" class="w-3.5 h-3.5"></i>
+                            <span>58mm Admin</span>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-amber-200/80 dark:border-amber-700/50 text-xs">
+                        <label for="inputAdminOffset" class="text-[11px] font-semibold text-amber-900 dark:text-amber-300">
+                            Geser Kanan (Spasi/Karakter):
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="adjustAdminOffset(-1)"
+                                class="w-6 h-6 rounded bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-600 font-bold text-amber-900 dark:text-amber-300 flex items-center justify-center hover:bg-amber-100 dark:hover:bg-amber-900/40">
+                                <i data-feather="minus" class="w-3 h-3"></i>
+                            </button>
+                            <input id="inputAdminOffset" type="number" min="0" max="30" value="15"
+                                onchange="simpanPengaturanPrinter()"
+                                class="w-12 py-0.5 text-center font-mono font-bold bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-600 rounded text-xs text-gray-900 dark:text-white" />
+                            <button type="button" onclick="adjustAdminOffset(1)"
+                                class="w-6 h-6 rounded bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-600 font-bold text-amber-900 dark:text-amber-300 flex items-center justify-center hover:bg-amber-100 dark:hover:bg-amber-900/40">
+                                <i data-feather="plus" class="w-3 h-3"></i>
+                            </button>
+                            <span class="text-[10px] text-amber-800 dark:text-amber-400">spasi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-slate-700 text-[11px] text-gray-500 dark:text-gray-400">
+                <span>Total Di Terima dicetak <strong class="text-gray-700 dark:text-gray-300">Double Height</strong></span>
+                <button type="button" onclick="bukaModalBluetooth()"
+                    class="flex items-center gap-1 text-sky-600 dark:text-sky-400 font-semibold hover:underline">
+                    <i data-feather="sliders" class="w-3.5 h-3.5"></i>
+                    <span>Pengaturan BLE</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: PENGATURAN BLUETOOTH PRINTER (BLE) ==================== -->
+    <div id="modalBluetooth" onclick="if(event.target === this) tutupModalBluetooth()"
+        class="no-print fixed inset-0 z-[130] hidden bg-black/60 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-4 shadow-2xl space-y-3 border border-gray-100 dark:border-slate-700">
+            <div class="flex items-center justify-between border-b border-gray-100 dark:border-slate-700 pb-2.5">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                        <i data-feather="bluetooth" class="w-4 h-4"></i>
+                    </span>
+                    <div>
+                        <h3 class="font-bold text-sm text-gray-900 dark:text-white">Pengaturan Printer Bluetooth</h3>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Web Bluetooth API (ESC/POS Thermal)</p>
+                    </div>
+                </div>
+                <button type="button" onclick="tutupModalBluetooth()"
+                    class="w-7 h-7 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex items-center justify-center transition">
+                    <i data-feather="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="bg-stone-50 dark:bg-slate-750 rounded-xl p-3 border border-stone-200 dark:border-slate-700 text-xs space-y-1.5">
+                <div class="flex items-center justify-between">
+                    <span class="text-stone-500 dark:text-slate-400">Status Koneksi:</span>
+                    <span id="modalBleStatus" class="font-bold text-amber-600 dark:text-amber-400">Belum Terhubung</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-stone-500 dark:text-slate-400">Perangkat:</span>
+                    <span id="modalBleDeviceName" class="font-mono font-semibold text-stone-800 dark:text-slate-200">-</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label for="selectPaperWidthDefault" class="block text-[11px] font-semibold text-stone-600 dark:text-slate-400 mb-1">Mode Kertas Default</label>
+                    <select id="selectPaperWidthDefault" onchange="simpanPengaturanPrinter()"
+                        class="w-full px-2.5 py-2 rounded-lg border border-stone-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs font-semibold text-gray-900 dark:text-white">
+                        <option value="32">58mm (32 Karakter)</option>
+                        <option value="48">80mm (48 Karakter)</option>
+                        <option value="58_admin">58mm Admin (di Printer 80mm)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="selectChunkSize" class="block text-[11px] font-semibold text-stone-600 dark:text-slate-400 mb-1">Ukuran Paket BLE</label>
+                    <select id="selectChunkSize" onchange="simpanPengaturanPrinter()"
+                        class="w-full px-2.5 py-2 rounded-lg border border-stone-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs font-semibold text-gray-900 dark:text-white">
+                        <option value="20">20 Bytes (Aman Semua HP)</option>
+                        <option value="64">64 Bytes (Cepat)</option>
+                        <option value="128">128 Bytes (Ultra Cepat)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="text-[11px] text-stone-600 dark:text-slate-300 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-lg p-2.5 leading-relaxed flex items-start gap-2">
+                <i data-feather="info" class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"></i>
+                <div>
+                    <strong>Tips Mobile:</strong> Gunakan browser <strong>Google Chrome di Android</strong> (atau Bluefy di iOS) via koneksi HTTPS. Nyalakan printer Bluetooth lalu tekan <em>Cari &amp; Hubungkan Printer</em>.
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 pt-1">
+                <button type="button" onclick="hubungkanPrinterBluetooth()"
+                    class="flex-1 py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-sm">
+                    <i data-feather="bluetooth" class="w-4 h-4"></i>
+                    <span>Cari &amp; Hubungkan</span>
+                </button>
+                <button id="btnBleDisconnect" type="button" onclick="putuskanPrinterBluetooth()"
+                    class="hidden py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-sm">
+                    <i data-feather="power" class="w-4 h-4"></i>
+                    <span>Putus</span>
+                </button>
+                <button type="button" onclick="testPrintBluetooth()"
+                    class="py-2.5 px-3 rounded-xl bg-stone-800 hover:bg-stone-900 dark:bg-slate-700 dark:hover:bg-slate-600 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-sm">
+                    <i data-feather="printer" class="w-4 h-4"></i>
+                    <span>Test Print</span>
+                </button>
             </div>
         </div>
     </div>
@@ -2010,7 +2301,7 @@
     <!-- SCRIPT LOGIKA -->
     <script>
         feather.replace();
-        const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+        const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka).replace(/\u00A0/g, ' ');
 
         // --- SISTEM KOTRETAN QTY CEPAT ---
         let activeQtyInput = null;
@@ -4822,14 +5113,21 @@
             document.getElementById('btnEditRiwayat').classList.remove('hidden');
             document.getElementById('btnEditRiwayat').setAttribute('onclick', `siapkanEditTransaksi('${trxId}')`);
 
+            const grpKelola = document.getElementById('groupDropdownKelolaNota');
+            if (grpKelola) grpKelola.classList.remove('hidden');
+
             const btnVoid = document.getElementById('btnVoidRiwayat');
             if (btnVoid) {
                 btnVoid.classList.remove('hidden');
-                btnVoid.setAttribute('onclick', `konfirmasiVoidTransaksi('${trxId}')`);
+                btnVoid.setAttribute('onclick', `tutupSemuaDropdownPratinjau(); konfirmasiVoidTransaksi('${trxId}')`);
             }
 
-            document.getElementById('btnHapusRiwayat').classList.remove('hidden');
-            document.getElementById('btnHapusRiwayat').setAttribute('onclick', `hapusRiwayatTransaksi('${trxId}')`);
+            const btnHapus = document.getElementById('btnHapusRiwayat');
+            if (btnHapus) {
+                btnHapus.classList.remove('hidden');
+                btnHapus.setAttribute('onclick', `tutupSemuaDropdownPratinjau(); hapusRiwayatTransaksi('${trxId}')`);
+            }
+            tutupSemuaDropdownPratinjau();
 
             document.getElementById('btnHistoryBahan').classList.remove('hidden');
             document.getElementById('btnHistoryJadi').classList.remove('hidden');
@@ -5005,9 +5303,12 @@
             document.getElementById('notaNama').innerText = reseller ? reseller.nama : '-';
             document.getElementById('notaTgl').innerText = formatHariTanggalID(document.getElementById('tglTransaksi').value);
             document.getElementById('btnEditRiwayat').classList.add('hidden');
+            const grpKelola = document.getElementById('groupDropdownKelolaNota');
+            if (grpKelola) grpKelola.classList.add('hidden');
             const btnVoid = document.getElementById('btnVoidRiwayat');
             if (btnVoid) btnVoid.classList.add('hidden');
             document.getElementById('btnHapusRiwayat').classList.add('hidden');
+            tutupSemuaDropdownPratinjau();
 
             const btnSimpanPrat = document.getElementById('btnSimpanPratinjau');
             btnSimpanPrat.style.display = 'flex';
@@ -5120,6 +5421,563 @@
                 // Fallback pemulihan tampilan layar setelah dialog print selesai
                 setTimeout(cleanupAfterPrint, 800);
             }, 60);
+        }
+
+        // =========================================================================
+        // DRIVER PRINT BLUETOOTH THERMAL ESC/POS (WEB BLUETOOTH API)
+        // =========================================================================
+        let bleDevice = null;
+        let bleServer = null;
+        let bleCharacteristic = null;
+        let printerSettings = {
+            paperWidth: '32',
+            chunkSize: 20,
+            adminOffset: 15
+        };
+
+        function cleanThermalString(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/\u00A0/g, ' ')               // Ganti non-breaking space (NBSP / &nbsp;) jadi spasi biasa
+                .replace(/[\u200B-\u200D\uFEFF]/g, '') // Hapus zero-width characters
+                .replace(/[\u2018\u2019]/g, "'")       // Ganti smart quote single
+                .replace(/[\u201C\u201D]/g, '"')       // Ganti smart quote double
+                .replace(/[\u2013\u2014]/g, '-')       // Ganti dash unicode
+                .replace(/©/g, '(c)')
+                .replace(/[^\x20-\x7E]/g, ' ')         // Pastikan HANYA karakter ASCII 7-bit murni (0x20 s.d 0x7E)
+                .replace(/ +/g, ' ')                   // Rapikan spasi berlebih
+                .trim();
+        }
+
+        function padRightBT(str, len) {
+            const s = cleanThermalString(str);
+            return s.length >= len ? s.slice(0, len) : s + ' '.repeat(len - s.length);
+        }
+
+        function padLeftBT(str, len) {
+            const s = cleanThermalString(str);
+            return s.length >= len ? s.slice(0, len) : ' '.repeat(len - s.length) + s;
+        }
+
+        function centerTextBT(str, width) {
+            const s = cleanThermalString(str);
+            if (s.length >= width) return s.slice(0, width);
+            const leftPad = Math.floor((width - s.length) / 2);
+            return ' '.repeat(leftPad) + s;
+        }
+
+        function resolvePrintModeParams(modeOrWidth) {
+            const adminOffsetInput = document.getElementById('inputAdminOffset');
+            const adminOffset = Math.max(0, Number(adminOffsetInput ? adminOffsetInput.value : (printerSettings.adminOffset || 15)));
+            if (modeOrWidth === '80mm' || modeOrWidth === 48 || modeOrWidth === '48') {
+                return { charWidth: 48, leftPad: 0, autoCut: false, modeLabel: 'Kertas 80mm' };
+            }
+            if (modeOrWidth === '58mm_admin' || modeOrWidth === '58_admin') {
+                return { charWidth: 32, leftPad: adminOffset, autoCut: true, modeLabel: 'Kertas 58mm Admin (+' + adminOffset + ' spasi & Auto-Cutter)' };
+            }
+            return { charWidth: 32, leftPad: 0, autoCut: false, modeLabel: 'Kertas 58mm' };
+        }
+
+        function adjustAdminOffset(delta) {
+            const inp = document.getElementById('inputAdminOffset');
+            if (!inp) return;
+            const cur = Number(inp.value) || 0;
+            const next = Math.max(0, Math.min(30, cur + delta));
+            inp.value = String(next);
+            simpanPengaturanPrinter();
+        }
+
+        function simpanPengaturanPrinter() {
+            const elWidth = document.getElementById('selectPaperWidthDefault');
+            const elChunk = document.getElementById('selectChunkSize');
+            const elOffset = document.getElementById('inputAdminOffset');
+
+            if (elWidth) printerSettings.paperWidth = elWidth.value || '32';
+            if (elChunk) printerSettings.chunkSize = Number(elChunk.value) || 20;
+            if (elOffset) printerSettings.adminOffset = Math.max(0, Number(elOffset.value) || 0);
+
+            try {
+                localStorage.setItem('sbr_reseller_printer_settings', JSON.stringify(printerSettings));
+            } catch (e) {
+                console.warn("Gagal simpan setting printer ke localStorage:", e);
+            }
+        }
+
+        function initPrinterSettingsUI() {
+            try {
+                const saved = localStorage.getItem('sbr_reseller_printer_settings');
+                if (saved) {
+                    printerSettings = Object.assign(printerSettings, JSON.parse(saved));
+                }
+            } catch (e) {
+                console.warn(e);
+            }
+
+            const inpOffset = document.getElementById('inputAdminOffset');
+            if (inpOffset) inpOffset.value = printerSettings.adminOffset || 15;
+
+            const elWidth = document.getElementById('selectPaperWidthDefault');
+            if (elWidth) elWidth.value = printerSettings.paperWidth || '32';
+
+            const elChunk = document.getElementById('selectChunkSize');
+            if (elChunk) elChunk.value = String(printerSettings.chunkSize || 20);
+
+            updateBleStatusUI(false, '');
+        }
+
+        function bukaModalPilihanCetakBT() {
+            const modalPrat = document.getElementById('modalPratinjau');
+            if (modalPrat && modalPrat.classList.contains('hidden')) {
+                if (!selectedResellerId) {
+                    showNotification("Pilih Reseller terlebih dahulu!", "error");
+                    return;
+                }
+                bukaPratinjau();
+            }
+
+            const inp = document.getElementById('inputAdminOffset');
+            if (inp) inp.value = printerSettings.adminOffset || 15;
+
+            const modal = document.getElementById('modalPrintChoicesBT');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            feather.replace();
+        }
+
+        function tutupModalPilihanCetakBT() {
+            const modal = document.getElementById('modalPrintChoicesBT');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function toggleDropdownKelolaNota(event) {
+            if (event) event.stopPropagation();
+            const menu = document.getElementById('menuDropdownKelolaNota');
+            const menuPrint = document.getElementById('menuDropdownPrint');
+            if (menuPrint) menuPrint.classList.add('hidden');
+            if (menu) menu.classList.toggle('hidden');
+            if (window.feather) feather.replace();
+        }
+
+        function toggleDropdownPrint(event) {
+            if (event) event.stopPropagation();
+            const menu = document.getElementById('menuDropdownPrint');
+            const menuKelola = document.getElementById('menuDropdownKelolaNota');
+            if (menuKelola) menuKelola.classList.add('hidden');
+            if (menu) menu.classList.toggle('hidden');
+            if (window.feather) feather.replace();
+        }
+
+        function tutupSemuaDropdownPratinjau() {
+            const menuKelola = document.getElementById('menuDropdownKelolaNota');
+            const menuPrint = document.getElementById('menuDropdownPrint');
+            if (menuKelola) menuKelola.classList.add('hidden');
+            if (menuPrint) menuPrint.classList.add('hidden');
+        }
+
+        window.addEventListener('click', function (e) {
+            const inKelola = e.target.closest('#groupDropdownKelolaNota');
+            const inPrint = e.target.closest('#menuDropdownPrint') || e.target.closest('#btnToggleMenuPrint');
+            if (!inKelola && !inPrint) {
+                tutupSemuaDropdownPratinjau();
+            }
+        });
+
+        function bukaModalBluetooth() {
+            tutupModalPilihanCetakBT();
+            const modal = document.getElementById('modalBluetooth');
+            if (!modal) return;
+
+            const elWidth = document.getElementById('selectPaperWidthDefault');
+            const elChunk = document.getElementById('selectChunkSize');
+            if (elWidth) elWidth.value = printerSettings.paperWidth || '32';
+            if (elChunk) elChunk.value = String(printerSettings.chunkSize || 20);
+
+            modal.classList.remove('hidden');
+            feather.replace();
+        }
+
+        function tutupModalBluetooth() {
+            const modal = document.getElementById('modalBluetooth');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function updateBleStatusUI(connected, deviceName) {
+            const navDot = document.getElementById('bleNavDot');
+            const navBtn = document.getElementById('btnBleNav');
+            const modalStatus = document.getElementById('modalBleStatus');
+            const modalName = document.getElementById('modalBleDeviceName');
+            const btnDisconnect = document.getElementById('btnBleDisconnect');
+
+            if (connected) {
+                if (navDot) navDot.className = 'absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900';
+                if (navBtn) navBtn.title = 'Printer: ' + (deviceName || 'Terhubung');
+                if (modalStatus) {
+                    modalStatus.textContent = 'Terhubung (Siap Cetak)';
+                    modalStatus.className = 'font-bold text-emerald-600 dark:text-emerald-400';
+                }
+                if (modalName) modalName.textContent = deviceName || 'Printer Bluetooth';
+                if (btnDisconnect) btnDisconnect.classList.remove('hidden');
+            } else {
+                if (navDot) navDot.className = 'absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-white dark:ring-slate-900';
+                if (navBtn) navBtn.title = 'Printer: Belum Terhubung';
+                if (modalStatus) {
+                    modalStatus.textContent = 'Belum Terhubung';
+                    modalStatus.className = 'font-bold text-amber-600 dark:text-amber-400';
+                }
+                if (modalName) modalName.textContent = '-';
+                if (btnDisconnect) btnDisconnect.classList.add('hidden');
+            }
+        }
+
+        async function hubungkanPrinterBluetooth() {
+            if (!navigator.bluetooth) {
+                showNotification("Browser tidak mendukung Web Bluetooth. Gunakan Google Chrome di Android/PC via HTTPS.", "error");
+                return false;
+            }
+
+            try {
+                const OPTIONAL_SERVICES = [
+                    '000018f0-0000-1000-8000-00805f9b34fb',
+                    'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
+                    '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+                    '0000ff00-0000-1000-8000-00805f9b34fb',
+                    '0000ffe0-0000-1000-8000-00805f9b34fb',
+                    '000018f1-0000-1000-8000-00805f9b34fb'
+                ];
+
+                showNotification("Mencari printer Bluetooth...", "info");
+
+                bleDevice = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: OPTIONAL_SERVICES
+                });
+
+                bleDevice.addEventListener('gattserverdisconnected', function() {
+                    bleCharacteristic = null;
+                    bleServer = null;
+                    updateBleStatusUI(false, '');
+                    showNotification('Printer Bluetooth terputus', 'warning-flash');
+                });
+
+                bleServer = await bleDevice.gatt.connect();
+                const services = await bleServer.getPrimaryServices();
+
+                let foundChar = null;
+                for (let s = 0; s < services.length; s++) {
+                    try {
+                        const chars = await services[s].getCharacteristics();
+                        for (let c = 0; c < chars.length; c++) {
+                            const props = chars[c].properties;
+                            if (props.write || props.writeWithoutResponse) {
+                                foundChar = chars[c];
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn("Gagal membaca characteristic:", e);
+                    }
+                    if (foundChar) break;
+                }
+
+                if (!foundChar) {
+                    showNotification('Karakteristik tulis (write) tidak ditemukan pada printer ini', 'error');
+                    return false;
+                }
+
+                bleCharacteristic = foundChar;
+                updateBleStatusUI(true, bleDevice.name || 'Printer Bluetooth');
+                showNotification('Terhubung ke ' + (bleDevice.name || 'Printer Bluetooth'), 'success');
+                return true;
+            } catch (err) {
+                if (err && err.name !== 'NotFoundError') {
+                    showNotification('Gagal menghubungkan BLE: ' + (err.message || 'Error'), 'error');
+                }
+                return false;
+            }
+        }
+
+        function putuskanPrinterBluetooth() {
+            if (bleDevice && bleDevice.gatt && bleDevice.gatt.connected) {
+                bleDevice.gatt.disconnect();
+            }
+            bleCharacteristic = null;
+            bleServer = null;
+            updateBleStatusUI(false, '');
+            showNotification('Printer Bluetooth diputuskan', 'info');
+        }
+
+        async function kirimDataKePrinterBLE(uint8Data) {
+            if (!bleCharacteristic || !bleDevice || !bleDevice.gatt || !bleDevice.gatt.connected) {
+                const ok = await hubungkanPrinterBluetooth();
+                if (!ok || !bleCharacteristic) return false;
+            }
+
+            const chunkSize = Number(printerSettings.chunkSize) || 20;
+            try {
+                for (let offset = 0; offset < uint8Data.length; offset += chunkSize) {
+                    const slice = uint8Data.slice(offset, offset + chunkSize);
+                    if (bleCharacteristic.properties.writeWithoutResponse) {
+                        await bleCharacteristic.writeValueWithoutResponse(slice);
+                    } else {
+                        await bleCharacteristic.writeValue(slice);
+                    }
+                    await new Promise(r => setTimeout(r, 20));
+                }
+                return true;
+            } catch (err) {
+                showNotification('Gagal mengirim data cetak: ' + (err.message || 'Error'), 'error');
+                return false;
+            }
+        }
+
+        function buildEscPosResellerReceipt(modeOrWidth) {
+            const params = resolvePrintModeParams(modeOrWidth || printerSettings.paperWidth);
+            const w = params.charWidth;
+            const margin = ' '.repeat(params.leftPad);
+            const divider = '-'.repeat(w);
+            const doubleDivider = '='.repeat(w);
+
+            const resellerName = cleanThermalString((document.getElementById('notaNama') ? document.getElementById('notaNama').innerText : '') || '-');
+            const tglCetak = cleanThermalString((document.getElementById('notaTgl') ? document.getElementById('notaTgl').innerText : '') || '-');
+
+            // 1. Ambil data Pengambilan Bahan Baku
+            const bahanRows = [];
+            document.querySelectorAll('#notaListBahan tr').forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                if (tds.length >= 4) {
+                    const qty = cleanThermalString(tds[0].innerText);
+                    const item = cleanThermalString(tds[1].innerText);
+                    const harga = cleanThermalString(tds[2].innerText);
+                    const total = cleanThermalString(tds[3].innerText);
+                    if (item && item.toLowerCase() !== 'kosong') {
+                        bahanRows.push({ qty, item, harga, total });
+                    }
+                }
+            });
+            const subBahanEl = document.getElementById('notaSubBahan');
+            const subBahanText = cleanThermalString(subBahanEl ? subBahanEl.innerText : '- Rp 0');
+
+            // 2. Ambil data Setoran Barang Jadi
+            const setoranRows = [];
+            document.querySelectorAll('#notaListSetoran tr').forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                if (tds.length >= 4) {
+                    const qty = cleanThermalString(tds[0].innerText);
+                    const item = cleanThermalString(tds[1].innerText);
+                    const harga = cleanThermalString(tds[2].innerText);
+                    const total = cleanThermalString(tds[3].innerText);
+                    if (item && item.toLowerCase() !== 'kosong') {
+                        setoranRows.push({ qty, item, harga, total });
+                    }
+                }
+            });
+            const subSetoranEl = document.getElementById('notaSubSetoran');
+            const subSetoranText = cleanThermalString(subSetoranEl ? subSetoranEl.innerText : 'Rp 0');
+
+            // 3. Ambil data Kasbon / Pinjaman Manual
+            const manualRows = [];
+            const contManual = document.getElementById('notaContainerManual');
+            const isManualVisible = contManual && window.getComputedStyle(contManual).display !== 'none';
+            if (isManualVisible) {
+                document.querySelectorAll('#notaListManual tr').forEach(tr => {
+                    const tds = tr.querySelectorAll('td');
+                    if (tds.length >= 2) {
+                        const ket = cleanThermalString(tds[0].innerText);
+                        const total = cleanThermalString(tds[1].innerText);
+                        if (ket) {
+                            manualRows.push({ ket, total });
+                        }
+                    }
+                });
+            }
+            const subManualEl = document.getElementById('notaSubManual');
+            const subManualText = cleanThermalString(subManualEl ? subManualEl.innerText : '- Rp 0');
+
+            // 4. Summary & Grand Total
+            const sumSetoranEl = document.getElementById('notaSummarySetoran');
+            const sumKasbonEl = document.getElementById('notaSummaryKasbon');
+            const grandTotalEl = document.getElementById('notaGrandTotal');
+
+            const totalSetoranText = cleanThermalString(sumSetoranEl ? sumSetoranEl.innerText : subSetoranText);
+            const totalBahanText = cleanThermalString(sumKasbonEl ? sumKasbonEl.innerText : subBahanText);
+            const grandTotalText = cleanThermalString(grandTotalEl ? grandTotalEl.innerText : 'Rp 0');
+
+            if (bahanRows.length === 0 && setoranRows.length === 0 && manualRows.length === 0) {
+                showNotification("Tidak ada rincian transaksi pada pratinjau nota!", "error");
+                return null;
+            }
+
+            const preTotalLines = [];
+            preTotalLines.push(margin + centerTextBT('SBR PUTRA FOOD', w));
+            preTotalLines.push(margin + centerTextBT('Lembang, Bandung Barat 40391', w));
+            preTotalLines.push(margin + doubleDivider);
+            preTotalLines.push(margin + centerTextBT('NOTA PEMBAYARAN RESELLER', w));
+            preTotalLines.push(margin + doubleDivider);
+            preTotalLines.push(margin + 'Agen/Reseller : ' + resellerName);
+            preTotalLines.push(margin + 'Tgl Cetak     : ' + tglCetak);
+
+            // Pengambilan Bahan Baku
+            if (bahanRows.length > 0) {
+                preTotalLines.push(margin + divider);
+                preTotalLines.push(margin + 'PENGAMBILAN BAHAN BAKU:');
+                bahanRows.forEach(it => {
+                    preTotalLines.push(margin + it.item.slice(0, w));
+                    const leftDetail = '  ' + it.qty + ' x ' + it.harga;
+                    const rightSub = it.total;
+                    const spaceLeft = Math.max(1, w - rightSub.length);
+                    preTotalLines.push(margin + padRightBT(leftDetail, spaceLeft) + rightSub);
+                });
+                preTotalLines.push(margin + divider);
+                preTotalLines.push(margin + padRightBT('Subtotal Bahan:', Math.max(1, w - subBahanText.length)) + subBahanText);
+            }
+
+            // Setoran Barang Jadi
+            if (setoranRows.length > 0) {
+                preTotalLines.push(margin + divider);
+                preTotalLines.push(margin + 'SETORAN BARANG JADI:');
+                setoranRows.forEach(it => {
+                    preTotalLines.push(margin + it.item.slice(0, w));
+                    const leftDetail = '  ' + it.qty + ' x ' + it.harga;
+                    const rightSub = it.total;
+                    const spaceLeft = Math.max(1, w - rightSub.length);
+                    preTotalLines.push(margin + padRightBT(leftDetail, spaceLeft) + rightSub);
+                });
+                preTotalLines.push(margin + divider);
+                preTotalLines.push(margin + padRightBT('Subtotal Setoran:', Math.max(1, w - subSetoranText.length)) + subSetoranText);
+            }
+
+            // Kasbon / Pinjaman Manual
+            if (manualRows.length > 0) {
+                preTotalLines.push(margin + divider);
+                preTotalLines.push(margin + 'PINJAMAN / KASBON LAINNYA:');
+                manualRows.forEach(it => {
+                    const leftDetail = '  ' + it.ket;
+                    const rightSub = it.total;
+                    const spaceLeft = Math.max(1, w - rightSub.length);
+                    preTotalLines.push(margin + padRightBT(leftDetail, spaceLeft) + rightSub);
+                });
+                preTotalLines.push(margin + divider);
+                preTotalLines.push(margin + padRightBT('Total Kasbon Uang:', Math.max(1, w - subManualText.length)) + subManualText);
+            }
+
+            // Ringkasan Pembayaran
+            preTotalLines.push(margin + doubleDivider);
+            if (setoranRows.length > 0) {
+                preTotalLines.push(margin + padRightBT('Total Setoran Jadi:', Math.max(1, w - totalSetoranText.length)) + totalSetoranText);
+            }
+            if (bahanRows.length > 0) {
+                preTotalLines.push(margin + padRightBT('Total Ambil Bahan:', Math.max(1, w - totalBahanText.length)) + totalBahanText);
+            }
+            if (manualRows.length > 0) {
+                preTotalLines.push(margin + padRightBT('Total Kasbon Uang:', Math.max(1, w - subManualText.length)) + subManualText);
+            }
+            preTotalLines.push(margin + divider);
+
+            // TOTAL NET PEMBAYARAN - ESC/POS Double Height
+            const dblHeightOn = '\x1B\x21\x10\x1D\x21\x01\x1B\x45\x01';
+            const dblOff = '\x1B\x21\x00\x1D\x21\x00\x1B\x45\x00';
+            const netLabel = 'TOTAL NET PEMBAYARAN:';
+
+            let totalBlock = '';
+            if (w >= 48) {
+                totalBlock = margin + dblHeightOn + padRightBT('TOTAL NET PEMBAYARAN', w - grandTotalText.length) + grandTotalText + dblOff + '\n';
+            } else {
+                totalBlock = margin + dblHeightOn + netLabel + '\n' + margin + padLeftBT(grandTotalText, w) + dblOff + '\n';
+            }
+
+            const postTotalLines = [
+                margin + doubleDivider,
+                margin + centerTextBT('HATUR NUHUN, CEK KEMBALI', w),
+                margin + centerTextBT('Mulus Rahayu, Berkah Salamet', w),
+                margin + centerTextBT('SBR Putra Food Sistems (c) 2026', w),
+                '\n\n\n'
+            ];
+
+            // Inisialisasi ESC/POS: Reset (\x1B\x40) + Code Page 0 PC437 Standard ASCII (\x1B\x74\x00) + Matikan Kanji Mode (\x1C\x2E)
+            const fullPayloadString =
+                '\x1B\x40\x1B\x74\x00\x1C\x2E' +
+                preTotalLines.join('\n') + '\n' +
+                totalBlock +
+                postTotalLines.join('\n');
+
+            const encoder = new TextEncoder();
+            const textBytes = encoder.encode(fullPayloadString);
+
+            if (!params.autoCut) {
+                return textBytes;
+            }
+
+            const cutCmd = new Uint8Array([0x0A, 0x0A, 0x1D, 0x56, 0x42, 0x00]);
+            const combined = new Uint8Array(textBytes.length + cutCmd.length);
+            combined.set(textBytes, 0);
+            combined.set(cutCmd, textBytes.length);
+            return combined;
+        }
+
+        async function eksekusiCetakBluetooth(modeKey) {
+            tutupModalPilihanCetakBT();
+
+            const areaPrint = document.getElementById('areaPrint');
+            if (!areaPrint) {
+                showNotification("Buka Pratinjau Nota terlebih dahulu!", "error");
+                return;
+            }
+
+            const bytes = buildEscPosResellerReceipt(modeKey);
+            if (!bytes) return;
+
+            showNotification("Mengirim data ke printer Bluetooth...", "info");
+            const printed = await kirimDataKePrinterBLE(bytes);
+            if (printed) {
+                const params = resolvePrintModeParams(modeKey);
+                showNotification('Nota berhasil dicetak (' + params.modeLabel + ')!', 'success');
+            }
+        }
+
+        async function testPrintBluetooth() {
+            const elW = document.getElementById('selectPaperWidthDefault');
+            const modeVal = (elW ? elW.value : '32') === '48' ? '80mm' : ((elW ? elW.value : '32') === '58_admin' ? '58mm_admin' : '58mm');
+            const params = resolvePrintModeParams(modeVal);
+            const w = params.charWidth;
+            const margin = ' '.repeat(params.leftPad);
+            const dblHeightOn = '\x1B\x21\x10\x1D\x21\x01\x1B\x45\x01';
+            const dblOff = '\x1B\x21\x00\x1D\x21\x00\x1B\x45\x00';
+            const tLine = padRightBT('TOTAL TEST', Math.max(1, w - 12)) + 'Rp 3.695.000';
+
+            const sample = [
+                '\x1B\x40\x1B\x74\x00\x1C\x2E',
+                margin + centerTextBT('SBR PUTRA FOOD', w),
+                margin + centerTextBT('Lembang, Bandung Barat', w),
+                margin + '-'.repeat(w),
+                margin + centerTextBT('TEST PRINT BLUETOOTH', w),
+                margin + 'Mode  : ' + params.modeLabel,
+                margin + 'Waktu : ' + (new Date()).toLocaleTimeString('id-ID'),
+                margin + '-'.repeat(w),
+                margin + '10 Sak x Rp 369.500',
+                margin + padRightBT('  Subtotal:', Math.max(1, w - 12)) + 'Rp 3.695.000',
+                margin + '-'.repeat(w),
+                margin + dblHeightOn + tLine + dblOff,
+                margin + '='.repeat(w),
+                margin + centerTextBT('Koneksi Printer Bluetooth Berhasil!', w),
+                margin + centerTextBT('Mulus Rahayu Berkah Salamet', w),
+                '\n\n\n\n'
+            ].join('\n');
+
+            const encoder = new TextEncoder();
+            let textBytes = encoder.encode(sample);
+
+            if (params.autoCut) {
+                const cutCmd = new Uint8Array([0x0A, 0x0A, 0x1D, 0x56, 0x42, 0x00]);
+                const combined = new Uint8Array(textBytes.length + cutCmd.length);
+                combined.set(textBytes, 0);
+                combined.set(cutCmd, textBytes.length);
+                textBytes = combined;
+            }
+
+            const ok = await kirimDataKePrinterBLE(textBytes);
+            if (ok) {
+                showNotification('Test print berhasil dikirim ke printer!', 'success');
+            }
         }
 
         async function simpanPNG() {
@@ -5414,7 +6272,10 @@
                     if (overlay) overlay.classList.add('hidden');
                 }
 
-                if (id === 'modalPratinjau') { currentViewTrxId = null; }
+                if (id === 'modalPratinjau') { 
+                    currentViewTrxId = null; 
+                    tutupSemuaDropdownPratinjau();
+                }
             }, 200);
         }
 
@@ -6153,6 +7014,7 @@
         }
 
         window.onload = () => {
+            initPrinterSettingsUI();
             loadMasterData().then(() => {
                 for (let i = 0; i < 8; i++) addRow('bahanBaku');
                 addRow('barangJadi'); addKasbonManual();
