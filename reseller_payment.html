@@ -162,12 +162,12 @@
                 transform-origin: top center !important;
             }
 
-            #printContentBody > div:first-child {
+            #printContentBody>div:first-child {
                 padding-bottom: 6px !important;
                 margin-bottom: 8px !important;
             }
 
-            #printContentBody > div:nth-child(2) {
+            #printContentBody>div:nth-child(2) {
                 margin-bottom: 10px !important;
             }
 
@@ -205,19 +205,23 @@
     <div id="toastContainer" class="fixed bottom-4 right-4 z-[110] flex flex-col gap-2 pointer-events-none"></div>
 
     <nav
-        class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 sticky top-0 z-30 print:hidden transition-colors">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-gray-200/80 dark:border-slate-800 sticky top-0 z-30 print:hidden transition-colors shadow-2xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-14">
                 <div class="flex items-center space-x-3">
                     <div class="flex-shrink-0">
                         <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/677036e078cc7fa6c94788da8482dc53d883e2df/sbr_logo.png"
-                            alt="SBR Logo" class="w-12 h-12">
+                            alt="SBR Logo" class="w-10 h-10 object-contain drop-shadow-xs">
                     </div>
                     <div>
-                        <h1 class="font-bold text-sm leading-tight text-gray-900 dark:text-slate-100">SBR Putra Food
-                        </h1>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-black text-sm tracking-tight text-gray-900 dark:text-slate-100">SBR Putra
+                                Food</h1>
+                            <span
+                                class="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40">POS</span>
+                        </div>
                         <p class="text-[10px] text-gray-500 dark:text-slate-400 font-medium">Sistem Kalkulasi Reseller
-                            v9.8.4</p>
+                            v9.8.6</p>
                     </div>
                 </div>
 
@@ -226,7 +230,8 @@
                         class="relative text-gray-400 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400 p-1.5 rounded-lg transition"
                         title="Printer Bluetooth: Belum Terhubung">
                         <i data-feather="printer" class="w-4 h-4"></i>
-                        <span id="bleNavDot" class="absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-white dark:ring-slate-900"></span>
+                        <span id="bleNavDot"
+                            class="absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-white dark:ring-slate-900"></span>
                     </button>
 
                     <button onclick="toggleTheme()"
@@ -289,6 +294,22 @@
                                     Analitik Data Bulanan
                                     <span
                                         class="ml-auto bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-xs">Baru</span></a>
+                                <div class="border-t border-gray-100 dark:border-slate-700 my-1"></div>
+                                <a href="#" onclick="openModal('modalBackupRestore', 'backup'); return false;"
+                                    class="group flex items-center px-4 py-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-slate-700 transition"><i
+                                        data-feather="database"
+                                        class="w-3.5 h-3.5 mr-3 text-emerald-500 group-hover:text-emerald-600"></i>
+                                    Backup & Restore DB
+                                    <span
+                                        class="ml-auto bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-xs">Cloud</span></a>
+                                <a href="#" onclick="openModal('modalBackupRestore', 'reset'); return false;"
+                                    class="group flex items-center px-4 py-2.5 text-xs text-gray-700 dark:text-slate-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-slate-700 transition"><i
+                                        data-feather="trash-2"
+                                        class="w-3.5 h-3.5 mr-3 text-rose-500 group-hover:text-rose-600"></i>
+                                    Reset Data Transaksi
+                                    <span
+                                        class="ml-auto bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-xs">Layer
+                                        2</span></a>
                             </div>
                         </div>
                     </div>
@@ -306,187 +327,291 @@
     </nav>
 
     <!-- MAIN DASHBOARD CONTENT -->
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-5 print:hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5 print:hidden">
 
+        <!-- MODERN EXECUTIVE COMMAND BAR -->
         <div
-            class="flex flex-wrap items-center gap-4 mb-6 bg-white dark:bg-slate-800 p-3 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm transition-colors">
-            <div class="flex items-center gap-2">
-                <label class="text-xs font-bold text-gray-500 dark:text-slate-400">Reseller:</label>
-                <div class="flex items-center gap-1.5">
-                    <select id="resellerSelect"
-                        class="w-48 rounded border border-gray-300 dark:border-slate-600 py-1 px-2 text-sm text-gray-800 dark:text-slate-100 bg-gray-50 dark:bg-slate-900 font-semibold outline-none focus:border-blue-500 transition-colors">
-                        <option value="">-- Pilih --</option>
-                    </select>
-                    <button id="btnRefreshMaster" onclick="manualRefreshMasterData()"
-                        class="p-1.5 text-gray-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 bg-gray-100 hover:bg-blue-50 dark:bg-slate-700/60 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg transition-all flex items-center justify-center shadow-xs"
-                        title="Sinkronkan master reseller & barang terbaru">
-                        <i data-feather="refresh-cw" id="iconRefreshMaster" class="w-3.5 h-3.5"></i>
+            class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl border border-gray-200/80 dark:border-slate-700/80 shadow-xs mb-6 transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+
+                <!-- SISI KIRI: PEMILIH RESELLER, TANGGAL & STATUS BADGES (MENYATU RAPI DI KIRI) -->
+                <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+
+                    <!-- RESELLER CHIP -->
+                    <div
+                        class="flex items-center gap-2.5 bg-gray-50/90 dark:bg-slate-900/70 hover:bg-gray-100/90 dark:hover:bg-slate-900 p-1.5 pr-2.5 rounded-xl border border-gray-200/80 dark:border-slate-700/80 transition-colors shadow-2xs">
+                        <div id="resellerAvatarBadge"
+                            class="w-8 h-8 rounded-lg bg-gray-200/80 dark:bg-slate-700 text-gray-500 dark:text-slate-300 font-bold text-xs flex items-center justify-center transition-all flex-shrink-0">
+                            <i data-feather="user" class="w-4 h-4"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <label
+                                class="text-[9px] font-black uppercase tracking-wider text-gray-400 dark:text-slate-400 leading-none mb-1">Reseller</label>
+                            <div class="flex items-center gap-1">
+                                <select id="resellerSelect"
+                                    class="bg-transparent text-sm font-bold text-gray-800 dark:text-slate-100 outline-none cursor-pointer focus:text-blue-600 dark:focus:text-blue-400 pr-1 max-w-[170px] sm:max-w-[190px] truncate">
+                                    <option value="">-- Pilih --</option>
+                                </select>
+                                <button id="btnRefreshMaster" onclick="manualRefreshMasterData()"
+                                    class="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-200/70 dark:hover:bg-slate-800 rounded-md transition-all flex items-center justify-center"
+                                    title="Sinkronkan master reseller & barang terbaru">
+                                    <i data-feather="refresh-cw" id="iconRefreshMaster" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DIVIDER VERTICAL -->
+                    <div class="hidden sm:block w-px h-8 bg-gray-200 dark:bg-slate-700"></div>
+
+                    <!-- TANGGAL CHIP -->
+                    <div
+                        class="flex items-center gap-2.5 bg-gray-50/90 dark:bg-slate-900/70 hover:bg-gray-100/90 dark:hover:bg-slate-900 p-1.5 pr-3 rounded-xl border border-gray-200/80 dark:border-slate-700/80 transition-colors relative group shadow-2xs">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+                            <i data-feather="calendar" class="w-4 h-4"></i>
+                        </div>
+                        <div class="flex flex-col relative">
+                            <label
+                                class="text-[9px] font-black uppercase tracking-wider text-gray-400 dark:text-slate-400 leading-none mb-1">Tanggal</label>
+                            <input type="date" id="tglTransaksi"
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                onchange="updateTglDisplay()">
+                            <div
+                                class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center gap-1.5 cursor-pointer">
+                                <span id="tglDisplay">DD/MMM/YY</span>
+                                <i data-feather="chevron-down"
+                                    class="w-3 h-3 text-gray-400 group-hover:text-blue-500 transition"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SMART CONTEXTUAL BADGES (INLINE LANGSUNG DI KIRI SETELAH TANGGAL) -->
+                    <div id="resellerInfoBadges" class="flex flex-wrap items-center gap-1.5 py-0.5"></div>
+                </div>
+
+                <!-- SISI KANAN: ACTIONS -->
+                <div class="flex items-center gap-2 ml-auto">
+                    <button onclick="konfirmasiReset()"
+                        class="text-xs text-rose-600 hover:text-white hover:bg-rose-600 dark:text-rose-400 dark:hover:text-white dark:hover:bg-rose-600 px-3.5 py-2 rounded-xl border border-rose-200/90 dark:border-rose-900/60 flex items-center gap-1.5 font-bold transition-all shadow-2xs hover:shadow-rose-500/20 active:scale-95"
+                        title="Kosongkan form input dan mulai transaksi baru">
+                        <i data-feather="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Reset Form</span>
                     </button>
                 </div>
             </div>
-            <div class="w-px h-6 bg-gray-200 dark:bg-slate-700 hidden md:block"></div>
-
-            <div class="flex items-center gap-2 relative">
-                <label class="text-xs font-bold text-gray-500 dark:text-slate-400">Tanggal:</label>
-                <div class="relative w-40">
-                    <input type="date" id="tglTransaksi"
-                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                        onchange="updateTglDisplay()">
-                    <div
-                        class="w-full rounded border border-gray-300 dark:border-slate-600 py-1 px-2.5 text-sm text-gray-800 dark:text-slate-100 bg-gray-50 dark:bg-slate-900 font-medium flex justify-between items-center transition-colors">
-                        <span id="tglDisplay">DD/MMM/YY</span>
-                        <i data-feather="calendar" class="w-3.5 h-3.5 text-gray-400"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tombol Reset Form (Opsi B: Aman & Rapi di Bar Kontrol Atas) -->
-            <div class="ml-auto flex items-center">
-                <button onclick="konfirmasiReset()"
-                    class="text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:text-rose-400 dark:hover:text-rose-300 dark:hover:bg-rose-950/40 px-3 py-1.5 rounded-lg border border-rose-200/80 dark:border-rose-900/50 flex items-center gap-1.5 font-bold transition shadow-xs active:scale-95"
-                    title="Kosongkan form input dan mulai transaksi baru">
-                    <i data-feather="rotate-ccw" class="w-3.5 h-3.5 text-rose-500"></i>
-                    <span>Reset Form</span>
-                </button>
-            </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-            <!-- KIRI: Kasbon Bahan -->
-            <div class="glass-card rounded-xl p-4 shadow-sm border-t-4 border-t-red-500 flex flex-col h-full">
+            <!-- ============================================================= -->
+            <!-- KOLOM KIRI (65% / 7 COLS): AREA INPUT TRANSAKSI (SETORAN & BAHAN) -->
+            <!-- ============================================================= -->
+            <div class="lg:col-span-7 xl:col-span-7 space-y-6">
+
+                <!-- KARTU 1: SETORAN BARANG JADI (PENDAPATAN / KREDIT AGEN) -->
                 <div
-                    class="flex justify-between items-center mb-3 pb-2 border-b border-gray-100 dark:border-slate-700 transition-colors">
-                    <h2 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center">
-                        <i data-feather="shopping-bag" class="w-4 h-4 text-red-600 mr-1.5"></i> Pengambilan Bahan
-                    </h2>
-                    <div class="flex gap-2">
-                        <button onclick="tarikDataHarian('bahan')"
-                            class="text-[11px] bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 font-bold py-1 px-2.5 rounded flex items-center transition border border-red-200 dark:border-red-800/50 shadow-sm"
-                            title="Tarik catatan bahan harian">
-                            <i data-feather="download" class="w-3 h-3 mr-1"></i> Tarik Bahan
-                        </button>
-                        <button onclick="addRow('bahanBaku')"
-                            class="text-[11px] bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 font-bold py-1 px-2.5 rounded flex items-center transition">
-                            <i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah
-                        </button>
-                    </div>
-                </div>
-
-                <div class="flex text-[10px] font-bold text-gray-400 px-1 mb-1.5 uppercase tracking-wider">
-                    <div class="w-2/12 text-center">Qty</div>
-                    <div class="w-4/12 pl-1">Item Bahan</div>
-                    <div class="w-3/12 text-right">Harga</div>
-                    <div class="w-3/12 text-right pr-2">Subtotal</div>
-                </div>
-
-                <div id="containerBahanBaku" class="space-y-1 custom-scroll"></div>
-
-                <div
-                    class="mt-auto pt-3 mt-4 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
-                    <span class="text-xs font-bold text-gray-500 dark:text-slate-400">Subtotal Bahan Baku:</span>
-                    <span id="subtotalBahanBakuLayar" class="text-sm font-bold text-red-500">Rp 0</span>
-                </div>
-            </div>
-
-            <!-- KANAN: Barang Jadi & Ringkasan -->
-            <div class="space-y-6 flex flex-col">
-
-                <div class="glass-card rounded-xl p-4 shadow-sm border-t-4 border-t-blue-500 flex flex-col">
+                    class="glass-card rounded-xl p-4 sm:p-5 shadow-sm border-t-4 border-t-blue-500 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 transition-colors">
                     <div
-                        class="flex justify-between items-center mb-3 pb-2 border-b border-gray-100 dark:border-slate-700 transition-colors">
-                        <h2 class="text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center">
-                            <i data-feather="package" class="w-4 h-4 text-blue-600 mr-1.5"></i> Setoran Barang Jadi
-                        </h2>
+                        class="flex flex-wrap justify-between items-center gap-2 mb-3 pb-2.5 border-b border-gray-100 dark:border-slate-700">
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+                                <i data-feather="package" class="w-4 h-4"></i>
+                            </span>
+                            <div>
+                                <h2 class="text-sm font-bold text-gray-800 dark:text-slate-100 leading-tight">
+                                    Setoran Barang Jadi
+                                </h2>
+                                <p class="text-[10px] text-gray-400 dark:text-slate-400">Hasil produksi yang disetorkan
+                                    agen/reseller</p>
+                            </div>
+                        </div>
                         <div class="flex gap-2">
                             <button onclick="tarikDataHarian('jadi')"
-                                class="text-[11px] bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 text-purple-600 dark:text-purple-400 font-bold py-1 px-2.5 rounded flex items-center transition border border-purple-200 dark:border-purple-800/50 shadow-sm"
+                                class="text-[11px] bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 text-purple-600 dark:text-purple-300 font-bold py-1.5 px-3 rounded-lg flex items-center transition border border-purple-200 dark:border-purple-800/50 shadow-xs"
                                 title="Tarik dari catatan harian yang belum dibayar">
-                                <i data-feather="download" class="w-3 h-3 mr-1"></i> Tarik Harian
+                                <i data-feather="download" class="w-3.5 h-3.5 mr-1"></i> Tarik Harian
                             </button>
                             <button onclick="addRow('barangJadi')"
-                                class="text-[11px] bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-bold py-1 px-2.5 rounded flex items-center transition border border-blue-100 dark:border-blue-800/50">
-                                <i data-feather="plus" class="w-3 h-3 mr-1"></i> Tambah
+                                class="text-[11px] bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-300 font-bold py-1.5 px-3 rounded-lg flex items-center transition border border-blue-200 dark:border-blue-800/50 shadow-xs">
+                                <i data-feather="plus" class="w-3.5 h-3.5 mr-1"></i> Tambah Baris
                             </button>
                         </div>
                     </div>
 
-                    <div class="flex text-[10px] font-bold text-gray-400 px-1 mb-1.5 uppercase tracking-wider">
+                    <div
+                        class="flex text-[10px] font-bold text-gray-400 dark:text-slate-400 px-1 mb-1.5 uppercase tracking-wider">
                         <div class="w-2/12 text-center">Qty</div>
                         <div class="w-4/12 pl-1">Barang Jadi</div>
                         <div class="w-3/12 text-right">Harga</div>
                         <div class="w-3/12 text-right pr-2">Subtotal</div>
                     </div>
 
-                    <div id="containerBarangJadi" class="space-y-1 custom-scroll"></div>
+                    <div id="containerBarangJadi" class="space-y-1.5 custom-scroll"></div>
 
                     <div
-                        class="mt-auto pt-3 mt-4 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
-                        <span class="text-xs font-bold text-gray-500 dark:text-slate-400">Subtotal Barang Jadi:</span>
-                        <span id="subtotalBarangJadiLayar" class="text-sm font-bold text-blue-500">Rp 0</span>
+                        class="mt-4 pt-3 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center bg-blue-50/40 dark:bg-blue-950/20 px-3 py-2 rounded-lg">
+                        <span class="text-xs font-bold text-gray-600 dark:text-slate-300 flex items-center gap-1.5">
+                            <i data-feather="arrow-down-left" class="w-3.5 h-3.5 text-blue-500"></i> Subtotal Barang
+                            Jadi:
+                        </span>
+                        <span id="subtotalBarangJadiLayar"
+                            class="text-base font-black text-blue-600 dark:text-blue-400">Rp 0</span>
                     </div>
                 </div>
 
-                <!-- Ringkasan -->
+                <!-- KARTU 2: PENGAMBILAN BAHAN BAKU (POTONGAN BAHAN) -->
                 <div
-                    class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 transition-colors">
-                    <h2 class="text-sm font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center">
-                        <i data-feather="file-text" class="w-4 h-4 mr-1.5 text-blue-500"></i> Ringkasan Akhir
-                    </h2>
-
-                    <div class="space-y-1.5">
-                        <div
-                            class="flex justify-between items-center bg-gray-50 dark:bg-slate-900/50 py-1.5 px-2.5 rounded border border-gray-100 dark:border-slate-700">
-                            <span class="text-[11px] text-gray-600 dark:text-slate-300 font-medium">Total Setoran</span>
-                            <span id="summarySetoran" class="text-xs font-bold text-blue-600">Rp 0</span>
-                        </div>
-                        <div
-                            class="flex justify-between items-center bg-gray-50 dark:bg-slate-900/50 py-1.5 px-2.5 rounded border border-gray-100 dark:border-slate-700">
-                            <span class="text-[11px] text-gray-600 dark:text-slate-300 font-medium">Total Pengambilan
-                                Bahan</span>
-                            <span id="summaryKasbon" class="text-xs font-bold text-red-500"> - Rp 0</span>
-                        </div>
-
-                        <div
-                            class="bg-gray-50 dark:bg-slate-900/50 py-2 px-2.5 rounded border border-gray-100 dark:border-slate-700 relative overflow-hidden group">
-
-                            <div class="flex justify-between items-center relative z-10">
-                                <span
-                                    class="text-[11px] text-gray-600 dark:text-slate-300 font-bold flex items-center gap-1.5">
-                                    <i data-feather="dollar-sign" class="w-3 h-3 text-red-500"></i> Kasbon Lain/Uang
-                                    <span class="flex h-2.5 w-2.5 relative ml-1"
-                                        title="Jangan lupa cek kasbon reseller/agen!">
-                                        <span
-                                            class="animate-ping [animation-duration:2s] absolute inset-0 rounded-full bg-orange-400 opacity-70 z-0 scale-[2.7]"></span>
-                                        <span class="absolute inset-0 rounded-full bg-orange-400 opacity-80 z-0"></span>
-                                    </span>
-                                </span>
-                                <span id="summaryManual" class="text-xs font-bold text-red-500"> - Rp 0</span>
-                            </div>
-                            <div id="listKasbonManual"
-                                class="mt-2 pt-2 border-t border-gray-200 dark:border-slate-700 relative z-10"></div>
-
-                            <div class="flex gap-1.5 mt-2 relative z-10">
-                                <button onclick="addKasbonManual()"
-                                    class="text-[10px] bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:text-blue-600 py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 flex-1 transition shadow-sm">
-                                    <i data-feather="plus" class="w-3 h-3"></i> Tambah Manual
-                                </button>
-                                <button onclick="tarikDataKasbonHarian()"
-                                    class="text-[10px] bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 font-bold py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 flex-1 transition border border-red-200 dark:border-red-800/50 shadow-sm"
-                                    title="Tarik data kasbon dari aplikasi catatan harian">
-                                    <i data-feather="download" class="w-3 h-3"></i> Tarik Kasbon Harian
-                                </button>
+                    class="glass-card rounded-xl p-4 sm:p-5 shadow-sm border-t-4 border-t-red-500 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 transition-colors">
+                    <div
+                        class="flex flex-wrap justify-between items-center gap-2 mb-3 pb-2.5 border-b border-gray-100 dark:border-slate-700">
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center font-bold">
+                                <i data-feather="shopping-bag" class="w-4 h-4"></i>
+                            </span>
+                            <div>
+                                <h2 class="text-sm font-bold text-gray-800 dark:text-slate-100 leading-tight">
+                                    Pengambilan Bahan Baku
+                                </h2>
+                                <p class="text-[10px] text-gray-400 dark:text-slate-400">Bahan yang diambil agen untuk
+                                    produksi selanjutnya</p>
                             </div>
                         </div>
-
-                        <div
-                            class="pt-2 mt-2 border-t border-gray-200 dark:border-slate-700 flex justify-between items-end">
-                            <span class="block text-xs text-gray-700 dark:text-slate-200 font-bold">Net
-                                Pembayaran</span>
-                            <span id="summaryNet" class="block text-lg font-black text-green-500">Rp 0</span>
+                        <div class="flex gap-2">
+                            <button onclick="tarikDataHarian('bahan')"
+                                class="text-[11px] bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-300 font-bold py-1.5 px-3 rounded-lg flex items-center transition border border-red-200 dark:border-red-800/50 shadow-xs"
+                                title="Tarik catatan bahan harian">
+                                <i data-feather="download" class="w-3.5 h-3.5 mr-1"></i> Tarik Bahan
+                            </button>
+                            <button onclick="addRow('bahanBaku')"
+                                class="text-[11px] bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-300 font-bold py-1.5 px-3 rounded-lg flex items-center transition border border-red-200 dark:border-red-800/50 shadow-xs">
+                                <i data-feather="plus" class="w-3.5 h-3.5 mr-1"></i> Tambah Baris
+                            </button>
                         </div>
                     </div>
 
+                    <div
+                        class="flex text-[10px] font-bold text-gray-400 dark:text-slate-400 px-1 mb-1.5 uppercase tracking-wider">
+                        <div class="w-2/12 text-center">Qty</div>
+                        <div class="w-4/12 pl-1">Item Bahan</div>
+                        <div class="w-3/12 text-right">Harga</div>
+                        <div class="w-3/12 text-right pr-2">Subtotal</div>
+                    </div>
+
+                    <div id="containerBahanBaku" class="space-y-1.5 custom-scroll"></div>
+
+                    <div
+                        class="mt-4 pt-3 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center bg-red-50/40 dark:bg-red-950/20 px-3 py-2 rounded-lg">
+                        <span class="text-xs font-bold text-gray-600 dark:text-slate-300 flex items-center gap-1.5">
+                            <i data-feather="arrow-up-right" class="w-3.5 h-3.5 text-red-500"></i> Subtotal Bahan Baku:
+                        </span>
+                        <span id="subtotalBahanBakuLayar" class="text-base font-black text-red-500 dark:text-red-400">Rp
+                            0</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- KOLOM KANAN (35% / 5 COLS): STICKY SIDEBAR RINGKASAN & AKSI   -->
+            <!-- ============================================================= -->
+            <div class="lg:col-span-5 xl:col-span-5 lg:sticky lg:top-20 space-y-4">
+
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-5 shadow-sm border border-gray-200 dark:border-slate-700 transition-colors">
+                    <div
+                        class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 dark:border-slate-700">
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                                <i data-feather="file-text" class="w-4 h-4"></i>
+                            </span>
+                            <div>
+                                <h2 class="text-sm font-bold text-gray-800 dark:text-slate-100 leading-tight">
+                                    Ringkasan Pembayaran
+                                </h2>
+                                <p class="text-[10px] text-gray-400 dark:text-slate-400">Kalkulasi kasir & pembayaran
+                                    agen</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <!-- Total Setoran -->
+                        <div
+                            class="flex justify-between items-center bg-blue-50/50 dark:bg-blue-950/30 py-2 px-3 rounded-lg border border-blue-100 dark:border-blue-900/40">
+                            <span
+                                class="text-xs text-gray-700 dark:text-slate-300 font-medium flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span> Total Setoran
+                            </span>
+                            <span id="summarySetoran" class="text-xs font-black text-blue-600 dark:text-blue-400">Rp
+                                0</span>
+                        </div>
+
+                        <!-- Total Pengambilan Bahan -->
+                        <div
+                            class="flex justify-between items-center bg-red-50/50 dark:bg-red-950/30 py-2 px-3 rounded-lg border border-red-100 dark:border-red-900/40">
+                            <span
+                                class="text-xs text-gray-700 dark:text-slate-300 font-medium flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-red-500"></span> Total Ambil Bahan
+                            </span>
+                            <span id="summaryKasbon" class="text-xs font-black text-red-500 dark:text-red-400"> - Rp
+                                0</span>
+                        </div>
+
+                        <!-- Kasbon Lain / Pinjaman Uang -->
+                        <div
+                            class="bg-gray-50 dark:bg-slate-900/50 p-2.5 rounded-lg border border-gray-200 dark:border-slate-700 relative overflow-hidden group">
+                            <div class="flex justify-between items-center relative z-10">
+                                <span
+                                    class="text-[11px] text-gray-700 dark:text-slate-200 font-bold flex items-center gap-1.5">
+                                    <i data-feather="dollar-sign" class="w-3.5 h-3.5 text-amber-500"></i> Kasbon Lain /
+                                    Uang
+                                    <span class="flex h-2 w-2 relative ml-0.5" title="Cek kasbon agen!">
+                                        <span
+                                            class="animate-ping [animation-duration:2s] absolute inset-0 rounded-full bg-orange-400 opacity-70"></span>
+                                        <span class="absolute inset-0 rounded-full bg-orange-400 opacity-90"></span>
+                                    </span>
+                                </span>
+                                <span id="summaryManual" class="text-xs font-bold text-red-500 dark:text-red-400"> - Rp
+                                    0</span>
+                            </div>
+                            <div id="listKasbonManual"
+                                class="mt-2 pt-2 border-t border-gray-200 dark:border-slate-700 relative z-10 space-y-1.5">
+                            </div>
+
+                            <div class="flex gap-1.5 mt-2.5 relative z-10">
+                                <button onclick="addKasbonManual()"
+                                    class="text-[10px] bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 flex-1 transition shadow-xs">
+                                    <i data-feather="plus" class="w-3 h-3"></i> Tambah Manual
+                                </button>
+                                <button onclick="tarikDataKasbonHarian()"
+                                    class="text-[10px] bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 font-bold py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 flex-1 transition border border-red-200 dark:border-red-800/50 shadow-xs"
+                                    title="Tarik data kasbon dari aplikasi catatan harian">
+                                    <i data-feather="download" class="w-3 h-3"></i> Tarik Kasbon
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- NET PEMBAYARAN BOX (BESAR & TEGAS) -->
+                        <div
+                            class="pt-3 pb-2.5 px-3 mt-3 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/30 border-2 border-emerald-300 dark:border-emerald-700/60 shadow-xs">
+                            <span
+                                class="block text-[11px] text-emerald-800 dark:text-emerald-300 font-bold uppercase tracking-wider mb-0.5">
+                                Net Pembayaran (Bersih)
+                            </span>
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-[10px] text-gray-500 dark:text-slate-400">Diserahkan ke agen</span>
+                                <span id="summaryNet"
+                                    class="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">Rp
+                                    0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode Edit Banner (Jika dalam mode edit) -->
                     <div id="btnGroupEdit" class="mt-4 mb-2 hidden">
                         <div
                             class="bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700 p-3 rounded-xl mb-2 text-left shadow-xs">
@@ -496,17 +621,16 @@
                                 Riwayat
                             </div>
                             <p class="text-[11px] text-amber-700 dark:text-amber-400 leading-relaxed">
-                                Anda sedang mengedit nota tersimpan. Ubah angka, atau klik tombol <b>Tarik Bahan / Tarik
-                                    Harian</b> di atas untuk menarik catatan susulan yang baru diinput. Setelah selesai,
-                                klik <b>Update Data</b>.
+                                Anda sedang mengedit nota tersimpan. Ubah angka, lalu klik <b>Update Data</b>.
                             </p>
                         </div>
                         <button onclick="batalEdit()"
                             class="w-full bg-rose-600 hover:bg-rose-700 text-white text-[11px] tracking-wide font-black py-2.5 rounded-lg shadow-sm transition flex justify-center items-center gap-1.5 border border-rose-500">
-                            <i data-feather="x-circle" class="w-4 h-4"></i> Batalkan Mode Edit (Kembali ke Normal)
+                            <i data-feather="x-circle" class="w-4 h-4"></i> Batalkan Mode Edit
                         </button>
                     </div>
 
+                    <!-- Tombol Aksi Utama -->
                     <div class="mt-4 flex gap-2.5" id="btnGroupNormal">
                         <button onclick="bukaPratinjau()"
                             class="flex-1 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 font-bold py-2.5 rounded-lg flex justify-center items-center transition text-xs shadow-sm">
@@ -534,7 +658,8 @@
             <div
                 class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 py-2.5 flex justify-between items-center no-print sticky top-0 z-20">
                 <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-lg bg-primary-50 dark:bg-primary-950/50 text-primary-600 dark:text-primary-400 flex items-center justify-center">
+                    <div
+                        class="w-7 h-7 rounded-lg bg-primary-50 dark:bg-primary-950/50 text-primary-600 dark:text-primary-400 flex items-center justify-center">
                         <i data-feather="file-text" class="w-4 h-4"></i>
                     </div>
                     <div>
@@ -561,7 +686,8 @@
                         <button id="btnToggleKelolaNota" type="button" onclick="toggleDropdownKelolaNota(event)"
                             class="bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 text-[11px] font-bold py-1.5 px-2.5 rounded-lg flex items-center transition shadow-sm"
                             title="Menu pembatalan & penghapusan nota">
-                            <i data-feather="more-horizontal" class="w-3.5 h-3.5 mr-1.5 text-gray-500 dark:text-slate-300"></i>
+                            <i data-feather="more-horizontal"
+                                class="w-3.5 h-3.5 mr-1.5 text-gray-500 dark:text-slate-300"></i>
                             <span>Kelola</span>
                             <i data-feather="chevron-down" class="w-3 h-3 ml-1 text-gray-400"></i>
                         </button>
@@ -571,10 +697,12 @@
                                 <button id="btnVoidRiwayat" onclick=""
                                     class="hidden w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center transition"
                                     title="Batalkan nota ini dan kembalikan semua catatan harian ke draft belum dibayar">
-                                    <i data-feather="rotate-ccw" class="w-3.5 h-3.5 mr-2.5 text-rose-500 flex-shrink-0"></i>
+                                    <i data-feather="rotate-ccw"
+                                        class="w-3.5 h-3.5 mr-2.5 text-rose-500 flex-shrink-0"></i>
                                     <div>
                                         <div class="font-bold">Void / Batal Nota</div>
-                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Kembalikan ke draft harian</div>
+                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">
+                                            Kembalikan ke draft harian</div>
                                     </div>
                                 </button>
                             </div>
@@ -582,10 +710,12 @@
                                 <button id="btnHapusRiwayat" onclick=""
                                     class="hidden w-full text-left px-3 py-2 text-xs font-semibold text-gray-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400 flex items-center transition"
                                     title="Hapus riwayat permanen dengan PIN">
-                                    <i data-feather="trash-2" class="w-3.5 h-3.5 mr-2.5 text-slate-400 flex-shrink-0"></i>
+                                    <i data-feather="trash-2"
+                                        class="w-3.5 h-3.5 mr-2.5 text-slate-400 flex-shrink-0"></i>
                                     <div>
                                         <div class="font-bold">Hapus Riwayat</div>
-                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Hapus permanen (PIN)</div>
+                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Hapus
+                                            permanen (PIN)</div>
                                     </div>
                                 </button>
                             </div>
@@ -623,34 +753,40 @@
                             <div class="py-1">
                                 <button onclick="tutupSemuaDropdownPratinjau(); bukaModalPilihanCetakBT();"
                                     class="w-full text-left px-3 py-2 text-xs font-semibold text-gray-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:text-sky-600 dark:hover:text-sky-400 flex items-center transition">
-                                    <div class="w-6 h-6 rounded-md bg-sky-100 dark:bg-sky-900/50 flex items-center justify-center mr-2.5 text-sky-600 dark:text-sky-400 flex-shrink-0">
+                                    <div
+                                        class="w-6 h-6 rounded-md bg-sky-100 dark:bg-sky-900/50 flex items-center justify-center mr-2.5 text-sky-600 dark:text-sky-400 flex-shrink-0">
                                         <i data-feather="printer" class="w-3.5 h-3.5"></i>
                                     </div>
                                     <div>
                                         <div class="font-bold">Cetak Struk BT</div>
-                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Thermal 58mm / 80mm</div>
+                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Thermal
+                                            58mm / 80mm</div>
                                     </div>
                                 </button>
                                 <button onclick="tutupSemuaDropdownPratinjau(); cetakNotaA4();"
                                     class="w-full text-left px-3 py-2 text-xs font-semibold text-gray-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 flex items-center transition">
-                                    <div class="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mr-2.5 text-blue-600 dark:text-blue-400 flex-shrink-0">
+                                    <div
+                                        class="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mr-2.5 text-blue-600 dark:text-blue-400 flex-shrink-0">
                                         <i data-feather="file-text" class="w-3.5 h-3.5"></i>
                                     </div>
                                     <div>
                                         <div class="font-bold">Cetak Kertas A4</div>
-                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Browser print dialog</div>
+                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Browser
+                                            print dialog</div>
                                     </div>
                                 </button>
                             </div>
                             <div class="py-1">
                                 <button onclick="tutupSemuaDropdownPratinjau(); bukaModalBluetooth();"
                                     class="w-full text-left px-3 py-2 text-xs font-semibold text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center transition">
-                                    <div class="w-6 h-6 rounded-md bg-gray-100 dark:bg-slate-700 flex items-center justify-center mr-2.5 text-gray-600 dark:text-slate-300 flex-shrink-0">
+                                    <div
+                                        class="w-6 h-6 rounded-md bg-gray-100 dark:bg-slate-700 flex items-center justify-center mr-2.5 text-gray-600 dark:text-slate-300 flex-shrink-0">
                                         <i data-feather="bluetooth" class="w-3.5 h-3.5"></i>
                                     </div>
                                     <div>
                                         <div class="font-bold">Pengaturan Printer BT</div>
-                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Status koneksi & uji cetak</div>
+                                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Status
+                                            koneksi & uji cetak</div>
                                     </div>
                                 </button>
                             </div>
@@ -708,7 +844,8 @@
                                 </thead>
                                 <tbody id="notaListBahan" class="text-gray-700"></tbody>
                             </table>
-                            <div class="flex justify-end text-[11px] font-bold text-red-600 border-t border-gray-200 pt-1">
+                            <div
+                                class="flex justify-end text-[11px] font-bold text-red-600 border-t border-gray-200 pt-1">
                                 Subtotal: <span id="notaSubBahan" class="ml-4">- Rp 0</span>
                             </div>
                         </div>
@@ -743,7 +880,8 @@
                             <div class="bg-gray-50 p-3 rounded border border-gray-200 mt-auto">
                                 <div class="mb-2 space-y-0.5 border-b border-gray-300 pb-1.5">
                                     <div class="flex justify-between items-center">
-                                        <span class="text-[11px] font-bold text-gray-600">Total Setoran Barang Jadi</span>
+                                        <span class="text-[11px] font-bold text-gray-600">Total Setoran Barang
+                                            Jadi</span>
                                         <span id="notaSummarySetoran" class="text-[11px] font-bold text-blue-600">Rp
                                             0</span>
                                     </div>
@@ -756,7 +894,8 @@
                                 </div>
 
                                 <div id="notaContainerManual" class="mb-2">
-                                    <h4 class="text-[10px] font-bold text-gray-800 border-b border-gray-300 pb-0.5 mb-1">
+                                    <h4
+                                        class="text-[10px] font-bold text-gray-800 border-b border-gray-300 pb-0.5 mb-1">
                                         PINJAMAN / KASBON UANG LAINNYA</h4>
                                     <table class="w-full text-[11px] text-left mb-1">
                                         <tbody id="notaListManual" class="text-gray-700"></tbody>
@@ -780,7 +919,7 @@
                 <div id="printFooterInfo" class="mt-6 text-center text-[9px] text-gray-400 font-medium">
                     <p>HATUR NUHUN, CEK KEMBALI</p>
                     <p>Mulus Rahayu, Berkah Salamet</p>
-                    <p>SBR Putra Food Sistems &copy; 2026</p>
+                    <p>SBR Putra Food System &copy; 2026</p>
                 </div>
 
                 <!-- Garis Potong Tengah Kertas A4 (Batas A5 / 148.5mm) -->
@@ -795,15 +934,18 @@
     <!-- ==================== MODAL: PILIH MODE CETAK BLUETOOTH (3 PILIHAN) ==================== -->
     <div id="modalPrintChoicesBT" onclick="if(event.target === this) tutupModalPilihanCetakBT()"
         class="no-print fixed inset-0 z-[120] hidden bg-black/60 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-4 shadow-2xl space-y-3 border border-gray-100 dark:border-slate-700">
+        <div
+            class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-4 shadow-2xl space-y-3 border border-gray-100 dark:border-slate-700">
             <div class="flex items-center justify-between border-b border-gray-100 dark:border-slate-700 pb-2.5">
                 <div class="flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-full bg-stone-900 text-sky-400 flex items-center justify-center shrink-0">
+                    <span
+                        class="w-8 h-8 rounded-full bg-stone-900 text-sky-400 flex items-center justify-center shrink-0">
                         <i data-feather="printer" class="w-4 h-4"></i>
                     </span>
                     <div>
                         <h3 class="font-bold text-sm text-gray-900 dark:text-white">Pilih Mode Cetak Bluetooth</h3>
-                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Pilih sesuai ukuran kertas &amp; printer yang digunakan</p>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400">Pilih sesuai ukuran kertas &amp; printer
+                            yang digunakan</p>
                     </div>
                 </div>
                 <button type="button" onclick="tutupModalPilihanCetakBT()"
@@ -817,10 +959,13 @@
                 <button type="button" onclick="eksekusiCetakBluetooth('58mm')"
                     class="w-full p-3 rounded-xl border-2 border-stone-200 dark:border-slate-700 hover:border-[#ba5d4f] dark:hover:border-[#ba5d4f] hover:bg-stone-50 dark:hover:bg-slate-700/50 text-left flex items-center justify-between gap-2 transition group">
                     <div>
-                        <div class="font-bold text-sm text-stone-900 dark:text-white group-hover:text-[#ba5d4f]">1. Kertas 58mm</div>
-                        <div class="text-[11px] text-stone-500 dark:text-gray-400">Lebar standar 32 karakter pada printer 58mm</div>
+                        <div class="font-bold text-sm text-stone-900 dark:text-white group-hover:text-[#ba5d4f]">1.
+                            Kertas 58mm</div>
+                        <div class="text-[11px] text-stone-500 dark:text-gray-400">Lebar standar 32 karakter pada
+                            printer 58mm</div>
                     </div>
-                    <span class="px-2.5 py-1 rounded-lg bg-stone-900 dark:bg-stone-700 text-white text-xs font-bold shrink-0 flex items-center gap-1.5 shadow-sm">
+                    <span
+                        class="px-2.5 py-1 rounded-lg bg-stone-900 dark:bg-stone-700 text-white text-xs font-bold shrink-0 flex items-center gap-1.5 shadow-sm">
                         <i data-feather="printer" class="w-3.5 h-3.5"></i>
                         <span>58mm</span>
                     </span>
@@ -830,27 +975,33 @@
                 <button type="button" onclick="eksekusiCetakBluetooth('80mm')"
                     class="w-full p-3 rounded-xl border-2 border-stone-200 dark:border-slate-700 hover:border-[#ba5d4f] dark:hover:border-[#ba5d4f] hover:bg-stone-50 dark:hover:bg-slate-700/50 text-left flex items-center justify-between gap-2 transition group">
                     <div>
-                        <div class="font-bold text-sm text-stone-900 dark:text-white group-hover:text-[#ba5d4f]">2. Kertas 80mm</div>
-                        <div class="text-[11px] text-stone-500 dark:text-gray-400">Lebar penuh 48 karakter pada printer 80mm</div>
+                        <div class="font-bold text-sm text-stone-900 dark:text-white group-hover:text-[#ba5d4f]">2.
+                            Kertas 80mm</div>
+                        <div class="text-[11px] text-stone-500 dark:text-gray-400">Lebar penuh 48 karakter pada printer
+                            80mm</div>
                     </div>
-                    <span class="px-2.5 py-1 rounded-lg bg-stone-900 dark:bg-stone-700 text-white text-xs font-bold shrink-0 flex items-center gap-1.5 shadow-sm">
+                    <span
+                        class="px-2.5 py-1 rounded-lg bg-stone-900 dark:bg-stone-700 text-white text-xs font-bold shrink-0 flex items-center gap-1.5 shadow-sm">
                         <i data-feather="printer" class="w-3.5 h-3.5"></i>
                         <span>80mm</span>
                     </span>
                 </button>
 
                 <!-- Pilihan 3: Kertas 58mm Admin (di Printer 80mm - Geser Kanan) -->
-                <div class="p-3 rounded-xl border-2 border-amber-300 dark:border-amber-500/60 bg-amber-50/60 dark:bg-amber-950/20 space-y-2">
+                <div
+                    class="p-3 rounded-xl border-2 border-amber-300 dark:border-amber-500/60 bg-amber-50/60 dark:bg-amber-950/20 space-y-2">
                     <div class="flex items-center justify-between gap-2">
                         <div>
                             <div class="font-bold text-sm text-amber-950 dark:text-amber-300 flex items-center gap-1.5">
                                 <span>3. Kertas 58mm Admin</span>
-                                <span class="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded bg-amber-200 dark:bg-amber-800/80 text-amber-950 dark:text-amber-200 font-extrabold">
+                                <span
+                                    class="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded bg-amber-200 dark:bg-amber-800/80 text-amber-950 dark:text-amber-200 font-extrabold">
                                     <i data-feather="scissors" class="w-3 h-3"></i> Auto-Cutter
                                 </span>
                             </div>
                             <div class="text-[11px] text-amber-800 dark:text-amber-400/90 leading-tight mt-0.5">
-                                Kertas lebar 58mm (32 karakter) dipasang di printer Bluetooth 80mm (posisi cetak digeser ke kanan)
+                                Kertas lebar 58mm (32 karakter) dipasang di printer Bluetooth 80mm (posisi cetak digeser
+                                ke kanan)
                             </div>
                         </div>
                         <button type="button" onclick="eksekusiCetakBluetooth('58mm_admin')"
@@ -860,8 +1011,10 @@
                         </button>
                     </div>
 
-                    <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-amber-200/80 dark:border-amber-700/50 text-xs">
-                        <label for="inputAdminOffset" class="text-[11px] font-semibold text-amber-900 dark:text-amber-300">
+                    <div
+                        class="flex items-center justify-between gap-2 pt-1.5 border-t border-amber-200/80 dark:border-amber-700/50 text-xs">
+                        <label for="inputAdminOffset"
+                            class="text-[11px] font-semibold text-amber-900 dark:text-amber-300">
                             Geser Kanan (Spasi/Karakter):
                         </label>
                         <div class="flex items-center gap-1.5">
@@ -882,8 +1035,10 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-slate-700 text-[11px] text-gray-500 dark:text-gray-400">
-                <span>Total Di Terima dicetak <strong class="text-gray-700 dark:text-gray-300">Double Height</strong></span>
+            <div
+                class="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-slate-700 text-[11px] text-gray-500 dark:text-gray-400">
+                <span>Total Di Terima dicetak <strong class="text-gray-700 dark:text-gray-300">Double
+                        Height</strong></span>
                 <button type="button" onclick="bukaModalBluetooth()"
                     class="flex items-center gap-1 text-sky-600 dark:text-sky-400 font-semibold hover:underline">
                     <i data-feather="sliders" class="w-3.5 h-3.5"></i>
@@ -896,10 +1051,12 @@
     <!-- ==================== MODAL: PENGATURAN BLUETOOTH PRINTER (BLE) ==================== -->
     <div id="modalBluetooth" onclick="if(event.target === this) tutupModalBluetooth()"
         class="no-print fixed inset-0 z-[130] hidden bg-black/60 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-4 shadow-2xl space-y-3 border border-gray-100 dark:border-slate-700">
+        <div
+            class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-4 shadow-2xl space-y-3 border border-gray-100 dark:border-slate-700">
             <div class="flex items-center justify-between border-b border-gray-100 dark:border-slate-700 pb-2.5">
                 <div class="flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                    <span
+                        class="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 flex items-center justify-center">
                         <i data-feather="bluetooth" class="w-4 h-4"></i>
                     </span>
                     <div>
@@ -913,20 +1070,25 @@
                 </button>
             </div>
 
-            <div class="bg-stone-50 dark:bg-slate-750 rounded-xl p-3 border border-stone-200 dark:border-slate-700 text-xs space-y-1.5">
+            <div
+                class="bg-stone-50 dark:bg-slate-750 rounded-xl p-3 border border-stone-200 dark:border-slate-700 text-xs space-y-1.5">
                 <div class="flex items-center justify-between">
                     <span class="text-stone-500 dark:text-slate-400">Status Koneksi:</span>
-                    <span id="modalBleStatus" class="font-bold text-amber-600 dark:text-amber-400">Belum Terhubung</span>
+                    <span id="modalBleStatus" class="font-bold text-amber-600 dark:text-amber-400">Belum
+                        Terhubung</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-stone-500 dark:text-slate-400">Perangkat:</span>
-                    <span id="modalBleDeviceName" class="font-mono font-semibold text-stone-800 dark:text-slate-200">-</span>
+                    <span id="modalBleDeviceName"
+                        class="font-mono font-semibold text-stone-800 dark:text-slate-200">-</span>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
                 <div>
-                    <label for="selectPaperWidthDefault" class="block text-[11px] font-semibold text-stone-600 dark:text-slate-400 mb-1">Mode Kertas Default</label>
+                    <label for="selectPaperWidthDefault"
+                        class="block text-[11px] font-semibold text-stone-600 dark:text-slate-400 mb-1">Mode Kertas
+                        Default</label>
                     <select id="selectPaperWidthDefault" onchange="simpanPengaturanPrinter()"
                         class="w-full px-2.5 py-2 rounded-lg border border-stone-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs font-semibold text-gray-900 dark:text-white">
                         <option value="32">58mm (32 Karakter)</option>
@@ -935,7 +1097,9 @@
                     </select>
                 </div>
                 <div>
-                    <label for="selectChunkSize" class="block text-[11px] font-semibold text-stone-600 dark:text-slate-400 mb-1">Ukuran Paket BLE</label>
+                    <label for="selectChunkSize"
+                        class="block text-[11px] font-semibold text-stone-600 dark:text-slate-400 mb-1">Ukuran Paket
+                        BLE</label>
                     <select id="selectChunkSize" onchange="simpanPengaturanPrinter()"
                         class="w-full px-2.5 py-2 rounded-lg border border-stone-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs font-semibold text-gray-900 dark:text-white">
                         <option value="20">20 Bytes (Aman Semua HP)</option>
@@ -945,10 +1109,13 @@
                 </div>
             </div>
 
-            <div class="text-[11px] text-stone-600 dark:text-slate-300 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-lg p-2.5 leading-relaxed flex items-start gap-2">
+            <div
+                class="text-[11px] text-stone-600 dark:text-slate-300 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-lg p-2.5 leading-relaxed flex items-start gap-2">
                 <i data-feather="info" class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"></i>
                 <div>
-                    <strong>Tips Mobile:</strong> Gunakan browser <strong>Google Chrome di Android</strong> (atau Bluefy di iOS) via koneksi HTTPS. Nyalakan printer Bluetooth lalu tekan <em>Cari &amp; Hubungkan Printer</em>.
+                    <strong>Tips Mobile:</strong> Gunakan browser <strong>Google Chrome di Android</strong> (atau Bluefy
+                    di iOS) via koneksi HTTPS. Nyalakan printer Bluetooth lalu tekan <em>Cari &amp; Hubungkan
+                        Printer</em>.
                 </div>
             </div>
 
@@ -1219,7 +1386,8 @@
             </div>
             <p class="text-[11px] text-gray-500 dark:text-slate-400 mb-3">Masukkan PIN untuk menghapus rincian data ini.
             </p>
-            <input type="password" id="inputPinHapus" placeholder="••••••"
+            <input type="password" id="inputPinHapus" placeholder="••••••" autocomplete="off"
+                onkeydown="if(event.key === 'Enter') prosesHapusDenganPin()"
                 class="w-full text-center tracking-widest text-lg font-bold p-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500 mb-4">
             <div class="flex gap-2">
                 <button onclick="closeFormModal('modalPin')"
@@ -1614,6 +1782,12 @@
                         <i data-feather="download" class="w-3.5 h-3.5"></i>
                         <span class="hidden sm:inline">Export CSV</span>
                     </button>
+                    <button id="btnSimpanAnalitikPNG" onclick="simpanAnalitikPNG()"
+                        class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/50 flex items-center gap-1.5 transition shadow-xs"
+                        title="Simpan Laporan Analitik sebagai Gambar PNG Proporsional">
+                        <i data-feather="image" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">Simpan PNG</span>
+                    </button>
                     <button onclick="closeModal('modalAnalitik')"
                         class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1.5 bg-gray-100/70 hover:bg-gray-200/70 dark:bg-slate-700 rounded-lg transition">
                         <i data-feather="x" class="w-4 h-4"></i>
@@ -1986,6 +2160,572 @@
         </div>
     </div>
 
+    <!-- Modal Backup & Restore Database -->
+    <div id="modalBackupRestore"
+        class="fixed inset-0 z-50 flex items-center justify-center hidden pointer-events-none p-2 sm:p-4">
+        <div
+            class="bg-white dark:bg-slate-800 w-full max-w-4xl rounded-2xl shadow-2xl pointer-events-auto flex flex-col max-h-[92vh] border border-gray-100 dark:border-slate-700 overflow-hidden transform scale-95 transition-all duration-200">
+            <!-- Modal Header -->
+            <div
+                class="flex flex-wrap justify-between items-center px-5 py-3.5 border-b border-gray-100 dark:border-slate-700 bg-gray-50/80 dark:bg-slate-800/90 gap-2">
+                <div class="flex items-center gap-3">
+                    <span
+                        class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 inline-flex items-center justify-center shadow-xs ring-1 ring-emerald-500/20">
+                        <i data-feather="database" class="w-5 h-5"></i>
+                    </span>
+                    <div>
+                        <h3
+                            class="text-xs sm:text-sm font-bold text-gray-800 dark:text-slate-100 flex items-center gap-2">
+                            Backup & Restore Database
+                            <span
+                                class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 font-semibold flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Supabase
+                                Cloud
+                            </span>
+                        </h3>
+                        <p class="text-[10px] sm:text-[11px] text-gray-500 dark:text-slate-400 mt-0.5">
+                            Manajemen pencadangan dan pemulihan data transaksi & master SBR Putra Food
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="closeModal('modalBackupRestore')"
+                        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1.5 bg-gray-100/70 hover:bg-gray-200/70 dark:bg-slate-700 rounded-lg transition"
+                        title="Tutup Modal">
+                        <i data-feather="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Switcher Navigation -->
+            <div
+                class="px-5 py-2.5 bg-gray-50/50 dark:bg-slate-800/60 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between gap-3">
+                <div class="flex items-center bg-gray-200/70 dark:bg-slate-700/80 p-1 rounded-xl w-full sm:w-auto">
+                    <button id="tabBtnBackup" onclick="switchBackupTab('backup')"
+                        class="flex-1 sm:flex-initial text-xs font-bold py-1.5 px-3.5 rounded-lg bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm transition flex items-center justify-center gap-1.5">
+                        <i data-feather="download" class="w-3.5 h-3.5"></i>
+                        <span>1. Backup Database</span>
+                    </button>
+                    <button id="tabBtnRestore" onclick="switchBackupTab('restore')"
+                        class="flex-1 sm:flex-initial text-xs font-bold py-1.5 px-3.5 rounded-lg text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center justify-center gap-1.5">
+                        <i data-feather="upload-cloud" class="w-3.5 h-3.5"></i>
+                        <span>2. Restore Database</span>
+                    </button>
+                    <button id="tabBtnReset" onclick="switchBackupTab('reset')"
+                        class="flex-1 sm:flex-initial text-xs font-bold py-1.5 px-3.5 rounded-lg text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition flex items-center justify-center gap-1.5">
+                        <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
+                        <span>3. Reset Data</span>
+                    </button>
+                </div>
+                <div class="hidden sm:flex items-center gap-2 text-[11px] text-gray-500 dark:text-slate-400">
+                    <i data-feather="shield-check" class="w-3.5 h-3.5 text-emerald-500"></i>
+                    <span>Terenkapsulasi JSON Resmi SBR</span>
+                </div>
+            </div>
+
+            <!-- Tab Content Container -->
+            <div class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5">
+
+                <!-- PANEL TAB BACKUP -->
+                <div id="panelTabBackup" class="space-y-4">
+                    <!-- Info Alert Card -->
+                    <div
+                        class="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40 flex items-start gap-3">
+                        <div
+                            class="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 shrink-0">
+                            <i data-feather="info" class="w-4 h-4"></i>
+                        </div>
+                        <div class="text-xs text-emerald-900 dark:text-emerald-200 space-y-1">
+                            <p class="font-bold text-xs sm:text-sm">Cadangan Menyeluruh 7 Tabel Cloud</p>
+                            <p
+                                class="leading-relaxed text-[11px] sm:text-xs text-emerald-800/80 dark:text-emerald-300/80">
+                                Fitur Backup akan mengunduh seluruh baris data dari database Supabase Cloud (Data
+                                Reseller, Master Barang, Harga Khusus, Riwayat Transaksi, Rincian Nota, Buku Catatan
+                                Harian, dan Kasbon Harian) ke dalam berkas <span
+                                    class="font-mono font-semibold bg-emerald-100/70 dark:bg-emerald-800/50 px-1 py-0.5 rounded">.JSON</span>
+                                berstruktur rapi yang siap disimpan secara aman di komputer Anda.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Live Cloud Data Summary Card -->
+                    <div
+                        class="bg-gray-50/60 dark:bg-slate-800/60 rounded-2xl p-4 border border-gray-100 dark:border-slate-700 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-gray-700 dark:text-slate-200 flex items-center gap-1.5">
+                                <i data-feather="activity" class="w-3.5 h-3.5 text-emerald-500"></i> Ringkasan Data
+                                Cloud Aktif
+                            </span>
+                            <button onclick="hitungRingkasanDataBackup(true)"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 shadow-2xs transition">
+                                <i data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan Hitungan
+                            </button>
+                        </div>
+
+                        <!-- 7 Table Stat Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                            <div
+                                class="bg-white dark:bg-slate-700/60 p-3 rounded-xl border border-gray-100 dark:border-slate-600 shadow-2xs">
+                                <div class="text-[10px] text-gray-400 dark:text-slate-400 font-medium">Data Reseller
+                                </div>
+                                <div
+                                    class="text-sm sm:text-base font-bold text-gray-800 dark:text-slate-100 mt-0.5 flex items-baseline justify-between">
+                                    <span id="bkStatReseller">-</span>
+                                    <span class="text-[10px] text-gray-400 font-normal">agen</span>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white dark:bg-slate-700/60 p-3 rounded-xl border border-gray-100 dark:border-slate-600 shadow-2xs">
+                                <div class="text-[10px] text-gray-400 dark:text-slate-400 font-medium">Master Barang
+                                </div>
+                                <div
+                                    class="text-sm sm:text-base font-bold text-gray-800 dark:text-slate-100 mt-0.5 flex items-baseline justify-between">
+                                    <span id="bkStatBarang">-</span>
+                                    <span class="text-[10px] text-gray-400 font-normal">produk</span>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white dark:bg-slate-700/60 p-3 rounded-xl border border-gray-100 dark:border-slate-600 shadow-2xs">
+                                <div class="text-[10px] text-gray-400 dark:text-slate-400 font-medium">Harga Khusus
+                                </div>
+                                <div
+                                    class="text-sm sm:text-base font-bold text-gray-800 dark:text-slate-100 mt-0.5 flex items-baseline justify-between">
+                                    <span id="bkStatHarga">-</span>
+                                    <span class="text-[10px] text-gray-400 font-normal">relasi</span>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white dark:bg-slate-700/60 p-3 rounded-xl border border-gray-100 dark:border-slate-600 shadow-2xs">
+                                <div class="text-[10px] text-gray-400 dark:text-slate-400 font-medium">Riwayat Transaksi
+                                </div>
+                                <div
+                                    class="text-sm sm:text-base font-bold text-blue-600 dark:text-blue-400 mt-0.5 flex items-baseline justify-between">
+                                    <span id="bkStatTransaksi">-</span>
+                                    <span class="text-[10px] text-gray-400 font-normal">nota</span>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white dark:bg-slate-700/60 p-3 rounded-xl border border-gray-100 dark:border-slate-600 shadow-2xs">
+                                <div class="text-[10px] text-gray-400 dark:text-slate-400 font-medium">Rincian Transaksi
+                                </div>
+                                <div
+                                    class="text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5 flex items-baseline justify-between">
+                                    <span id="bkStatDetail">-</span>
+                                    <span class="text-[10px] text-gray-400 font-normal">item</span>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white dark:bg-slate-700/60 p-3 rounded-xl border border-gray-100 dark:border-slate-600 shadow-2xs">
+                                <div class="text-[10px] text-gray-400 dark:text-slate-400 font-medium">Buku Harian</div>
+                                <div
+                                    class="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-baseline justify-between">
+                                    <span id="bkStatBuku">-</span>
+                                    <span class="text-[10px] text-gray-400 font-normal">entri</span>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white dark:bg-slate-700/60 p-3 rounded-xl border border-gray-100 dark:border-slate-600 shadow-2xs sm:col-span-2">
+                                <div class="text-[10px] text-gray-400 dark:text-slate-400 font-medium">Kasbon Harian
+                                </div>
+                                <div
+                                    class="text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 mt-0.5 flex items-baseline justify-between">
+                                    <span id="bkStatKasbon">-</span>
+                                    <span class="text-[10px] text-gray-400 font-normal">entri</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Backup CTA Action Area -->
+                    <div
+                        class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-200/80 dark:border-slate-700">
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center gap-1.5">
+                                <i data-feather="check-circle" class="w-3.5 h-3.5 text-emerald-500"></i> Siap Mengunduh
+                                Cadangan
+                            </h4>
+                            <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5">
+                                Berkas akan disimpan otomatis dengan nama: <span
+                                    class="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">BACKUP_SBR_SYSTEM_YYYYMMDD_HHMMSS.json</span>
+                            </p>
+                        </div>
+                        <button id="btnJalankanBackup" onclick="jalankanBackupDatabase()"
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md hover:shadow-lg transition active:scale-95 cursor-pointer shrink-0">
+                            <i data-feather="download-cloud" class="w-4 h-4"></i>
+                            <span>Unduh Cadangan Database (.JSON)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PANEL TAB RESTORE -->
+                <div id="panelTabRestore" class="space-y-4 hidden">
+                    <!-- Warning Alert Card -->
+                    <div
+                        class="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-900/20 border border-amber-200/80 dark:border-amber-800/50 flex items-start gap-3">
+                        <div
+                            class="p-2 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 shrink-0">
+                            <i data-feather="alert-triangle" class="w-4 h-4"></i>
+                        </div>
+                        <div class="text-xs text-amber-900 dark:text-amber-200 space-y-1">
+                            <p class="font-bold text-xs sm:text-sm">Perhatian Penting Sebelum Melakukan Restore</p>
+                            <p class="leading-relaxed text-[11px] sm:text-xs text-amber-800/80 dark:text-amber-300/80">
+                                Proses ini akan menyinkronkan (upsert) data dari berkas cadangan ke Supabase Cloud. Jika
+                                ID atau relasi data sudah ada di database, data akan diperbarui sesuai berkas cadangan.
+                                Pastikan hanya mengunggah file JSON cadangan resmi yang berasal dari sistem SBR Putra
+                                Food.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Dropzone Area -->
+                    <div id="dropzoneRestore" onclick="document.getElementById('fileInputRestore').click()"
+                        ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)"
+                        ondrop="handleDropFile(event)"
+                        class="border-2 border-dashed border-gray-300 dark:border-slate-600 hover:border-emerald-500 dark:hover:border-emerald-400 bg-gray-50/60 dark:bg-slate-800/40 rounded-2xl p-7 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2 group">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition duration-200">
+                            <i data-feather="upload-cloud" class="w-6 h-6"></i>
+                        </div>
+                        <div class="mt-1">
+                            <p class="text-xs sm:text-sm font-bold text-gray-700 dark:text-slate-200">
+                                Klik untuk memilih berkas cadangan <span
+                                    class="text-emerald-600 dark:text-emerald-400">.json</span>
+                            </p>
+                            <p class="text-[11px] text-gray-400 dark:text-slate-400 mt-0.5">
+                                atau seret & lepas berkas ke area ini
+                            </p>
+                        </div>
+                        <span
+                            class="inline-flex items-center gap-1 text-[10px] font-semibold text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-700 px-2.5 py-1 rounded-full border border-gray-200 dark:border-slate-600 shadow-2xs mt-1">
+                            <i data-feather="file" class="w-3 h-3 text-emerald-500"></i> Format didukung: JSON Cadangan
+                            Sistem
+                        </span>
+                        <input type="file" id="fileInputRestore" accept=".json,application/json" class="hidden"
+                            onchange="handleFileBackupDipilih(event)">
+                    </div>
+
+                    <!-- Box Preview Restore (Revealed upon selecting valid file) -->
+                    <div id="boxPreviewRestore"
+                        class="hidden bg-gray-50/80 dark:bg-slate-800/80 rounded-2xl p-4 border border-gray-200 dark:border-slate-700 space-y-3.5">
+                        <div
+                            class="flex flex-wrap items-center justify-between pb-3 border-b border-gray-200 dark:border-slate-700 gap-2">
+                            <div class="flex items-center gap-2.5">
+                                <span
+                                    class="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300">
+                                    <i data-feather="file-text" class="w-4 h-4"></i>
+                                </span>
+                                <div>
+                                    <h4 id="previewRestoreFileName"
+                                        class="text-xs sm:text-sm font-bold text-gray-800 dark:text-slate-100 truncate max-w-[260px] sm:max-w-md">
+                                        backup.json</h4>
+                                    <div
+                                        class="flex items-center gap-2 text-[10px] text-gray-500 dark:text-slate-400 mt-0.5">
+                                        <span id="previewRestoreFileSize">-</span>
+                                        <span>•</span>
+                                        <span>Tanggal: <span id="previewRestoreDate"
+                                                class="font-medium text-gray-700 dark:text-slate-300">-</span></span>
+                                        <span>•</span>
+                                        <span>Versi: <span id="previewRestoreVersion"
+                                                class="font-semibold text-emerald-600 dark:text-emerald-400">-</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                                    <i data-feather="check-circle" class="w-3 h-3"></i> Berkas Valid
+                                </span>
+                                <button type="button" onclick="resetRestoreForm()"
+                                    class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-300 dark:hover:bg-slate-600 transition">
+                                    Ganti File
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Detected Tables Breakdown -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-gray-700 dark:text-slate-300">Rincian Data yang
+                                    Terdeteksi dalam Berkas:</span>
+                                <span id="previewRestoreTotalRows"
+                                    class="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">-</span>
+                            </div>
+                            <div id="previewRestoreTableList" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Box Progress Restore (Revealed during execution) -->
+                    <div id="boxProgressRestore"
+                        class="hidden space-y-2 bg-blue-50/80 dark:bg-blue-950/30 p-4 rounded-2xl border border-blue-200 dark:border-blue-800/50">
+                        <div class="flex justify-between items-center text-xs">
+                            <span id="lblProgressRestoreStep"
+                                class="font-semibold text-blue-800 dark:text-blue-300 flex items-center gap-1.5">
+                                <i data-feather="loader" class="w-3.5 h-3.5 animate-spin"></i> Menyiapkan pemulihan...
+                            </span>
+                            <span id="lblProgressRestorePercent"
+                                class="font-bold text-blue-800 dark:text-blue-300">0%</span>
+                        </div>
+                        <div class="w-full bg-blue-200/70 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                            <div id="barProgressRestore"
+                                class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Restore CTA Action Area -->
+                    <div
+                        class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-200/80 dark:border-slate-700">
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center gap-1.5">
+                                <i data-feather="shield" class="w-3.5 h-3.5 text-blue-500"></i> Mode Pemulihan: Upsert
+                                Aman
+                            </h4>
+                            <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5">
+                                Data yang sudah ada diperbarui, data baru ditambahkan tanpa duplikasi.
+                            </p>
+                        </div>
+                        <button id="btnJalankanRestore" onclick="jalankanRestoreDatabase()" disabled
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
+                            <i data-feather="upload-cloud" class="w-4 h-4"></i>
+                            <span>Mulai Pulihkan Database Cloud</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PANEL TAB RESET DATA (2-LAYER SECURITY) -->
+                <div id="panelTabReset" class="space-y-4 hidden">
+
+                    <!-- LAYER 1: PIN VERIFICATION SCREEN -->
+                    <div id="layerReset1" class="space-y-4">
+                        <!-- Top Warning Banner -->
+                        <div
+                            class="p-4 rounded-2xl bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-900/40 flex items-start gap-3">
+                            <div
+                                class="p-2 rounded-xl bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 shrink-0">
+                                <i data-feather="shield-alert" class="w-5 h-5"></i>
+                            </div>
+                            <div class="text-xs text-rose-900 dark:text-rose-200 space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-black text-xs sm:text-sm uppercase tracking-wide">Pembersihan Data
+                                        Transaksi</span>
+                                    <span
+                                        class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-200/80 dark:bg-rose-900/60 text-rose-800 dark:text-rose-300">Layer
+                                        1: PIN Keamanan</span>
+                                </div>
+                                <p
+                                    class="leading-relaxed text-[11px] sm:text-xs text-rose-800/80 dark:text-rose-300/80">
+                                    Fitur ini digunakan untuk mengosongkan seluruh riwayat nota dan buku harian (misal
+                                    saat tutup buku atau pembukuan periode baru).
+                                    <b>Data Master Agen, Master Barang, dan Harga Khusus TIDAK AKAN DIHAPUS</b> dan
+                                    tetap aman tersimpan di cloud.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- PIN Input Box Card -->
+                        <div
+                            class="bg-gray-50/70 dark:bg-slate-800/60 rounded-2xl p-6 border border-gray-100 dark:border-slate-700 flex flex-col items-center justify-center max-w-md mx-auto text-center space-y-4 shadow-sm">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-rose-100/80 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center shadow-inner ring-4 ring-rose-50 dark:ring-rose-950/30">
+                                <i data-feather="lock" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-800 dark:text-slate-100">Otorisasi PIN Keamanan
+                                </h4>
+                                <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-0.5">
+                                    Masukkan 6 digit PIN otoritas untuk membuka Layer 2 (Konfirmasi Akhir).
+                                </p>
+                            </div>
+                            <div class="w-full">
+                                <input type="password" id="inputPinResetData" maxlength="10" placeholder="••••••"
+                                    onkeydown="if(event.key === 'Enter') verifikasiPinResetLayer1()"
+                                    class="w-full text-center tracking-[0.35em] text-xl font-bold p-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-800 dark:text-white outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition shadow-inner">
+                                <p id="errPinResetData"
+                                    class="text-[11px] text-rose-600 dark:text-rose-400 font-semibold mt-1.5 hidden flex items-center justify-center gap-1">
+                                    <i data-feather="alert-circle" class="w-3.5 h-3.5"></i> PIN Keamanan salah! Silakan
+                                    coba lagi.
+                                </p>
+                            </div>
+                            <button type="button" onclick="verifikasiPinResetLayer1()"
+                                class="w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 shadow-md hover:shadow-lg transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                                <span>Verifikasi PIN & Lanjut ke Layer 2</span>
+                                <i data-feather="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- LAYER 2: CONFIRMATION & KEYWORD EXECUTION SCREEN -->
+                    <div id="layerReset2" class="space-y-4 hidden">
+                        <!-- Top Danger Banner -->
+                        <div
+                            class="p-4 rounded-2xl bg-red-100/70 dark:bg-red-950/40 border border-red-300 dark:border-red-800 flex items-start gap-3">
+                            <div class="p-2 rounded-xl bg-red-600 text-white shrink-0 animate-pulse">
+                                <i data-feather="alert-triangle" class="w-5 h-5"></i>
+                            </div>
+                            <div class="text-xs text-red-950 dark:text-red-200 space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-black text-xs sm:text-sm uppercase tracking-wide">Peringatan Keras
+                                        • Konfirmasi Lapis 2</span>
+                                    <span
+                                        class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">PIN
+                                        Terverifikasi ✓</span>
+                                </div>
+                                <p class="leading-relaxed text-[11px] sm:text-xs text-red-900/90 dark:text-red-300/90">
+                                    Tindakan ini bersifat <b>PERMANEN & TIDAK DAPAT DIBATALKAN</b>. Semua data riwayat
+                                    pembayaran nota dan buku harian akan dihapus total dari database Supabase Cloud.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Data Impact Summary: Red vs Green Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <!-- Left: Data to be Deleted (Red) -->
+                            <div
+                                class="bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 rounded-2xl p-4 space-y-2.5">
+                                <div class="flex items-center justify-between">
+                                    <span
+                                        class="text-xs font-bold text-rose-800 dark:text-rose-300 flex items-center gap-1.5">
+                                        <i data-feather="trash-2" class="w-3.5 h-3.5 text-rose-600"></i> Data yang Akan
+                                        Dihapus Total:
+                                    </span>
+                                    <span
+                                        class="text-[10px] font-bold uppercase text-rose-600 bg-rose-100 dark:bg-rose-900/50 px-2 py-0.5 rounded-full">Dihapus</span>
+                                </div>
+                                <div class="space-y-1.5 text-xs">
+                                    <div
+                                        class="flex justify-between items-center py-1.5 px-2.5 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-rose-100 dark:border-rose-900/30">
+                                        <span class="text-gray-600 dark:text-slate-300 font-medium">Riwayat Transaksi
+                                            (Nota)</span>
+                                        <span id="resetStatTrx" class="font-bold text-rose-600 dark:text-rose-400">...
+                                            nota</span>
+                                    </div>
+                                    <div
+                                        class="flex justify-between items-center py-1.5 px-2.5 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-rose-100 dark:border-rose-900/30">
+                                        <span class="text-gray-600 dark:text-slate-300 font-medium">Rincian Transaksi
+                                            (Barang)</span>
+                                        <span id="resetStatDetail"
+                                            class="font-bold text-rose-600 dark:text-rose-400">... item</span>
+                                    </div>
+                                    <div
+                                        class="flex justify-between items-center py-1.5 px-2.5 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-rose-100 dark:border-rose-900/30">
+                                        <span class="text-gray-600 dark:text-slate-300 font-medium">Buku Catatan
+                                            Harian</span>
+                                        <span id="resetStatBuku" class="font-bold text-rose-600 dark:text-rose-400">...
+                                            entri</span>
+                                    </div>
+                                    <div
+                                        class="flex justify-between items-center py-1.5 px-2.5 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-rose-100 dark:border-rose-900/30">
+                                        <span class="text-gray-600 dark:text-slate-300 font-medium">Kasbon Harian</span>
+                                        <span id="resetStatKasbon"
+                                            class="font-bold text-rose-600 dark:text-rose-400">... entri</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right: Protected Master Data (Green) -->
+                            <div
+                                class="bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 rounded-2xl p-4 space-y-2.5">
+                                <div class="flex items-center justify-between">
+                                    <span
+                                        class="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                                        <i data-feather="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i> Master
+                                        Data yang Aman & Tersimpan:
+                                    </span>
+                                    <span
+                                        class="text-[10px] font-bold uppercase text-emerald-700 bg-emerald-100 dark:bg-emerald-900/50 px-2 py-0.5 rounded-full">Aman</span>
+                                </div>
+                                <div class="space-y-1.5 text-xs">
+                                    <div
+                                        class="flex justify-between items-center py-1.5 px-2.5 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-emerald-100 dark:border-emerald-900/30">
+                                        <span class="text-gray-600 dark:text-slate-300 font-medium">Data Reseller /
+                                            Agen</span>
+                                        <span
+                                            class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><i
+                                                data-feather="check" class="w-3 h-3"></i> Terlindungi</span>
+                                    </div>
+                                    <div
+                                        class="flex justify-between items-center py-1.5 px-2.5 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-emerald-100 dark:border-emerald-900/30">
+                                        <span class="text-gray-600 dark:text-slate-300 font-medium">Master Barang Jadi &
+                                            Bahan</span>
+                                        <span
+                                            class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><i
+                                                data-feather="check" class="w-3 h-3"></i> Terlindungi</span>
+                                    </div>
+                                    <div
+                                        class="flex justify-between items-center py-1.5 px-2.5 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-emerald-100 dark:border-emerald-900/30">
+                                        <span class="text-gray-600 dark:text-slate-300 font-medium">Pengaturan Harga
+                                            Khusus</span>
+                                        <span
+                                            class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><i
+                                                data-feather="check" class="w-3 h-3"></i> Terlindungi</span>
+                                    </div>
+                                    <div
+                                        class="py-1 px-2.5 rounded-lg bg-emerald-100/50 dark:bg-emerald-950/40 text-[10px] text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                                        <i data-feather="info" class="w-3.5 h-3.5 shrink-0"></i>
+                                        <span>Master data produk dan agen siap langsung digunakan untuk transaksi
+                                            baru.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Typing Confirmation Box -->
+                        <div
+                            class="bg-gray-50/70 dark:bg-slate-800/60 rounded-2xl p-5 border border-gray-200 dark:border-slate-700 space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-800 dark:text-slate-200 mb-1">
+                                    Ketik kata konfirmasi <span
+                                        class="text-rose-600 dark:text-rose-400 font-black tracking-wider bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-900/60">RESET
+                                        TRANSAKSI</span> di bawah ini:
+                                </label>
+                                <p class="text-[11px] text-gray-500 dark:text-slate-400">
+                                    Tombol eksekusi hanya akan aktif jika Anda mengetik kata kunci di atas dengan benar
+                                    (huruf besar/kecil tidak berpengaruh).
+                                </p>
+                            </div>
+                            <input type="text" id="inputKeywordResetData" oninput="validasiKeywordResetData()"
+                                onkeydown="if(event.key === 'Enter' && !document.getElementById('btnEksekusiResetData').disabled) jalankanResetDataTransaksi()"
+                                placeholder="Ketik RESET TRANSAKSI" autocomplete="off"
+                                class="w-full text-center uppercase tracking-widest font-black text-sm p-3 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition shadow-inner">
+                        </div>
+
+                        <!-- Actions Area -->
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                            <button type="button" onclick="kunciUlangLayerResetSecurity()"
+                                class="w-full sm:w-auto px-4 py-2.5 rounded-xl font-bold text-xs text-gray-700 dark:text-slate-300 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                                <i data-feather="lock" class="w-3.5 h-3.5"></i>
+                                <span>Batal & Kunci Kembali</span>
+                            </button>
+                            <button type="button" id="btnEksekusiResetData" onclick="jalankanResetDataTransaksi()"
+                                disabled
+                                class="w-full sm:w-auto px-6 py-2.5 rounded-xl font-black text-xs sm:text-sm text-white bg-gradient-to-r from-rose-600 via-red-600 to-rose-700 hover:from-rose-700 hover:to-red-800 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                                <i data-feather="trash-2" class="w-4 h-4"></i>
+                                <span>Hapus & Kosongkan Data Transaksi Sekarang</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div
+                class="px-5 py-2.5 bg-gray-50/80 dark:bg-slate-800/90 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center text-[11px] text-gray-500 dark:text-slate-400">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span id="labelBackupFooterStatus">Siap melakukan pencadangan atau pemulihan data</span>
+                </div>
+                <button onclick="closeModal('modalBackupRestore')"
+                    class="px-3.5 py-1.5 rounded-lg bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-200 font-semibold hover:bg-gray-300 dark:hover:bg-slate-600 transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Form Agen -->
     <div id="modalFormAgen" class="fixed inset-0 z-[60] flex items-center justify-center hidden p-4">
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="closeFormModal('modalFormAgen')"></div>
@@ -2216,7 +2956,7 @@
                 <div
                     class="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-600 dark:border-t-blue-400 border-r-emerald-500 animate-spin">
                 </div>
-                <div
+                <div id="loadingSimpanIconWrapper"
                     class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-inner">
                     <i data-feather="save" class="w-6 h-6 animate-pulse"></i>
                 </div>
@@ -2343,16 +3083,31 @@
         let isSavingTransaction = false;
         let savedTrxContext = { id: null, date: '', resellerName: '', net: 0, isEdit: false };
 
-        function bukaLoadingSimpan(isEdit = false) {
+        function bukaLoadingSimpan(isEdit = false, customTitle = null, customDesc = null, customIcon = null) {
             const modal = document.getElementById('modalLoadingSimpan');
             const title = document.getElementById('loadingSimpanTitle');
             const desc = document.getElementById('loadingSimpanDesc');
+            const iconWrapper = document.getElementById('loadingSimpanIconWrapper');
             if (!modal) return;
 
-            if (title) title.innerText = isEdit ? 'Memperbarui Transaksi...' : 'Menyimpan Transaksi...';
-            if (desc) desc.innerText = isEdit
-                ? 'Sedang memperbarui nota & catatan harian di database...'
-                : 'Sedang menyimpan nota baru ke riwayat database...';
+            if (customTitle) {
+                if (title) title.innerText = customTitle;
+            } else {
+                if (title) title.innerText = isEdit ? 'Memperbarui Transaksi...' : 'Menyimpan Transaksi...';
+            }
+
+            if (customDesc) {
+                if (desc) desc.innerText = customDesc;
+            } else {
+                if (desc) desc.innerText = isEdit
+                    ? 'Sedang memperbarui nota & catatan harian di database...'
+                    : 'Sedang menyimpan nota baru ke riwayat database...';
+            }
+
+            if (iconWrapper) {
+                iconWrapper.innerHTML = `<i data-feather="${customIcon || 'save'}" class="w-6 h-6 animate-pulse"></i>`;
+                if (window.feather) feather.replace();
+            }
 
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -2493,6 +3248,69 @@
         function updateTglDisplay() {
             const raw = document.getElementById('tglTransaksi').value;
             document.getElementById('tglDisplay').innerText = formatTanggalSingkatID(raw);
+        }
+
+        function updateResellerContextBadges() {
+            const badgesContainer = document.getElementById('resellerInfoBadges');
+            const avatarBadge = document.getElementById('resellerAvatarBadge');
+            if (!badgesContainer) return;
+
+            if (!selectedResellerId) {
+                if (avatarBadge) {
+                    avatarBadge.innerHTML = `<i data-feather="user" class="w-4 h-4 text-gray-400 dark:text-slate-500"></i>`;
+                    avatarBadge.className = "w-8 h-8 rounded-lg bg-gray-200/80 dark:bg-slate-700 text-gray-500 dark:text-slate-300 font-bold text-xs flex items-center justify-center transition-all flex-shrink-0";
+                }
+                badgesContainer.innerHTML = '';
+                if (window.feather) feather.replace();
+                return;
+            }
+
+            const resObj = (masterData.resellers || []).find(r => String(r.id) === String(selectedResellerId));
+            const namaReseller = resObj ? resObj.nama : 'Reseller';
+            const initial = (namaReseller && namaReseller.trim().length > 0) ? namaReseller.trim().charAt(0).toUpperCase() : 'R';
+
+            if (avatarBadge) {
+                avatarBadge.innerText = initial;
+                avatarBadge.className = "w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-sm flex items-center justify-center shadow-xs flex-shrink-0 transition-transform duration-200";
+            }
+
+            // Hitung harga khusus aktif
+            let specialCount = 0;
+            if (masterData.hargaKhusus) {
+                specialCount = Object.keys(masterData.hargaKhusus).filter(k => k.startsWith(selectedResellerId + '_')).length;
+            }
+
+            // Hitung draft catatan harian yang belum dibayar
+            let draftCount = 0;
+            if (typeof globalDraftData !== 'undefined' && globalDraftData[selectedResellerId]) {
+                const dObj = globalDraftData[selectedResellerId];
+                if (dObj.dates) Object.values(dObj.dates).forEach(arr => draftCount += arr.length);
+                if (dObj.kasbons) Object.values(dObj.kasbons).forEach(arr => draftCount += arr.length);
+            }
+
+            let badgesHtml = '';
+
+            if (specialCount > 0) {
+                badgesHtml += `
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-700/60 shadow-2xs" title="${specialCount} item harga khusus aktif untuk ${namaReseller}">
+                        <i data-feather="tag" class="w-3 h-3 text-amber-500"></i>
+                        <span>${specialCount} Harga Khusus</span>
+                    </span>
+                `;
+            }
+
+            if (draftCount > 0) {
+                badgesHtml += `
+                    <button onclick="openModal('modalHarian')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-700/60 shadow-2xs cursor-pointer transition active:scale-95" title="Klik untuk membuka catatan harian reseller ini">
+                        <i data-feather="inbox" class="w-3 h-3 text-emerald-600 dark:text-emerald-400"></i>
+                        <span>${draftCount} Draft Catatan Harian</span>
+                        <i data-feather="arrow-right" class="w-2.5 h-2.5 opacity-70"></i>
+                    </button>
+                `;
+            }
+
+            badgesContainer.innerHTML = badgesHtml;
+            if (window.feather) feather.replace();
         }
 
         function formatInputRibuan(inputEl) {
@@ -2658,6 +3476,7 @@
                 selectedResellerId = e.target.value;
                 currentDraftIds = [];
                 currentKasbonDraftIds = [];
+                updateResellerContextBadges();
                 kalkulasiSemua();
             };
 
@@ -2666,6 +3485,7 @@
                 document.getElementById('tglTransaksi').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
             }
             updateTglDisplay();
+            updateResellerContextBadges();
         };
 
         function konfirmasiReset() { openFormModal('modalReset'); }
@@ -2680,13 +3500,16 @@
             const tzOffset = (new Date()).getTimezoneOffset() * 60000;
             document.getElementById('tglTransaksi').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
             updateTglDisplay();
+            updateResellerContextBadges();
 
             document.getElementById('containerBarangJadi').innerHTML = '';
             document.getElementById('containerBahanBaku').innerHTML = '';
             document.getElementById('listKasbonManual').innerHTML = '';
 
-            for (let i = 0; i < 8; i++) addRow('bahanBaku');
             addRow('barangJadi');
+            addRow('barangJadi');
+            addRow('bahanBaku');
+            addRow('bahanBaku');
             addKasbonManual();
 
             kalkulasiSemua(); closeFormModal('modalReset');
@@ -2790,6 +3613,7 @@
             const elNet = document.getElementById('summaryNet');
             elNet.innerText = formatRupiah(net);
             elNet.className = `block text-lg font-black ${net < 0 ? 'text-red-500' : 'text-green-500'}`;
+            updateResellerContextBadges();
         };
 
         let currentFilterBarangTipe = 'semua';
@@ -3289,6 +4113,7 @@
                 selDraftAgen.value = currVal;
 
                 renderFilteredDrafts();
+                updateResellerContextBadges();
             } catch (err) { container.innerHTML = `<div class="text-center text-red-500 text-xs py-4">Gagal memuat: ${err.message}</div>`; }
         }
 
@@ -3529,9 +4354,10 @@
                             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50 shrink-0">💵 Kasbon</span>
                             <span class="font-bold text-gray-700 dark:text-slate-300 text-xs leading-snug break-words">${item.keterangan} <span class="text-gray-400 dark:text-slate-400 font-normal text-[9.5px] italic ml-1">${infoBy}</span></span>
                         </div>
-                        <div class="flex items-center gap-3 shrink-0">
-                            <span class="font-black text-emerald-600 dark:text-emerald-400 text-xs bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/50">${formatRupiah(item.nominal)}</span>
-                            <button onclick="toggleEditRow(this)" class="text-amber-500 hover:text-amber-600 p-1 rounded-lg transition bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800/50 shadow-sm"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button onclick="toggleEditRow(this)" class="text-amber-500 hover:text-amber-600 hover:scale-110 active:scale-95 p-1.5 rounded-lg transition-all bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800/50 shadow-sm" title="Edit Kasbon"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>
+                            <span class="font-black text-emerald-600 dark:text-emerald-400 text-xs bg-white dark:bg-slate-800 px-2 py-1 rounded border border-emerald-200 dark:border-emerald-800/50">${formatRupiah(item.nominal)}</span>
+                            <button onclick="hapusKasbonHarianDraft('${item.id}', '${rId}', '${tgl}', this)" class="text-white hover:bg-red-600 hover:scale-110 active:scale-95 bg-red-500 p-1.5 rounded-lg transition-all shadow-sm" title="Hapus Kasbon"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
                         </div>
                     </div>
                 </div>
@@ -3546,7 +4372,7 @@
                             <input type="text" oninput="formatInputRibuan(this)" class="edit-nom-kasbon w-full text-xs p-1.5 border dark:border-slate-600 rounded text-center font-black bg-gray-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400" value="${strNom}">
                         </div>
                         <div class="w-1/12 flex justify-end self-end mb-0.5">
-                            <button onclick="hapusKasbonHarianDraft('${item.id}', this)" class="text-gray-400 hover:text-red-500 dark:hover:text-red-400 bg-gray-100 dark:bg-slate-700 p-1.5 rounded border dark:border-slate-600 transition"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
+                            <button onclick="hapusKasbonHarianDraft('${item.id}', '${rId}', '${tgl}', this)" class="text-white bg-red-500 hover:bg-red-600 hover:scale-110 active:scale-95 p-1.5 rounded-lg transition-all shadow-sm self-center" title="Hapus Kasbon"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
                         </div>
                     </div>
                 </div>
@@ -3624,13 +4450,14 @@
             }
         }
 
-        function hapusKasbonHarianDraft(id, btnElement) {
-            draftToDelete = { id, btnElement };
+        function hapusKasbonHarianDraft(id, rId = null, tgl = null, btnElement = null) {
+            draftToDelete = { id, rId, tgl, btnElement };
             targetHapusType = 'kasbon_draft';
             document.getElementById('inputPinHapus').value = '';
             const btn = document.querySelector('#modalPin button.bg-red-500');
             if (btn) btn.innerText = 'Hapus';
             openFormModal('modalPin');
+            setTimeout(() => { const el = document.getElementById('inputPinHapus'); if (el) el.focus(); }, 100);
         }
 
         function hapusCatatanHarian(id, rId = null, tgl = null, btnElement = null) {
@@ -3640,6 +4467,7 @@
             const btn = document.querySelector('#modalPin button.bg-red-500');
             if (btn) btn.innerText = 'Hapus';
             openFormModal('modalPin');
+            setTimeout(() => { const el = document.getElementById('inputPinHapus'); if (el) el.focus(); }, 100);
         }
 
         function hapusRiwayatTransaksi(trxId) {
@@ -3649,6 +4477,7 @@
             const btn = document.querySelector('#modalPin button.bg-red-500');
             if (btn) btn.innerText = 'Lanjut (Layer 2)';
             openFormModal('modalPin');
+            setTimeout(() => { const el = document.getElementById('inputPinHapus'); if (el) el.focus(); }, 100);
         }
 
         async function prosesHapusDenganPin() {
@@ -3662,6 +4491,112 @@
                 bukaModalKonfirmasiHapusPermanen(targetHapusId);
             } else if (targetHapusType === 'kasbon_draft') {
                 await prosesHapusKasbonDraftExecute();
+            }
+        }
+
+        async function prosesHapusCatatanHarianExecute() {
+            if (!draftToDelete || !draftToDelete.id) {
+                closeFormModal('modalPin');
+                return;
+            }
+
+            const btn = document.querySelector('#modalPin button.bg-red-500');
+            const originalTxt = btn ? btn.innerText : 'Hapus';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'Menghapus...';
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('buku_harian')
+                    .delete()
+                    .eq('id', draftToDelete.id);
+
+                if (error) throw error;
+
+                showNotification("Rincian barang berhasil dihapus!", "success");
+                closeFormModal('modalPin');
+
+                const rId = draftToDelete.rId;
+                const tgl = draftToDelete.tgl;
+
+                await fetchListHarian();
+                cekNotifikasiPending();
+
+                const modalDraft = document.getElementById('modalDetailDraft');
+                if (modalDraft && !modalDraft.classList.contains('hidden')) {
+                    const hasBuku = globalDraftData[rId]?.dates?.[tgl]?.length > 0;
+                    const hasKasbon = globalDraftData[rId]?.kasbons?.[tgl]?.length > 0;
+                    if (rId && tgl && (hasBuku || hasKasbon)) {
+                        bukaDetailDraft(`${tgl}_${rId}`);
+                    } else {
+                        closeFormModal('modalDetailDraft');
+                    }
+                }
+            } catch (err) {
+                console.error("Gagal menghapus rincian harian:", err);
+                showNotification("Gagal menghapus: " + err.message, "error");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalTxt;
+                }
+                draftToDelete = null;
+                targetHapusType = '';
+            }
+        }
+
+        async function prosesHapusKasbonDraftExecute() {
+            if (!draftToDelete || !draftToDelete.id) {
+                closeFormModal('modalPin');
+                return;
+            }
+
+            const btn = document.querySelector('#modalPin button.bg-red-500');
+            const originalTxt = btn ? btn.innerText : 'Hapus';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'Menghapus...';
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('kasbon_harian')
+                    .delete()
+                    .eq('id', draftToDelete.id);
+
+                if (error) throw error;
+
+                showNotification("Catatan kasbon harian berhasil dihapus!", "success");
+                closeFormModal('modalPin');
+
+                const rId = draftToDelete.rId;
+                const tgl = draftToDelete.tgl;
+
+                await fetchListHarian();
+                cekNotifikasiPending();
+
+                const modalDraft = document.getElementById('modalDetailDraft');
+                if (modalDraft && !modalDraft.classList.contains('hidden')) {
+                    const hasBuku = globalDraftData[rId]?.dates?.[tgl]?.length > 0;
+                    const hasKasbon = globalDraftData[rId]?.kasbons?.[tgl]?.length > 0;
+                    if (rId && tgl && (hasBuku || hasKasbon)) {
+                        bukaDetailDraft(`${tgl}_${rId}`);
+                    } else {
+                        closeFormModal('modalDetailDraft');
+                    }
+                }
+            } catch (err) {
+                console.error("Gagal menghapus kasbon harian:", err);
+                showNotification("Gagal menghapus: " + err.message, "error");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalTxt;
+                }
+                draftToDelete = null;
+                targetHapusType = '';
             }
         }
 
@@ -3970,8 +4905,10 @@
                 document.getElementById('containerBarangJadi').innerHTML = '';
                 document.getElementById('containerBahanBaku').innerHTML = '';
                 document.getElementById('listKasbonManual').innerHTML = '';
-                for (let i = 0; i < 8; i++) addRow('bahanBaku');
                 addRow('barangJadi');
+                addRow('barangJadi');
+                addRow('bahanBaku');
+                addRow('bahanBaku');
                 addKasbonManual();
 
                 if (resId) {
@@ -5191,6 +6128,7 @@
             selectedResellerId = trx.reseller_id;
             document.getElementById('tglTransaksi').value = trx.tanggal_transaksi;
             updateTglDisplay();
+            updateResellerContextBadges();
             document.getElementById('containerBarangJadi').innerHTML = ''; document.getElementById('containerBahanBaku').innerHTML = '';
             document.getElementById('listKasbonManual').innerHTML = '';
 
@@ -5450,7 +6388,7 @@
         }
 
         function padRightBT(str, len) {
-            const s = cleanThermalString(str);
+            const s = String(str != null ? str : '').replace(/[^\x20-\x7E]/g, ' ');
             return s.length >= len ? s.slice(0, len) : s + ' '.repeat(len - s.length);
         }
 
@@ -5652,7 +6590,7 @@
                     optionalServices: OPTIONAL_SERVICES
                 });
 
-                bleDevice.addEventListener('gattserverdisconnected', function() {
+                bleDevice.addEventListener('gattserverdisconnected', function () {
                     bleCharacteristic = null;
                     bleServer = null;
                     updateBleStatusUI(false, '');
@@ -5740,24 +6678,7 @@
             const resellerName = cleanThermalString((document.getElementById('notaNama') ? document.getElementById('notaNama').innerText : '') || '-');
             const tglCetak = cleanThermalString((document.getElementById('notaTgl') ? document.getElementById('notaTgl').innerText : '') || '-');
 
-            // 1. Ambil data Pengambilan Bahan Baku
-            const bahanRows = [];
-            document.querySelectorAll('#notaListBahan tr').forEach(tr => {
-                const tds = tr.querySelectorAll('td');
-                if (tds.length >= 4) {
-                    const qty = cleanThermalString(tds[0].innerText);
-                    const item = cleanThermalString(tds[1].innerText);
-                    const harga = cleanThermalString(tds[2].innerText);
-                    const total = cleanThermalString(tds[3].innerText);
-                    if (item && item.toLowerCase() !== 'kosong') {
-                        bahanRows.push({ qty, item, harga, total });
-                    }
-                }
-            });
-            const subBahanEl = document.getElementById('notaSubBahan');
-            const subBahanText = cleanThermalString(subBahanEl ? subBahanEl.innerText : '- Rp 0');
-
-            // 2. Ambil data Setoran Barang Jadi
+            // 1. Ambil data Setoran Barang Jadi
             const setoranRows = [];
             document.querySelectorAll('#notaListSetoran tr').forEach(tr => {
                 const tds = tr.querySelectorAll('td');
@@ -5773,6 +6694,23 @@
             });
             const subSetoranEl = document.getElementById('notaSubSetoran');
             const subSetoranText = cleanThermalString(subSetoranEl ? subSetoranEl.innerText : 'Rp 0');
+
+            // 2. Ambil data Pengambilan Bahan Baku
+            const bahanRows = [];
+            document.querySelectorAll('#notaListBahan tr').forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                if (tds.length >= 4) {
+                    const qty = cleanThermalString(tds[0].innerText);
+                    const item = cleanThermalString(tds[1].innerText);
+                    const harga = cleanThermalString(tds[2].innerText);
+                    const total = cleanThermalString(tds[3].innerText);
+                    if (item && item.toLowerCase() !== 'kosong') {
+                        bahanRows.push({ qty, item, harga, total });
+                    }
+                }
+            });
+            const subBahanEl = document.getElementById('notaSubBahan');
+            const subBahanText = cleanThermalString(subBahanEl ? subBahanEl.innerText : '- Rp 0');
 
             // 3. Ambil data Kasbon / Pinjaman Manual
             const manualRows = [];
@@ -5807,6 +6745,9 @@
                 return null;
             }
 
+            const boldOn = '\x1B\x45\x01';
+            const boldOff = '\x1B\x45\x00';
+
             const preTotalLines = [];
             preTotalLines.push(margin + centerTextBT('SBR PUTRA FOOD', w));
             preTotalLines.push(margin + centerTextBT('Lembang, Bandung Barat 40391', w));
@@ -5816,21 +6757,6 @@
             preTotalLines.push(margin + 'Agen/Reseller : ' + resellerName);
             preTotalLines.push(margin + 'Tgl Cetak     : ' + tglCetak);
 
-            // Pengambilan Bahan Baku
-            if (bahanRows.length > 0) {
-                preTotalLines.push(margin + divider);
-                preTotalLines.push(margin + 'PENGAMBILAN BAHAN BAKU:');
-                bahanRows.forEach(it => {
-                    preTotalLines.push(margin + it.item.slice(0, w));
-                    const leftDetail = '  ' + it.qty + ' x ' + it.harga;
-                    const rightSub = it.total;
-                    const spaceLeft = Math.max(1, w - rightSub.length);
-                    preTotalLines.push(margin + padRightBT(leftDetail, spaceLeft) + rightSub);
-                });
-                preTotalLines.push(margin + divider);
-                preTotalLines.push(margin + padRightBT('Subtotal Bahan:', Math.max(1, w - subBahanText.length)) + subBahanText);
-            }
-
             // Setoran Barang Jadi
             if (setoranRows.length > 0) {
                 preTotalLines.push(margin + divider);
@@ -5839,11 +6765,36 @@
                     preTotalLines.push(margin + it.item.slice(0, w));
                     const leftDetail = '  ' + it.qty + ' x ' + it.harga;
                     const rightSub = it.total;
-                    const spaceLeft = Math.max(1, w - rightSub.length);
-                    preTotalLines.push(margin + padRightBT(leftDetail, spaceLeft) + rightSub);
+                    if (leftDetail.length + rightSub.length + 1 <= w) {
+                        const spaceLeft = Math.max(1, w - rightSub.length);
+                        preTotalLines.push(margin + padRightBT(leftDetail, spaceLeft) + rightSub);
+                    } else {
+                        preTotalLines.push(margin + leftDetail);
+                        preTotalLines.push(margin + padLeftBT(rightSub, w));
+                    }
                 });
                 preTotalLines.push(margin + divider);
-                preTotalLines.push(margin + padRightBT('Subtotal Setoran:', Math.max(1, w - subSetoranText.length)) + subSetoranText);
+                preTotalLines.push(margin + boldOn + padRightBT('Subtotal Setoran:', Math.max(1, w - subSetoranText.length)) + subSetoranText + boldOff);
+            }
+
+            // Pengambilan Bahan Baku
+            if (bahanRows.length > 0) {
+                preTotalLines.push(margin + divider);
+                preTotalLines.push(margin + 'PENGAMBILAN BAHAN BAKU:');
+                bahanRows.forEach(it => {
+                    preTotalLines.push(margin + it.item.slice(0, w));
+                    const leftDetail = '  ' + it.qty + ' x ' + it.harga;
+                    const rightSub = it.total;
+                    if (leftDetail.length + rightSub.length + 1 <= w) {
+                        const spaceLeft = Math.max(1, w - rightSub.length);
+                        preTotalLines.push(margin + padRightBT(leftDetail, spaceLeft) + rightSub);
+                    } else {
+                        preTotalLines.push(margin + leftDetail);
+                        preTotalLines.push(margin + padLeftBT(rightSub, w));
+                    }
+                });
+                preTotalLines.push(margin + divider);
+                preTotalLines.push(margin + boldOn + padRightBT('Subtotal Bahan:', Math.max(1, w - subBahanText.length)) + subBahanText + boldOff);
             }
 
             // Kasbon / Pinjaman Manual
@@ -5857,19 +6808,23 @@
                     preTotalLines.push(margin + padRightBT(leftDetail, spaceLeft) + rightSub);
                 });
                 preTotalLines.push(margin + divider);
-                preTotalLines.push(margin + padRightBT('Total Kasbon Uang:', Math.max(1, w - subManualText.length)) + subManualText);
+                preTotalLines.push(margin + boldOn + padRightBT('Total Kasbon Uang:', Math.max(1, w - subManualText.length)) + subManualText + boldOff);
             }
 
             // Ringkasan Pembayaran
             preTotalLines.push(margin + doubleDivider);
+            const labelSetoran = w >= 48 ? 'Total Setoran Jadi:' : 'Total Setoran:';
+            const labelBahan = w >= 48 ? 'Total Ambil Bahan:' : 'Total Bahan:';
+            const labelKasbon = w >= 48 ? 'Total Kasbon Uang:' : 'Total Kasbon:';
+
             if (setoranRows.length > 0) {
-                preTotalLines.push(margin + padRightBT('Total Setoran Jadi:', Math.max(1, w - totalSetoranText.length)) + totalSetoranText);
+                preTotalLines.push(margin + padRightBT(labelSetoran, Math.max(1, w - totalSetoranText.length)) + totalSetoranText);
             }
             if (bahanRows.length > 0) {
-                preTotalLines.push(margin + padRightBT('Total Ambil Bahan:', Math.max(1, w - totalBahanText.length)) + totalBahanText);
+                preTotalLines.push(margin + padRightBT(labelBahan, Math.max(1, w - totalBahanText.length)) + totalBahanText);
             }
             if (manualRows.length > 0) {
-                preTotalLines.push(margin + padRightBT('Total Kasbon Uang:', Math.max(1, w - subManualText.length)) + subManualText);
+                preTotalLines.push(margin + padRightBT(labelKasbon, Math.max(1, w - subManualText.length)) + subManualText);
             }
             preTotalLines.push(margin + divider);
 
@@ -5889,7 +6844,7 @@
                 margin + doubleDivider,
                 margin + centerTextBT('HATUR NUHUN, CEK KEMBALI', w),
                 margin + centerTextBT('Mulus Rahayu, Berkah Salamet', w),
-                margin + centerTextBT('SBR Putra Food Sistems (c) 2026', w),
+                margin + centerTextBT('SBR Putra Food System (c) 2026', w),
                 '\n\n\n'
             ];
 
@@ -6262,7 +7217,7 @@
                 modalEl.classList.add('hidden');
 
                 // Jangan sembunyikan modalOverlay jika modalRiwayat atau modal lain masih terbuka
-                const otherModals = ['modalRiwayat', 'modalHarian', 'modalAgen', 'modalBarang', 'modalHarga', 'modalAnalitik'];
+                const otherModals = ['modalRiwayat', 'modalHarian', 'modalAgen', 'modalBarang', 'modalHarga', 'modalAnalitik', 'modalBackupRestore'];
                 const isAnyOtherOpen = otherModals.some(mId => {
                     const el = document.getElementById(mId);
                     return el && !el.classList.contains('hidden');
@@ -6272,14 +7227,14 @@
                     if (overlay) overlay.classList.add('hidden');
                 }
 
-                if (id === 'modalPratinjau') { 
-                    currentViewTrxId = null; 
+                if (id === 'modalPratinjau') {
+                    currentViewTrxId = null;
                     tutupSemuaDropdownPratinjau();
                 }
             }, 200);
         }
 
-        function openModal(id) {
+        function openModal(id, subTab = null) {
             document.getElementById(id).classList.remove('hidden');
             document.getElementById('modalOverlay').classList.remove('hidden');
             setTimeout(() => { document.getElementById(id).children[0].classList.replace('scale-95', 'scale-100'); }, 10);
@@ -6335,6 +7290,7 @@
             }
             if (id === 'modalRiwayat') initModalRiwayat();
             if (id === 'modalAnalitik') initModalAnalitik();
+            if (id === 'modalBackupRestore') initModalBackupRestore(subTab);
             feather.replace();
         }
 
@@ -7013,11 +7969,838 @@
             showNotification("Rekap analitik berhasil didownload sebagai CSV!", "success");
         }
 
+        let isSavingAnalitikPng = false;
+
+        async function simpanAnalitikPNG() {
+            if (isSavingAnalitikPng) return;
+            isSavingAnalitikPng = true;
+
+            const btn = document.getElementById('btnSimpanAnalitikPNG');
+            const originalBtnHtml = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 animate-spin"></i> <span class="hidden sm:inline">Menyimpan...</span>`;
+                btn.disabled = true;
+                if (window.feather) feather.replace();
+            }
+
+            // Buka Modal Full Screen Blur Loading dengan Proteksi Anti-Duplikasi (Persis seperti Simpan Pembayaran)
+            bukaLoadingSimpan(false, 'Menyimpan Laporan PNG...', 'Sedang merender laporan grafis resolusi tinggi & menyiapkan file gambar. Mohon tunggu...', 'image');
+
+            try {
+                if (!currentAnalitikDataCache || !currentAnalitikDataCache.trx) {
+                    await tutupLoadingSimpan();
+                    isSavingAnalitikPng = false;
+                    showNotification("Data analitik belum siap untuk disimpan!", "warning-flash");
+                    return;
+                }
+
+                const isDark = document.documentElement.classList.contains('dark');
+                const periodeLabel = formatBulanTahunID(currentAnalitikBulan);
+                const periodeFileStr = (periodeLabel || 'PERIODE').toUpperCase().replace(/\s+/g, '_');
+
+                let resellerLabel = "Semua Agen Reseller";
+                let resellerFileStr = "";
+                if (currentAnalitikReseller) {
+                    const rObj = (masterData.resellers || []).find(r => String(r.id) === String(currentAnalitikReseller));
+                    if (rObj && rObj.nama) {
+                        resellerLabel = rObj.nama;
+                        resellerFileStr = "_" + rObj.nama.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+                    }
+                }
+
+                // Format nama file sesuai instruksi: ALTK_SBR_(PERIODE BULAN DAN TAHUN)
+                const fileName = `ALTK_SBR_${periodeFileStr}${resellerFileStr}.png`;
+
+                // Buat container wrapper khusus dengan lebar proporsional (1200px locked desktop layout)
+                const exportWrapper = document.createElement('div');
+                exportWrapper.id = 'tempAnalitikExportWrapper';
+                exportWrapper.className = isDark ? 'dark bg-slate-900 text-slate-100' : 'bg-white text-gray-900';
+                exportWrapper.style.position = 'fixed';
+                exportWrapper.style.left = '-9999px';
+                exportWrapper.style.top = '0';
+                exportWrapper.style.width = '1200px';
+                exportWrapper.style.zIndex = '-9999';
+                exportWrapper.style.padding = '32px';
+                exportWrapper.style.borderRadius = '20px';
+                exportWrapper.style.boxSizing = 'border-box';
+                exportWrapper.style.fontFamily = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+                const now = new Date();
+                const tglCetak = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+                // Header Laporan Proporsional & Rapi (Tanpa tombol X atau Export yang mengganggu)
+                const headerHtml = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid ${isDark ? '#334155' : '#f1f5f9'}; padding-bottom: 20px; margin-bottom: 22px;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/677036e078cc7fa6c94788da8482dc53d883e2df/sbr_logo.png" crossorigin="anonymous" style="width: 48px; height: 48px; object-fit: contain;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <h2 style="font-size: 20px; font-weight: 900; margin: 0; line-height: 1.2;">Analitik Data & Rekap Bulanan</h2>
+                                    <span style="font-size: 11px; font-weight: 800; background-color: ${isDark ? '#312e81' : '#e0e7ff'}; color: ${isDark ? '#c7d2fe' : '#4338ca'}; padding: 3px 10px; border-radius: 9999px;">SBR Putra Food</span>
+                                </div>
+                                <p style="font-size: 12px; color: ${isDark ? '#94a3b8' : '#64748b'}; margin: 4px 0 0 0;">Analisis Pembayaran, Setoran Barang Jadi, dan Pengambilan Bahan Baku</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                            <div style="display: flex; gap: 8px;">
+                                <span style="font-size: 12px; font-weight: 700; background-color: ${isDark ? '#1e293b' : '#f8fafc'}; border: 1px solid ${isDark ? '#334155' : '#e2e8f0'}; color: ${isDark ? '#e2e8f0' : '#334155'}; padding: 5px 12px; border-radius: 10px;">📅 Periode: <strong>${periodeLabel}</strong></span>
+                                <span style="font-size: 12px; font-weight: 700; background-color: ${isDark ? '#1e293b' : '#f8fafc'}; border: 1px solid ${isDark ? '#334155' : '#e2e8f0'}; color: ${isDark ? '#e2e8f0' : '#334155'}; padding: 5px 12px; border-radius: 10px;">👤 Reseller: <strong>${resellerLabel}</strong></span>
+                            </div>
+                            <span style="font-size: 10px; color: ${isDark ? '#64748b' : '#94a3b8'};">Dicetak pada: ${tglCetak} WIB</span>
+                        </div>
+                    </div>
+                `;
+
+                // Clone seluruh container konten analitik
+                const sourceContent = document.getElementById('containerAnalitikContent');
+                const cloneContent = sourceContent.cloneNode(true);
+                cloneContent.id = 'clonedAnalitikContent';
+                cloneContent.style.overflow = 'visible';
+                cloneContent.style.maxHeight = 'none';
+                cloneContent.style.height = 'auto';
+                cloneContent.style.padding = '0';
+
+                // Ganti canvas dengan snapshot gambar PNG base64 beresolusi penuh agar bebas blur dan tidak blank
+                const origCanvasTren = document.getElementById('chartAnalitikTren');
+                const cloneCanvasTren = cloneContent.querySelector('#chartAnalitikTren');
+                if (origCanvasTren && cloneCanvasTren) {
+                    const imgTren = document.createElement('img');
+                    imgTren.src = origCanvasTren.toDataURL('image/png', 1.0);
+                    imgTren.style.width = '100%';
+                    imgTren.style.height = '240px';
+                    imgTren.style.objectFit = 'contain';
+                    cloneCanvasTren.parentNode.replaceChild(imgTren, cloneCanvasTren);
+                }
+
+                const origCanvasProduk = document.getElementById('chartAnalitikProduk');
+                const cloneCanvasProduk = cloneContent.querySelector('#chartAnalitikProduk');
+                if (origCanvasProduk && cloneCanvasProduk) {
+                    const imgProduk = document.createElement('img');
+                    imgProduk.src = origCanvasProduk.toDataURL('image/png', 1.0);
+                    imgProduk.style.width = '100%';
+                    imgProduk.style.height = '240px';
+                    imgProduk.style.objectFit = 'contain';
+                    cloneCanvasProduk.parentNode.replaceChild(imgProduk, cloneCanvasProduk);
+                }
+
+                // Footer Laporan Resmi
+                const footerText = document.getElementById('labelAnalitikStatus')?.innerText || 'Sinkronisasi otomatis dengan database';
+                const footerHtml = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid ${isDark ? '#334155' : '#f1f5f9'}; padding-top: 18px; margin-top: 22px; font-size: 11px; color: ${isDark ? '#94a3b8' : '#64748b'};">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 9999px; background-color: #10b981;"></span>
+                            <span>${footerText}</span>
+                        </div>
+                        <span style="font-weight: 700; color: ${isDark ? '#cbd5e1' : '#475569'};">SBR Putra Food System • Laporan Eksekutif Bulanan</span>
+                    </div>
+                `;
+
+                exportWrapper.innerHTML = headerHtml;
+                exportWrapper.appendChild(cloneContent);
+                exportWrapper.insertAdjacentHTML('beforeend', footerHtml);
+
+                document.body.appendChild(exportWrapper);
+
+                // Beri waktu agar DOM rendering siap sempurna
+                await new Promise(r => setTimeout(r, 250));
+
+                const canvas = await html2canvas(exportWrapper, {
+                    scale: 2, // Resolusi 2x Retina HD tajam
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                    width: 1200,
+                    windowWidth: 1200,
+                    scrollX: 0,
+                    scrollY: 0,
+                    logging: false
+                });
+
+                document.body.removeChild(exportWrapper);
+
+                const dataUrl = canvas.toDataURL('image/png', 1.0);
+                const downloadLink = document.createElement('a');
+                downloadLink.download = fileName;
+                downloadLink.href = dataUrl;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+
+                showNotification(`Laporan analitik berhasil disimpan: ${fileName}`, "success");
+            } catch (err) {
+                console.error("Gagal menyimpan PNG analitik:", err);
+                showNotification("Gagal menyimpan gambar: " + err.message, "error");
+                const existingWrapper = document.getElementById('tempAnalitikExportWrapper');
+                if (existingWrapper) existingWrapper.remove();
+            } finally {
+                await tutupLoadingSimpan();
+                isSavingAnalitikPng = false;
+                if (btn) {
+                    btn.innerHTML = originalBtnHtml;
+                    btn.disabled = false;
+                    if (window.feather) feather.replace();
+                }
+            }
+        }
+
+        // ==========================================
+        // FITUR BACKUP & RESTORE DATABASE SUPABASE
+        // ==========================================
+        let isBackingUpDatabase = false;
+        let isRestoringDatabase = false;
+        let isResettingDataTransactions = false;
+        let parsedBackupForRestore = null;
+
+        function switchBackupTab(tab) {
+            const btnBackup = document.getElementById('tabBtnBackup');
+            const btnRestore = document.getElementById('tabBtnRestore');
+            const btnReset = document.getElementById('tabBtnReset');
+            const panelBackup = document.getElementById('panelTabBackup');
+            const panelRestore = document.getElementById('panelTabRestore');
+            const panelReset = document.getElementById('panelTabReset');
+
+            const baseInactiveClass = "flex-1 sm:flex-initial text-xs font-bold py-1.5 px-3.5 rounded-lg text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center justify-center gap-1.5";
+            const baseInactiveResetClass = "flex-1 sm:flex-initial text-xs font-bold py-1.5 px-3.5 rounded-lg text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition flex items-center justify-center gap-1.5";
+            const activeEmeraldClass = "flex-1 sm:flex-initial text-xs font-bold py-1.5 px-3.5 rounded-lg bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm transition flex items-center justify-center gap-1.5";
+            const activeRoseClass = "flex-1 sm:flex-initial text-xs font-bold py-1.5 px-3.5 rounded-lg bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 shadow-sm transition flex items-center justify-center gap-1.5";
+
+            if (panelBackup) panelBackup.classList.add('hidden');
+            if (panelRestore) panelRestore.classList.add('hidden');
+            if (panelReset) panelReset.classList.add('hidden');
+
+            if (btnBackup) btnBackup.className = baseInactiveClass;
+            if (btnRestore) btnRestore.className = baseInactiveClass;
+            if (btnReset) btnReset.className = baseInactiveResetClass;
+
+            if (tab === 'backup') {
+                if (btnBackup) btnBackup.className = activeEmeraldClass;
+                if (panelBackup) panelBackup.classList.remove('hidden');
+            } else if (tab === 'restore') {
+                if (btnRestore) btnRestore.className = activeEmeraldClass;
+                if (panelRestore) panelRestore.classList.remove('hidden');
+            } else if (tab === 'reset') {
+                if (btnReset) btnReset.className = activeRoseClass;
+                if (panelReset) panelReset.classList.remove('hidden');
+                kunciUlangLayerResetSecurity();
+            }
+
+            if (window.feather) feather.replace();
+        }
+
+        function initModalBackupRestore(subTab = null) {
+            switchBackupTab(subTab || 'backup');
+            resetRestoreForm();
+            kunciUlangLayerResetSecurity();
+            hitungRingkasanDataBackup();
+            if (window.feather) feather.replace();
+        }
+
+        async function hitungRingkasanDataBackup(forceShowLoading = false) {
+            const statIds = {
+                reseller: 'bkStatReseller',
+                barang: 'bkStatBarang',
+                harga_khusus: 'bkStatHarga',
+                transaksi: 'bkStatTransaksi',
+                transaksi_detail: 'bkStatDetail',
+                buku_harian: 'bkStatBuku',
+                kasbon_harian: 'bkStatKasbon'
+            };
+
+            Object.values(statIds).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '<span class="animate-pulse text-gray-400">...</span>';
+            });
+
+            try {
+                const [
+                    resReseller,
+                    resBarang,
+                    resHarga,
+                    resTrx,
+                    resDetail,
+                    resBuku,
+                    resKasbon
+                ] = await Promise.all([
+                    supabaseClient.from('reseller').select('*', { count: 'exact', head: true }),
+                    supabaseClient.from('barang').select('*', { count: 'exact', head: true }),
+                    supabaseClient.from('harga_khusus').select('*', { count: 'exact', head: true }),
+                    supabaseClient.from('transaksi').select('*', { count: 'exact', head: true }),
+                    supabaseClient.from('transaksi_detail').select('*', { count: 'exact', head: true }),
+                    supabaseClient.from('buku_harian').select('*', { count: 'exact', head: true }),
+                    supabaseClient.from('kasbon_harian').select('*', { count: 'exact', head: true })
+                ]);
+
+                const counts = {
+                    reseller: resReseller.count || 0,
+                    barang: resBarang.count || 0,
+                    harga_khusus: resHarga.count || 0,
+                    transaksi: resTrx.count || 0,
+                    transaksi_detail: resDetail.count || 0,
+                    buku_harian: resBuku.count || 0,
+                    kasbon_harian: resKasbon.count || 0
+                };
+
+                for (const [tbl, id] of Object.entries(statIds)) {
+                    const el = document.getElementById(id);
+                    if (el) el.innerText = counts[tbl].toLocaleString('id-ID');
+                }
+
+                // Update juga indikator di Layer 2 Reset Data
+                const elResetTrx = document.getElementById('resetStatTrx');
+                const elResetDetail = document.getElementById('resetStatDetail');
+                const elResetBuku = document.getElementById('resetStatBuku');
+                const elResetKasbon = document.getElementById('resetStatKasbon');
+                if (elResetTrx) elResetTrx.innerText = `${counts.transaksi.toLocaleString('id-ID')} nota`;
+                if (elResetDetail) elResetDetail.innerText = `${counts.transaksi_detail.toLocaleString('id-ID')} item`;
+                if (elResetBuku) elResetBuku.innerText = `${counts.buku_harian.toLocaleString('id-ID')} entri`;
+                if (elResetKasbon) elResetKasbon.innerText = `${counts.kasbon_harian.toLocaleString('id-ID')} entri`;
+
+                const footerLabel = document.getElementById('labelBackupFooterStatus');
+                if (footerLabel) {
+                    const totalRows = Object.values(counts).reduce((a, b) => a + b, 0);
+                    footerLabel.innerText = `Total ${totalRows.toLocaleString('id-ID')} baris data terdeteksi aktif di Supabase Cloud`;
+                }
+
+                if (forceShowLoading) {
+                    showNotification("Ringkasan data cloud berhasil diperbarui!", "info");
+                }
+            } catch (err) {
+                console.error("Gagal menghitung ringkasan database:", err);
+                Object.values(statIds).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerText = '-';
+                });
+                const footerLabel = document.getElementById('labelBackupFooterStatus');
+                if (footerLabel) footerLabel.innerText = 'Gagal memuat status data cloud: ' + err.message;
+            }
+        }
+
+        // ==========================================
+        // FITUR RESET DATA TRANSAKSI (2-LAYER SECURITY)
+        // ==========================================
+        function kunciUlangLayerResetSecurity() {
+            const inputPin = document.getElementById('inputPinResetData');
+            const inputKeyword = document.getElementById('inputKeywordResetData');
+            const errPin = document.getElementById('errPinResetData');
+            const layer1 = document.getElementById('layerReset1');
+            const layer2 = document.getElementById('layerReset2');
+            const btnEksekusi = document.getElementById('btnEksekusiResetData');
+
+            if (inputPin) inputPin.value = '';
+            if (inputKeyword) inputKeyword.value = '';
+            if (errPin) errPin.classList.add('hidden');
+            if (layer1) layer1.classList.remove('hidden');
+            if (layer2) layer2.classList.add('hidden');
+            if (btnEksekusi) btnEksekusi.disabled = true;
+            if (window.feather) feather.replace();
+        }
+
+        function verifikasiPinResetLayer1() {
+            const inputPin = document.getElementById('inputPinResetData');
+            const errPin = document.getElementById('errPinResetData');
+            const layer1 = document.getElementById('layerReset1');
+            const layer2 = document.getElementById('layerReset2');
+
+            const pinVal = inputPin ? inputPin.value.trim() : '';
+
+            // Security PIN sistem SBR: 749947
+            if (pinVal !== "749947") {
+                if (errPin) errPin.classList.remove('hidden');
+                showNotification("PIN Keamanan salah! Akses Layer 2 ditolak.", "error");
+                if (inputPin) {
+                    inputPin.value = '';
+                    inputPin.focus();
+                }
+                return;
+            }
+
+            if (errPin) errPin.classList.add('hidden');
+            if (layer1) layer1.classList.add('hidden');
+            if (layer2) layer2.classList.remove('hidden');
+
+            const inputKeyword = document.getElementById('inputKeywordResetData');
+            if (inputKeyword) {
+                inputKeyword.value = '';
+                inputKeyword.focus();
+            }
+
+            hitungRingkasanDataBackup();
+
+            showNotification("PIN Valid! Anda berada di Layer 2 (Konfirmasi Akhir).", "info");
+            if (window.feather) feather.replace();
+        }
+
+        function validasiKeywordResetData() {
+            const inputKeyword = document.getElementById('inputKeywordResetData');
+            const btnEksekusi = document.getElementById('btnEksekusiResetData');
+            if (!inputKeyword || !btnEksekusi) return;
+
+            const val = inputKeyword.value.trim().toUpperCase();
+            if (val === 'RESET TRANSAKSI') {
+                btnEksekusi.disabled = false;
+            } else {
+                btnEksekusi.disabled = true;
+            }
+        }
+
+        async function jalankanResetDataTransaksi() {
+            const inputKeyword = document.getElementById('inputKeywordResetData');
+            if (!inputKeyword || inputKeyword.value.trim().toUpperCase() !== 'RESET TRANSAKSI') {
+                showNotification("Harap ketik 'RESET TRANSAKSI' dengan benar!", "error");
+                return;
+            }
+
+            if (isResettingDataTransactions) return;
+
+            const confirmFinal = window.confirm(
+                "PERINGATAN AKHIR:\n\n" +
+                "Apakah Anda BENAR-BENAR YAKIN ingin menghapus seluruh data transaksi (Nota Riwayat, Rincian Barang, Buku Harian, dan Kasbon Harian)?\n\n" +
+                "Tindakan ini bersifat PERMANEN dan tidak dapat dibatalkan!"
+            );
+            if (!confirmFinal) return;
+
+            isResettingDataTransactions = true;
+            const btnEksekusi = document.getElementById('btnEksekusiResetData');
+            const originalBtnHtml = btnEksekusi ? btnEksekusi.innerHTML : '';
+            if (btnEksekusi) {
+                btnEksekusi.disabled = true;
+                btnEksekusi.innerHTML = `<i data-feather="loader" class="w-4 h-4 animate-spin"></i> Menghapus Data...`;
+                if (window.feather) feather.replace();
+            }
+
+            bukaLoadingSimpan(false, 'Mereset Data Transaksi...', 'Menghapus rincian barang nota (transaksi_detail)...', 'trash-2');
+
+            try {
+                // Urutan penghapusan aman sesuai foreign key constraints
+                // 1. transaksi_detail
+                bukaLoadingSimpan(false, 'Mereset Data Transaksi...', 'Menghapus rincian barang nota (transaksi_detail)...', 'trash-2');
+                const { error: errDetail } = await supabaseClient
+                    .from('transaksi_detail')
+                    .delete()
+                    .not('id', 'is', null);
+                if (errDetail) throw new Error("Gagal menghapus rincian transaksi: " + errDetail.message);
+
+                // 2. buku_harian
+                bukaLoadingSimpan(false, 'Mereset Data Transaksi...', 'Menghapus catatan buku harian (buku_harian)...', 'trash-2');
+                const { error: errBuku } = await supabaseClient
+                    .from('buku_harian')
+                    .delete()
+                    .not('id', 'is', null);
+                if (errBuku) throw new Error("Gagal menghapus buku harian: " + errBuku.message);
+
+                // 3. kasbon_harian
+                bukaLoadingSimpan(false, 'Mereset Data Transaksi...', 'Menghapus catatan kasbon harian (kasbon_harian)...', 'trash-2');
+                const { error: errKasbon } = await supabaseClient
+                    .from('kasbon_harian')
+                    .delete()
+                    .not('id', 'is', null);
+                if (errKasbon) throw new Error("Gagal menghapus kasbon harian: " + errKasbon.message);
+
+                // 4. transaksi (header nota)
+                bukaLoadingSimpan(false, 'Mereset Data Transaksi...', 'Menghapus header riwayat nota (transaksi)...', 'trash-2');
+                const { error: errTrx } = await supabaseClient
+                    .from('transaksi')
+                    .delete()
+                    .not('id', 'is', null);
+                if (errTrx) throw new Error("Gagal menghapus riwayat transaksi: " + errTrx.message);
+
+                // 5. Refresh data tampilan aplikasi
+                bukaLoadingSimpan(false, 'Menyegarkan Sistem...', 'Menyinkronkan master data & tampilan...', 'refresh-cw');
+                await loadMasterData();
+                await fetchRiwayatData();
+                await fetchListHarian();
+                cekNotifikasiPending();
+                await hitungRingkasanDataBackup();
+
+                showNotification("Seluruh data transaksi dan catatan harian berhasil di-reset! Master Agen & Barang tetap aman.", "success");
+
+                kunciUlangLayerResetSecurity();
+                switchBackupTab('backup');
+            } catch (err) {
+                console.error("Gagal reset data transaksi:", err);
+                showNotification("Gagal mereset data: " + err.message, "error");
+            } finally {
+                await tutupLoadingSimpan();
+                isResettingDataTransactions = false;
+                if (btnEksekusi) {
+                    btnEksekusi.disabled = false;
+                    btnEksekusi.innerHTML = originalBtnHtml;
+                    if (window.feather) feather.replace();
+                }
+            }
+        }
+
+        async function fetchAllRowsFromTable(tableName) {
+            let allRows = [];
+            let from = 0;
+            const step = 1000;
+            let hasMore = true;
+            while (hasMore) {
+                const { data, error } = await supabaseClient
+                    .from(tableName)
+                    .select('*')
+                    .range(from, from + step - 1);
+                if (error) throw error;
+                if (data && data.length > 0) {
+                    allRows = allRows.concat(data);
+                    if (data.length < step) {
+                        hasMore = false;
+                    } else {
+                        from += step;
+                    }
+                } else {
+                    hasMore = false;
+                }
+            }
+            return allRows;
+        }
+
+        async function jalankanBackupDatabase() {
+            if (isBackingUpDatabase) return;
+            isBackingUpDatabase = true;
+
+            const btnBackup = document.getElementById('btnJalankanBackup');
+            const originalBtnHtml = btnBackup ? btnBackup.innerHTML : '';
+            if (btnBackup) {
+                btnBackup.disabled = true;
+                btnBackup.innerHTML = `<i data-feather="loader" class="w-4 h-4 animate-spin"></i> Menyiapkan...`;
+                if (window.feather) feather.replace();
+            }
+
+            bukaLoadingSimpan(false, 'Membuat Cadangan Database...', 'Mengambil seluruh tabel dari Supabase Cloud...', 'database');
+
+            try {
+                const tables = ['reseller', 'barang', 'harga_khusus', 'transaksi', 'transaksi_detail', 'buku_harian', 'kasbon_harian'];
+                const backupData = {};
+                const summary = {};
+
+                for (let i = 0; i < tables.length; i++) {
+                    const tbl = tables[i];
+                    bukaLoadingSimpan(false, 'Membuat Cadangan Database...', `Mengambil data tabel ${tbl} (${i + 1}/${tables.length})...`, 'database');
+                    const rows = await fetchAllRowsFromTable(tbl);
+                    backupData[tbl] = rows;
+                    summary[tbl] = rows.length;
+                }
+
+                const now = new Date();
+                const pad = (n) => String(n).padStart(2, '0');
+                const yyyy = now.getFullYear();
+                const mm = pad(now.getMonth() + 1);
+                const dd = pad(now.getDate());
+                const hh = pad(now.getHours());
+                const min = pad(now.getMinutes());
+                const ss = pad(now.getSeconds());
+
+                const fileName = `BACKUP_SBR_SYSTEM_${yyyy}${mm}${dd}_${hh}${min}${ss}.json`;
+
+                const exportPayload = {
+                    app: "SBR Putra Food POS System",
+                    version: "9.8.6",
+                    backup_date: now.toISOString(),
+                    backup_timestamp: now.getTime(),
+                    summary: summary,
+                    total_records: Object.values(summary).reduce((a, b) => a + b, 0),
+                    data: backupData
+                };
+
+                const jsonString = JSON.stringify(exportPayload, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const downloadLink = document.createElement('a');
+                downloadLink.href = url;
+                downloadLink.download = fileName;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+
+                setTimeout(() => {
+                    document.body.removeChild(downloadLink);
+                    URL.revokeObjectURL(url);
+                }, 300);
+
+                showNotification(`Cadangan database berhasil diunduh: ${fileName}`, "success");
+            } catch (err) {
+                console.error("Gagal membuat cadangan database:", err);
+                showNotification("Gagal membuat cadangan: " + err.message, "error");
+            } finally {
+                await tutupLoadingSimpan();
+                isBackingUpDatabase = false;
+                if (btnBackup) {
+                    btnBackup.disabled = false;
+                    btnBackup.innerHTML = originalBtnHtml;
+                    if (window.feather) feather.replace();
+                }
+            }
+        }
+
+        function formatUkuranFile(bytes) {
+            if (!bytes || bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function resetRestoreForm() {
+            parsedBackupForRestore = null;
+            const fileInput = document.getElementById('fileInputRestore');
+            if (fileInput) fileInput.value = '';
+
+            const boxPreview = document.getElementById('boxPreviewRestore');
+            const dropzone = document.getElementById('dropzoneRestore');
+            const btnRestore = document.getElementById('btnJalankanRestore');
+            const boxProgress = document.getElementById('boxProgressRestore');
+
+            if (boxPreview) boxPreview.classList.add('hidden');
+            if (dropzone) dropzone.classList.remove('hidden');
+            if (boxProgress) boxProgress.classList.add('hidden');
+            if (btnRestore) btnRestore.disabled = true;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropzone = document.getElementById('dropzoneRestore');
+            if (dropzone) dropzone.classList.add('border-emerald-500', 'bg-emerald-50/50', 'dark:bg-emerald-900/20');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropzone = document.getElementById('dropzoneRestore');
+            if (dropzone) dropzone.classList.remove('border-emerald-500', 'bg-emerald-50/50', 'dark:bg-emerald-900/20');
+        }
+
+        function handleDropFile(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleDragLeave(e);
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                handleFileBackupDirect(file);
+            }
+        }
+
+        function handleFileBackupDirect(file) {
+            if (!file) return;
+            if (!file.name.toLowerCase().endsWith('.json')) {
+                showNotification("Harap pilih berkas cadangan berekstensi .json!", "error");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    validasiDanTampilkanPreviewBackup(parsed, file.name, file.size);
+                } catch (err) {
+                    console.error("Gagal parse JSON:", err);
+                    showNotification("File JSON tidak dapat dibaca atau rusak: " + err.message, "error");
+                    resetRestoreForm();
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function handleFileBackupDipilih(event) {
+            const file = event.target.files && event.target.files[0];
+            if (file) handleFileBackupDirect(file);
+        }
+
+        function validasiDanTampilkanPreviewBackup(parsed, fileName, fileSize) {
+            const dataTables = (parsed && parsed.data) ? parsed.data : parsed;
+            const knownTables = ['reseller', 'barang', 'harga_khusus', 'transaksi', 'transaksi_detail', 'buku_harian', 'kasbon_harian'];
+
+            let foundTables = 0;
+            let totalRows = 0;
+            const detectedCounts = {};
+
+            knownTables.forEach(t => {
+                if (dataTables && Array.isArray(dataTables[t])) {
+                    foundTables++;
+                    detectedCounts[t] = dataTables[t].length;
+                    totalRows += dataTables[t].length;
+                } else {
+                    detectedCounts[t] = 0;
+                }
+            });
+
+            if (foundTables === 0 || totalRows === 0) {
+                showNotification("Format berkas cadangan tidak valid atau tidak memiliki data tabel yang dikenali!", "error");
+                resetRestoreForm();
+                return;
+            }
+
+            parsedBackupForRestore = {
+                meta: parsed,
+                tables: dataTables,
+                counts: detectedCounts,
+                totalRows: totalRows,
+                fileName: fileName
+            };
+
+            const boxPreview = document.getElementById('boxPreviewRestore');
+            const dropzone = document.getElementById('dropzoneRestore');
+            const btnRestore = document.getElementById('btnJalankanRestore');
+
+            if (boxPreview) boxPreview.classList.remove('hidden');
+            if (dropzone) dropzone.classList.add('hidden');
+            if (btnRestore) btnRestore.disabled = false;
+
+            const elFileName = document.getElementById('previewRestoreFileName');
+            const elFileSize = document.getElementById('previewRestoreFileSize');
+            const elFileDate = document.getElementById('previewRestoreDate');
+            const elFileVersion = document.getElementById('previewRestoreVersion');
+            const elTotalRows = document.getElementById('previewRestoreTotalRows');
+
+            if (elFileName) elFileName.innerText = fileName;
+            if (elFileSize) elFileSize.innerText = formatUkuranFile(fileSize);
+            if (elFileDate) {
+                elFileDate.innerText = parsed.backup_date
+                    ? new Date(parsed.backup_date).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })
+                    : 'Tidak tercatat';
+            }
+            if (elFileVersion) elFileVersion.innerText = parsed.version ? `v${parsed.version}` : 'Standar';
+            if (elTotalRows) elTotalRows.innerText = totalRows.toLocaleString('id-ID') + ' baris';
+
+            const containerTbl = document.getElementById('previewRestoreTableList');
+            if (containerTbl) {
+                const labels = {
+                    reseller: 'Data Reseller',
+                    barang: 'Master Barang',
+                    harga_khusus: 'Harga Khusus',
+                    transaksi: 'Riwayat Transaksi',
+                    transaksi_detail: 'Rincian Transaksi',
+                    buku_harian: 'Buku Harian',
+                    kasbon_harian: 'Kasbon Harian'
+                };
+                containerTbl.innerHTML = Object.entries(labels).map(([tbl, label]) => {
+                    const count = detectedCounts[tbl] || 0;
+                    return `
+                        <div class="flex justify-between items-center py-2 px-3 rounded-xl bg-white dark:bg-slate-700/60 border border-gray-100 dark:border-slate-600 shadow-2xs text-xs">
+                            <span class="text-gray-600 dark:text-slate-300 font-medium">${label}</span>
+                            <span class="font-bold ${count > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}">${count.toLocaleString('id-ID')} baris</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            if (window.feather) feather.replace();
+            showNotification("Berkas cadangan valid dan siap dipulihkan!", "success");
+        }
+
+        async function jalankanRestoreDatabase() {
+            if (!parsedBackupForRestore || !parsedBackupForRestore.tables) {
+                showNotification("Silakan pilih berkas cadangan .json terlebih dahulu!", "error");
+                return;
+            }
+            if (isRestoringDatabase) return;
+
+            const totalRows = parsedBackupForRestore.totalRows;
+            const confirmRestore = window.confirm(
+                `APAKAH ANDA YAKIN ingin memulihkan ${totalRows.toLocaleString('id-ID')} baris data ke Supabase Cloud?\n\n` +
+                `Data akan disinkronkan (upsert) ke tabel database. Pastikan koneksi internet stabil hingga proses selesai.`
+            );
+            if (!confirmRestore) return;
+
+            isRestoringDatabase = true;
+            const btnRestore = document.getElementById('btnJalankanRestore');
+            const originalBtnHtml = btnRestore ? btnRestore.innerHTML : '';
+            if (btnRestore) {
+                btnRestore.disabled = true;
+                btnRestore.innerHTML = `<i data-feather="loader" class="w-4 h-4 animate-spin"></i> Memulihkan Data...`;
+                if (window.feather) feather.replace();
+            }
+
+            const boxProgress = document.getElementById('boxProgressRestore');
+            const barProgress = document.getElementById('barProgressRestore');
+            const lblStep = document.getElementById('lblProgressRestoreStep');
+            const lblPercent = document.getElementById('lblProgressRestorePercent');
+
+            if (boxProgress) boxProgress.classList.remove('hidden');
+
+            bukaLoadingSimpan(false, 'Memulihkan Database Cloud...', 'Menyiapkan pemulihan data ke Supabase...', 'upload-cloud');
+
+            const updateProgress = (processed, total, stepText) => {
+                const percent = Math.min(100, Math.round((processed / total) * 100));
+                if (barProgress) barProgress.style.width = percent + '%';
+                if (lblPercent) lblPercent.innerText = percent + '%';
+                if (lblStep) lblStep.innerHTML = `<i data-feather="loader" class="w-3.5 h-3.5 animate-spin"></i> ${stepText}`;
+                bukaLoadingSimpan(false, 'Memulihkan Database Cloud...', `${stepText} (${percent}%)`, 'upload-cloud');
+                if (window.feather) feather.replace();
+            };
+
+            try {
+                // Urutan restore yang aman sesuai relasi foreign keys
+                const restorePlan = [
+                    { table: 'reseller', conflict: 'id', label: 'Data Reseller' },
+                    { table: 'barang', conflict: 'id', label: 'Master Barang' },
+                    { table: 'harga_khusus', conflict: 'reseller_id,barang_id', label: 'Harga Khusus' },
+                    { table: 'transaksi', conflict: 'id', label: 'Riwayat Transaksi' },
+                    { table: 'transaksi_detail', conflict: 'id', label: 'Rincian Transaksi' },
+                    { table: 'buku_harian', conflict: 'id', label: 'Buku Harian' },
+                    { table: 'kasbon_harian', conflict: 'id', label: 'Kasbon Harian' }
+                ];
+
+                let totalProcessed = 0;
+                const batchSize = 100;
+
+                for (const item of restorePlan) {
+                    const rows = parsedBackupForRestore.tables[item.table];
+                    if (rows && Array.isArray(rows) && rows.length > 0) {
+                        for (let i = 0; i < rows.length; i += batchSize) {
+                            const chunk = rows.slice(i, i + batchSize);
+                            const { error } = await supabaseClient
+                                .from(item.table)
+                                .upsert(chunk, { onConflict: item.conflict });
+
+                            if (error) {
+                                throw new Error(`Gagal pada tabel ${item.label}: ` + error.message);
+                            }
+
+                            totalProcessed += chunk.length;
+                            updateProgress(
+                                totalProcessed,
+                                totalRows,
+                                `Memulihkan ${item.label} (${Math.min(i + chunk.length, rows.length)}/${rows.length})...`
+                            );
+                        }
+                    }
+                }
+
+                updateProgress(totalRows, totalRows, 'Menyegarkan data sistem...');
+                bukaLoadingSimpan(false, 'Menyegarkan Sistem...', 'Menyinkronkan master data & riwayat...', 'refresh-cw');
+
+                await loadMasterData();
+                await fetchRiwayatData();
+                await fetchListHarian();
+                cekNotifikasiPending();
+                await hitungRingkasanDataBackup();
+
+                showNotification("Pemulihan database berhasil! Seluruh data transaksi dan master telah diperbarui.", "success");
+                resetRestoreForm();
+                switchBackupTab('backup');
+            } catch (err) {
+                console.error("Gagal restore database:", err);
+                showNotification("Gagal memulihkan database: " + err.message, "error");
+                if (lblStep) lblStep.innerText = 'Terjadi kesalahan: ' + err.message;
+            } finally {
+                await tutupLoadingSimpan();
+                isRestoringDatabase = false;
+                if (btnRestore) {
+                    btnRestore.disabled = false;
+                    btnRestore.innerHTML = originalBtnHtml;
+                    if (window.feather) feather.replace();
+                }
+            }
+        }
+
         window.onload = () => {
             initPrinterSettingsUI();
             loadMasterData().then(() => {
-                for (let i = 0; i < 8; i++) addRow('bahanBaku');
-                addRow('barangJadi'); addKasbonManual();
+                addRow('barangJadi');
+                addRow('barangJadi');
+                addRow('bahanBaku');
+                addRow('bahanBaku');
+                addKasbonManual();
             });
         };
     </script>
