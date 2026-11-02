@@ -3,8 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Catatan Harian - SBR Putra Food</title>
+
+    <!-- Mobile Device & Android Optimization Meta Tags -->
+    <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,7 +21,7 @@
         tailwind.config = { darkMode: 'class', }
     </script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -20,9 +29,30 @@
     <script src="https://unpkg.com/feather-icons"></script>
 
     <style>
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: contain;
+        }
+
+        /* Safe area support for Android gesture bar and camera notch */
+        .safe-bottom {
+            padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+        }
+
+        /* Touch interaction micro-animation */
+        .btn-touch,
+        .card-touch {
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s ease;
+        }
+
+        .btn-touch:active {
+            transform: scale(0.97);
         }
 
         input,
@@ -204,7 +234,7 @@
                 </button>
                 <div
                     class="mt-4 pt-3 border-t border-gray-100 dark:border-slate-700/60 flex justify-between items-center text-[10px] text-gray-400 dark:text-slate-500">
-                    <span class="font-medium">Versi 7.4 • SBR System</span>
+                    <span class="font-medium">Versi 7.9 • SBR System</span>
                     <button type="button" onclick="cekPembaruanAplikasiOtomatis(true)"
                         class="hover:text-blue-500 flex items-center gap-1 font-semibold transition active:scale-95">
                         <i data-feather="refresh-cw" class="w-3 h-3"></i> Cek Update
@@ -216,24 +246,26 @@
 
     <!-- ==================== AREA DASHBOARD ==================== -->
     <div id="dashboardArea" class="hidden pb-16">
-        <!-- Mobile Header -->
+        <!-- Responsive Header (Mobile Android & Desktop) -->
         <nav
-            class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-30 px-4 py-3 shadow-sm">
-            <div class="flex justify-between items-center max-w-md mx-auto">
-                <div class="flex items-center space-x-2.5">
+            class="bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 sticky top-0 z-30 px-3 sm:px-4 py-2.5 sm:py-3 shadow-xs">
+            <div class="flex justify-between items-center max-w-md md:max-w-4xl lg:max-w-6xl mx-auto">
+                <div class="flex items-center space-x-2.5 min-w-0">
                     <img src="https://raw.githubusercontent.com/sbrputrafood-sys/payress/677036e078cc7fa6c94788da8482dc53d883e2df/sbr_logo.png"
                         alt="SBR Logo"
-                        class="w-8 h-8 object-cover rounded-full border border-gray-200 dark:border-slate-600 bg-white">
-                    <div>
-                        <h1 class="font-bold text-xs leading-tight text-gray-900 dark:text-slate-100">Catatan Harian
-                        </h1>
+                        class="w-8 h-8 sm:w-9 sm:h-9 object-cover rounded-full border border-gray-200 dark:border-slate-600 bg-white shrink-0 shadow-xs">
+                    <div class="min-w-0">
+                        <h1
+                            class="font-extrabold text-xs sm:text-sm leading-tight text-gray-900 dark:text-slate-100 truncate">
+                            Catatan Harian</h1>
                         <p id="labelRoleDisplay"
-                            class="text-[9px] text-blue-500 font-bold bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded inline-block mt-0.5">
+                            class="text-[9px] text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/40 px-1.5 py-0.5 rounded-md inline-block mt-0.5 border border-blue-100 dark:border-blue-800/50">
                             SBR Putra Food</p>
                     </div>
                 </div>
 
-                <div class="flex items-center space-x-1.5">
+                <div class="flex items-center space-x-1 sm:space-x-1.5 shrink-0">
+                    <!-- Status Connection Badge -->
                     <div class="flex items-center space-x-1 bg-yellow-50 dark:bg-yellow-900/30 px-2 py-1 rounded-full border border-yellow-100 dark:border-yellow-800/50 cursor-pointer active:scale-95 transition"
                         id="status-connection" onclick="cekPembaruanAplikasiOtomatis(true)"
                         title="Ketuk untuk periksa pembaruan">
@@ -243,296 +275,459 @@
                         <span id="text-connection"
                             class="text-[9px] font-semibold text-yellow-700 dark:text-yellow-500">Loading</span>
                     </div>
+
+                    <!-- Refresh Button (selalu tampil) -->
                     <button onclick="cekPembaruanAplikasiOtomatis(true)" title="Periksa Pembaruan Sistem"
-                        class="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/40 transition shadow-sm border border-blue-100 dark:border-blue-800/50 active:scale-95"><i
-                            data-feather="refresh-cw" class="w-4 h-4"></i></button>
-                    <button id="btnAdminMasterMenu" onclick="openFormModal('modalMasterAdmin')"
-                        class="hidden p-2 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 hover:bg-purple-100 transition shadow-sm border border-purple-100 dark:border-purple-800/50"><i
-                            data-feather="settings" class="w-4 h-4"></i></button>
-                    <button id="btnAdminResetMenu" onclick="bukaModalResetAdmin()"
-                        class="hidden p-2 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 hover:bg-orange-100 transition"><i
-                            data-feather="user-check" class="w-4 h-4"></i></button>
-                    <button onclick="toggleTheme()"
-                        class="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 transition"><i
-                            data-feather="moon" id="iconMoon" class="w-4 h-4"></i><i data-feather="sun" id="iconSun"
-                            class="w-4 h-4 hidden"></i></button>
-                    <button onclick="openFormModal('modalGantiPin')"
-                        class="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 transition"><i
-                            data-feather="key" class="w-4 h-4"></i></button>
-                    <button onclick="prosesLogout()"
-                        class="p-2 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-500 hover:bg-red-100 transition"><i
-                            data-feather="power" class="w-4 h-4"></i></button>
+                        class="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/40 transition shadow-xs border border-blue-100 dark:border-blue-800/50 active:scale-95">
+                        <i data-feather="refresh-cw" class="w-4 h-4"></i>
+                    </button>
+
+                    <!-- Theme Toggle (selalu tampil) -->
+                    <button onclick="toggleTheme()" title="Mode Gelap/Terang"
+                        class="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition active:scale-95">
+                        <i data-feather="moon" id="iconMoon" class="w-4 h-4"></i>
+                        <i data-feather="sun" id="iconSun" class="w-4 h-4 hidden"></i>
+                    </button>
+
+                    <!-- DESKTOP / TABLET ACTIONS (tampil di layar lebar) -->
+                    <div class="hidden md:flex items-center space-x-1.5">
+                        <button id="btnAdminMasterMenu" onclick="openFormModal('modalMasterAdmin')"
+                            class="hidden p-2 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 hover:bg-purple-100 transition shadow-xs border border-purple-100 dark:border-purple-800/50 active:scale-95"
+                            title="Master Data & Operasional">
+                            <i data-feather="settings" class="w-4 h-4"></i>
+                        </button>
+                        <button id="btnAdminResetMenu" onclick="bukaModalResetAdmin()"
+                            class="hidden p-2 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 hover:bg-orange-100 transition shadow-xs border border-orange-100 dark:border-orange-800/50 active:scale-95"
+                            title="Pengguna & Reset PIN">
+                            <i data-feather="user-check" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="openFormModal('modalGantiPin')" title="Ganti PIN Saya"
+                            class="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-200 transition active:scale-95">
+                            <i data-feather="key" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="prosesLogout()" title="Keluar Akun"
+                            class="p-2 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-500 hover:bg-red-100 transition active:scale-95">
+                            <i data-feather="power" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- MOBILE ACTION SHEET TRIGGER (Tampil khusus di HP Android) -->
+                    <button onclick="openMobileMenuSheet()" title="Menu Akun & Sistem"
+                        class="md:hidden p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 hover:bg-gray-200 dark:hover:bg-slate-600 transition active:scale-95 border border-gray-200/80 dark:border-slate-600">
+                        <i data-feather="more-vertical" class="w-4 h-4"></i>
+                    </button>
                 </div>
             </div>
         </nav>
 
-        <!-- Main Content -->
-        <main class="max-w-md mx-auto px-3 pt-4 space-y-4">
+        <!-- Main Content (Multi-Device Responsive) -->
+        <main
+            class="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-3 md:pt-6 space-y-4 md:space-y-6">
 
             <!-- TAB NAVIGASI: BARANG VS KASBON -->
-            <div class="flex p-1 bg-gray-200/80 dark:bg-slate-800 rounded-xl">
+            <div
+                class="flex p-1 bg-gray-200/80 dark:bg-slate-800 rounded-2xl max-w-md md:max-w-lg mx-auto shadow-inner border border-gray-300/40 dark:border-slate-700">
                 <button onclick="switchTab('barang')" id="tabBarang"
-                    class="flex-1 text-xs font-black py-2.5 rounded-lg bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400 transition flex items-center justify-center gap-1.5 border border-transparent dark:border-slate-600">
+                    class="flex-1 text-xs font-black py-2.5 rounded-xl bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400 transition flex items-center justify-center gap-1.5 border border-transparent dark:border-slate-600 active:scale-[0.98]">
                     <i data-feather="package" class="w-3.5 h-3.5"></i> Barang
                 </button>
                 <button onclick="switchTab('kasbon')" id="tabKasbon"
-                    class="flex-1 text-xs font-black py-2.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 transition flex items-center justify-center gap-1.5 border border-transparent">
+                    class="flex-1 text-xs font-black py-2.5 rounded-xl text-gray-500 hover:text-gray-700 dark:text-gray-400 transition flex items-center justify-center gap-1.5 border border-transparent active:scale-[0.98]">
                     <i data-feather="dollar-sign" class="w-3.5 h-3.5"></i> Kasbon
                 </button>
             </div>
 
             <!-- ================= AREA BARANG ================= -->
-            <div id="areaBarang" class="space-y-4 transition-all duration-300">
-
-                <!-- ================= RINGKASAN TOTAL BAHAN & SETOR (Admin & Reseller) ================= -->
-                <div id="cardSummaryTotal"
-                    class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 hidden">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="min-w-0">
-                            <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i
-                                    data-feather="bar-chart-2" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Ringkasan
-                                Total Bahan &amp; Setor</h3>
-                            <p id="summaryScopeLabel"
-                                class="text-[10px] text-gray-500 dark:text-slate-400 font-semibold mt-0.5 truncate"></p>
-                        </div>
-                        <button onclick="toggleSummaryCard()" class="text-gray-400 hover:text-blue-500 p-1 shrink-0"
-                            aria-label="Buka/tutup ringkasan">
-                            <i data-feather="chevron-up" id="iconSummaryChevron"
-                                class="w-4 h-4 transition-transform"></i>
-                        </button>
-                    </div>
-
-                    <div id="summaryBody" class="space-y-2.5">
-                        <!-- Chip Periode -->
-                        <div id="summaryPeriodChips" class="flex gap-1.5 overflow-x-auto custom-scroll pb-0.5">
-                            <button data-period="today" onclick="setSummaryPeriod('today')"
-                                class="summary-chip text-[10px] font-black px-2.5 py-1.5 rounded-lg border shrink-0 transition bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 border-transparent">Hari
-                                ini</button>
-                            <button data-period="all" onclick="setSummaryPeriod('all')"
-                                class="summary-chip text-[10px] font-black px-2.5 py-1.5 rounded-lg border shrink-0 transition bg-blue-600 text-white border-blue-600">Belum
-                                lunas</button>
-                        </div>
-
-                        <!-- Label Rentang Periode -->
-                        <p id="summaryRangeLabel"
-                            class="text-[10px] font-black text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/50 rounded-lg px-2 py-1.5 text-center">
-                        </p>
-
-                        <!-- Dua Kolom: Pengambilan Bahan & Setoran Barang -->
-                        <div class="grid grid-cols-2 gap-2" id="summaryListWrap">
-                            <div
-                                class="bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl p-2.5 min-w-0">
-                                <div
-                                    class="flex items-center gap-1.5 mb-1.5 pb-1.5 border-b border-gray-200 dark:border-slate-700">
-                                    <span
-                                        class="w-5 h-5 rounded-md bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
-                                        <i data-feather="package" class="w-3 h-3"></i></span>
-                                    <span
-                                        class="text-[9px] font-black text-gray-500 dark:text-slate-400 uppercase tracking-wider truncate">Pengambilan
-                                        Bahan</span>
+            <div id="areaBarang" class="transition-all duration-300">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 items-start">
+                    <!-- Kolom Kiri: Ringkasan Total & Form Input -->
+                    <div class="space-y-4 lg:col-span-5">
+                        <!-- ================= RINGKASAN TOTAL BAHAN & SETOR (Admin & Reseller) ================= -->
+                        <div id="cardSummaryTotal"
+                            class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 hidden">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="min-w-0">
+                                    <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i
+                                            data-feather="bar-chart-2" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i>
+                                        Ringkasan
+                                        Total Bahan &amp; Setor</h3>
+                                    <p id="summaryScopeLabel"
+                                        class="text-[10px] text-gray-500 dark:text-slate-400 font-semibold mt-0.5 truncate">
+                                    </p>
                                 </div>
-                                <div id="summaryListBahan"
-                                    class="space-y-1 max-h-[220px] overflow-y-auto custom-scroll pr-0.5">
-                                    <div class="flex justify-center py-3"><i data-feather="loader"
-                                            class="w-4 h-4 animate-spin text-blue-500"></i></div>
+                                <button onclick="toggleSummaryCard()"
+                                    class="text-gray-400 hover:text-blue-500 p-1 shrink-0"
+                                    aria-label="Buka/tutup ringkasan">
+                                    <i data-feather="chevron-up" id="iconSummaryChevron"
+                                        class="w-4 h-4 transition-transform"></i>
+                                </button>
+                            </div>
+
+                            <div id="summaryBody" class="space-y-2.5">
+                                <!-- Chip Periode -->
+                                <div id="summaryPeriodChips" class="flex gap-1.5 overflow-x-auto custom-scroll pb-0.5">
+                                    <button data-period="today" onclick="setSummaryPeriod('today')"
+                                        class="summary-chip text-[10px] font-black px-2.5 py-1.5 rounded-lg border shrink-0 transition bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 border-transparent">Hari
+                                        ini</button>
+                                    <button data-period="all" onclick="setSummaryPeriod('all')"
+                                        class="summary-chip text-[10px] font-black px-2.5 py-1.5 rounded-lg border shrink-0 transition bg-blue-600 text-white border-blue-600">Belum
+                                        lunas</button>
+                                </div>
+
+                                <!-- Label Rentang Periode -->
+                                <p id="summaryRangeLabel"
+                                    class="text-[10px] font-black text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/50 rounded-lg px-2 py-1.5 text-center">
+                                </p>
+
+                                <!-- Dua Kolom: Pengambilan Bahan & Setoran Barang -->
+                                <div class="grid grid-cols-2 gap-2" id="summaryListWrap">
+                                    <div
+                                        class="bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl p-2.5 min-w-0">
+                                        <div
+                                            class="flex items-center gap-1.5 mb-1.5 pb-1.5 border-b border-gray-200 dark:border-slate-700">
+                                            <span
+                                                class="w-5 h-5 rounded-md bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                                                <i data-feather="package" class="w-3 h-3"></i></span>
+                                            <span
+                                                class="text-[9px] font-black text-gray-500 dark:text-slate-400 uppercase tracking-wider truncate">Pengambilan
+                                                Bahan</span>
+                                        </div>
+                                        <div id="summaryListBahan"
+                                            class="space-y-1 max-h-[220px] overflow-y-auto custom-scroll pr-0.5">
+                                            <div class="flex justify-center py-3"><i data-feather="loader"
+                                                    class="w-4 h-4 animate-spin text-blue-500"></i></div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl p-2.5 min-w-0">
+                                        <div
+                                            class="flex items-center gap-1.5 mb-1.5 pb-1.5 border-b border-gray-200 dark:border-slate-700">
+                                            <span
+                                                class="w-5 h-5 rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                                <i data-feather="truck" class="w-3 h-3"></i></span>
+                                            <span
+                                                class="text-[9px] font-black text-gray-500 dark:text-slate-400 uppercase tracking-wider truncate">Setoran
+                                                Barang</span>
+                                        </div>
+                                        <div id="summaryListSetor"
+                                            class="space-y-1 max-h-[220px] overflow-y-auto custom-scroll pr-0.5">
+                                            <div class="flex justify-center py-3"><i data-feather="loader"
+                                                    class="w-4 h-4 animate-spin text-blue-500"></i></div>
+                                        </div>
+                                        <div id="summaryStatusWrap"
+                                            class="mt-2 pt-2 border-t border-gray-200 dark:border-slate-700">
+                                            <div id="summaryStatusSetor"></div>
+                                            <!-- Catatan admin: hanya disentuh renderSummaryNote, tidak pernah oleh renderSummaryBahanSetor -->
+                                            <div id="summaryNoteBox" class="hidden mt-2"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Rincian per Agen (Admin Only) -->
+                                <div id="summaryAgenBreakdown" class="hidden"></div>
+                            </div>
+                        </div>
+
+                        <!-- Input Catatan Harian Form -->
+                        <div
+                            class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 relative overflow-hidden">
+                            <h2 class="text-xs font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center"><i
+                                    data-feather="edit-3" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Input Catatan
+                                Harian
+                            </h2>
+
+                            <div class="grid grid-cols-2 gap-2.5 mb-3">
+                                <div>
+                                    <label
+                                        class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Pilih
+                                        Tanggal</label>
+                                    <input type="date" id="inputTglHarian"
+                                        class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Agen
+                                        /
+                                        Reseller</label>
+                                    <select id="inputResellerHarian"
+                                        class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
+                                        <option value="">Pilih...</option>
+                                    </select>
                                 </div>
                             </div>
-                            <div
-                                class="bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl p-2.5 min-w-0">
-                                <div
-                                    class="flex items-center gap-1.5 mb-1.5 pb-1.5 border-b border-gray-200 dark:border-slate-700">
-                                    <span
-                                        class="w-5 h-5 rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                                        <i data-feather="truck" class="w-3 h-3"></i></span>
-                                    <span
-                                        class="text-[9px] font-black text-gray-500 dark:text-slate-400 uppercase tracking-wider truncate">Setoran
-                                        Barang</span>
+
+                            <div class="grid grid-cols-2 gap-2.5 mb-3">
+                                <div>
+                                    <label
+                                        class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Input
+                                        By</label>
+                                    <input type="text" id="inputByPegawai"
+                                        class="w-full text-xs p-2 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-semibold transition-all">
                                 </div>
-                                <div id="summaryListSetor"
-                                    class="space-y-1 max-h-[220px] overflow-y-auto custom-scroll pr-0.5">
-                                    <div class="flex justify-center py-3"><i data-feather="loader"
-                                            class="w-4 h-4 animate-spin text-blue-500"></i></div>
-                                </div>
-                                <div id="summaryStatusWrap"
-                                    class="mt-2 pt-2 border-t border-gray-200 dark:border-slate-700">
-                                    <div id="summaryStatusSetor"></div>
-                                    <!-- Catatan admin: hanya disentuh renderSummaryNote, tidak pernah oleh renderSummaryBahanSetor -->
-                                    <div id="summaryNoteBox" class="hidden mt-2"></div>
+                                <div>
+                                    <label
+                                        class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Fokus
+                                        Tipe
+                                        Input</label>
+                                    <select id="inputTipeHarian" onchange="updateOpsiHarian()"
+                                        class="w-full text-[11px] p-2 rounded-xl border border-blue-200 dark:border-slate-600 bg-blue-50 dark:bg-slate-900 text-blue-700 dark:text-blue-400 font-semibold outline-none focus:border-blue-500">
+                                        <option value="semua">Tampilkan Semua</option>
+                                        <option value="jadi">📦 Barang Jadi</option>
+                                        <option value="bahan">🛍️ Bahan Baku</option>
+                                    </select>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Rincian per Agen (Admin Only) -->
-                        <div id="summaryAgenBreakdown" class="hidden"></div>
-                    </div>
-                </div>
+                            <div class="space-y-2 mb-3 max-h-[50vh] overflow-y-auto custom-scroll pr-1"
+                                id="containerHarianRows"></div>
 
-                <div
-                    class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 relative overflow-hidden">
-                    <h2 class="text-xs font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center"><i
-                            data-feather="edit-3" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Input Catatan Harian
-                    </h2>
+                            <div class="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-slate-700">
+                                <!-- Tombol Baris Dirampingkan & Dibuat Sejajar (Flex Row) -->
+                                <button onclick="addRowHarian()"
+                                    class="bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 text-blue-600 dark:text-blue-300 text-xs font-bold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1 border border-blue-200 dark:border-slate-600 shrink-0 active:scale-95">
+                                    <i data-feather="plus" class="w-3.5 h-3.5"></i> <span>Baris</span>
+                                </button>
 
-                    <div class="grid grid-cols-2 gap-2.5 mb-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Pilih
-                                Tanggal</label>
-                            <input type="date" id="inputTglHarian"
-                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Agen /
-                                Reseller</label>
-                            <select id="inputResellerHarian"
-                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-blue-500">
-                                <option value="">Pilih...</option>
-                            </select>
+                                <!-- Tombol Simpan Disesuaikan Tinggi Padding-nya -->
+                                <button id="btnSimpanHarian" onclick="simpanCatatanHarian()"
+                                    class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition flex items-center justify-center active:scale-[0.98]">
+                                    <i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Catatan
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 mb-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Input
-                                By</label>
-                            <input type="text" id="inputByPegawai"
-                                class="w-full text-xs p-2 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-semibold transition-all">
+                    <!-- Kolom Kanan: Riwayat Catatan Harian (Belum Lunas) -->
+                    <div class="space-y-4 lg:col-span-7">
+                        <div
+                            class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i
+                                        data-feather="archive" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Daftar
+                                    Catatan
+                                    (Belum Lunas)</h3>
+                                <div class="flex gap-3">
+                                    <button onclick="toggleFilterDraft()"
+                                        class="text-gray-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1 active:scale-95"><i
+                                            data-feather="filter" class="w-3 h-3"></i> Filter</button>
+                                    <button onclick="refreshBarangData()"
+                                        class="text-blue-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1 active:scale-95"><i
+                                            data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan</button>
+                                </div>
+                            </div>
+
+                            <div id="containerFilterDraft"
+                                class="hidden bg-gray-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-700 space-y-2 mb-3">
+                                <div class="flex gap-2">
+                                    <input type="date" id="filterTglAwal"
+                                        class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400"
+                                        onchange="renderFilteredDrafts()">
+                                    <input type="date" id="filterTglAkhir"
+                                        class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400"
+                                        onchange="renderFilteredDrafts()">
+                                </div>
+                                <select id="filterDraftAgen"
+                                    class="w-full text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400"
+                                    onchange="renderFilteredDrafts()">
+                                    <option value="">Semua Agen</option>
+                                </select>
+                            </div>
+
+                            <div class="max-h-[340px] lg:max-h-[620px] overflow-y-auto custom-scroll pr-1 space-y-2"
+                                id="listCatatanHarian">
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Fokus Tipe
-                                Input</label>
-                            <select id="inputTipeHarian" onchange="updateOpsiHarian()"
-                                class="w-full text-[11px] p-2 rounded-xl border border-blue-200 dark:border-slate-600 bg-blue-50 dark:bg-slate-900 text-blue-700 dark:text-blue-400 font-semibold outline-none focus:border-blue-500">
-                                <option value="semua">Tampilkan Semua</option>
-                                <option value="jadi">📦 Barang Jadi</option>
-                                <option value="bahan">🛍️ Bahan Baku</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2 mb-3 max-h-[50vh] overflow-y-auto custom-scroll pr-1"
-                        id="containerHarianRows"></div>
-
-                    <div class="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-slate-700">
-                        <!-- Tombol Baris Dirampingkan & Dibuat Sejajar (Flex Row) -->
-                        <button onclick="addRowHarian()"
-                            class="bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 text-blue-600 dark:text-blue-300 text-xs font-bold px-3 py-2 rounded-xl shadow-sm transition flex items-center gap-1 border border-blue-200 dark:border-slate-600 shrink-0">
-                            <i data-feather="plus" class="w-3.5 h-3.5"></i> <span>Baris</span>
-                        </button>
-
-                        <!-- Tombol Simpan Disesuaikan Tinggi Padding-nya -->
-                        <button id="btnSimpanHarian" onclick="simpanCatatanHarian()"
-                            class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition flex items-center justify-center">
-                            <i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Catatan
-                        </button>
-                    </div>
-                </div>
-
-                <div
-                    class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center"><i
-                                data-feather="archive" class="w-3.5 h-3.5 mr-1.5 text-blue-500"></i> Daftar Catatan
-                            (Belum Lunas)</h3>
-                        <div class="flex gap-3">
-                            <button onclick="toggleFilterDraft()"
-                                class="text-gray-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1"><i
-                                    data-feather="filter" class="w-3 h-3"></i> Filter</button>
-                            <button onclick="refreshBarangData()"
-                                class="text-blue-500 hover:text-blue-600 text-[11px] font-bold flex items-center gap-1"><i
-                                    data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan</button>
-                        </div>
-                    </div>
-
-                    <div id="containerFilterDraft"
-                        class="hidden bg-gray-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-gray-100 dark:border-slate-700 space-y-2 mb-3">
-                        <div class="flex gap-2">
-                            <input type="date" id="filterTglAwal"
-                                class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400"
-                                onchange="renderFilteredDrafts()">
-                            <input type="date" id="filterTglAkhir"
-                                class="w-1/2 text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400"
-                                onchange="renderFilteredDrafts()">
-                        </div>
-                        <select id="filterDraftAgen"
-                            class="w-full text-[10px] p-1.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 outline-none focus:border-blue-400"
-                            onchange="renderFilteredDrafts()">
-                            <option value="">Semua Agen</option>
-                        </select>
-                    </div>
-
-                    <div class="max-h-[320px] overflow-y-auto custom-scroll pr-1 space-y-2" id="listCatatanHarian">
                     </div>
                 </div>
             </div>
 
             <!-- ================= AREA KASBON ================= -->
-            <div id="areaKasbon" class="hidden space-y-4 transition-all duration-300">
-                <!-- Tambahkan id="formKasbonCard" di sini -->
-                <div id="formKasbonCard"
-                    class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 relative overflow-hidden">
-                    <h2 class="text-xs font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center">
-                        <i data-feather="dollar-sign" class="w-3.5 h-3.5 mr-1.5 text-emerald-500"></i> Form Pengambilan
-                        Kasbon
-                    </h2>
+            <div id="areaKasbon" class="hidden transition-all duration-300">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 items-start">
+                    <!-- Kolom Kiri: Form Kasbon -->
+                    <div class="space-y-4 lg:col-span-5">
+                        <div id="formKasbonCard"
+                            class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700 relative overflow-hidden">
+                            <h2 class="text-xs font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center">
+                                <i data-feather="dollar-sign" class="w-3.5 h-3.5 mr-1.5 text-emerald-500"></i> Form
+                                Pengambilan
+                                Kasbon
+                            </h2>
 
-                    <div class="grid grid-cols-2 gap-2.5 mb-3">
-                        <div>
-                            <label
-                                class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Tanggal</label>
-                            <input type="date" id="inputTglKasbon"
-                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
+                            <div class="grid grid-cols-2 gap-2.5 mb-3">
+                                <div>
+                                    <label
+                                        class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Tanggal</label>
+                                    <input type="date" id="inputTglKasbon"
+                                        class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Agen
+                                        /
+                                        Reseller</label>
+                                    <select id="inputResellerKasbon"
+                                        class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
+                                        <option value="">Pilih...</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label
+                                    class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Nominal
+                                    (Rupiah)</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-2.5 text-xs font-bold text-gray-400">Rp</span>
+                                    <input type="text" id="inputNominalKasbon" oninput="formatRupiah(this)"
+                                        inputmode="numeric" placeholder="Contoh: 1.500.000"
+                                        class="w-full text-sm font-bold pl-8 p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500 text-emerald-600 dark:text-emerald-400">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label
+                                    class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Keterangan
+                                    /
+                                    Tujuan (Wajib)</label>
+                                <input type="text" id="inputKetKasbon" placeholder="Misal: kasbon mingguan, dll"
+                                    class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
+                            </div>
+
+                            <button id="btnSimpanKasbon" onclick="simpanCatatanKasbon()"
+                                class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-3 rounded-xl flex justify-center items-center shadow-sm active:scale-[0.98]">
+                                <i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Kasbon
+                            </button>
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Agen /
-                                Reseller</label>
-                            <select id="inputResellerKasbon"
-                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
-                                <option value="">Pilih...</option>
-                            </select>
+                    </div>
+
+                    <!-- Kolom Kanan: Riwayat Kasbon -->
+                    <div class="space-y-4 lg:col-span-7">
+                        <div
+                            class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center">
+                                    <i data-feather="file-text" class="w-3.5 h-3.5 mr-1.5 text-emerald-500"></i> Draft
+                                    Kasbon
+                                    (Belum Lunas)
+                                </h3>
+                                <button onclick="fetchListKasbon()"
+                                    class="text-emerald-500 hover:text-emerald-600 text-[11px] font-bold flex items-center gap-1 active:scale-95"><i
+                                        data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan</button>
+                            </div>
+                            <div class="max-h-[340px] lg:max-h-[620px] overflow-y-auto custom-scroll pr-1 space-y-2"
+                                id="listCatatanKasbon">
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Nominal
-                            (Rupiah)</label>
-                        <div class="relative">
-                            <span class="absolute left-3 top-2.5 text-xs font-bold text-gray-400">Rp</span>
-                            <input type="text" id="inputNominalKasbon" oninput="formatRupiah(this)" inputmode="numeric"
-                                placeholder="Contoh: 1.500.000"
-                                class="w-full text-sm font-bold pl-8 p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500 text-emerald-600 dark:text-emerald-400">
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-[10px] font-bold text-gray-500 dark:text-slate-400 mb-1">Keterangan /
-                            Tujuan (Wajib)</label>
-                        <input type="text" id="inputKetKasbon" placeholder="Misal: kasbon mingguan, dll"
-                            class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-emerald-500">
-                    </div>
-
-                    <button id="btnSimpanKasbon" onclick="simpanCatatanKasbon()"
-                        class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-3 rounded-xl flex justify-center items-center shadow-sm">
-                        <i data-feather="save" class="w-3.5 h-3.5 mr-1.5"></i> Simpan Kasbon
-                    </button>
-                </div>
-
-                <div
-                    class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-slate-700">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center">
-                            <i data-feather="file-text" class="w-3.5 h-3.5 mr-1.5 text-emerald-500"></i> Draft Kasbon
-                            (Belum Lunas)
-                        </h3>
-                        <button onclick="fetchListKasbon()"
-                            class="text-emerald-500 hover:text-emerald-600 text-[11px] font-bold flex items-center gap-1"><i
-                                data-feather="refresh-cw" class="w-3 h-3"></i> Segarkan</button>
-                    </div>
-                    <div class="max-h-[320px] overflow-y-auto custom-scroll pr-1 space-y-2" id="listCatatanKasbon">
                     </div>
                 </div>
             </div>
 
         </main>
+    </div>
+
+    <!-- ==================== ANDROID MOBILE ACTION SHEET ==================== -->
+    <div id="modalMobileMenu" class="fixed inset-0 z-[120] hidden">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            onclick="closeFormModal('modalMobileMenu')"></div>
+        <!-- Sheet Container -->
+        <div
+            class="fixed inset-x-0 bottom-0 z-10 bg-white dark:bg-slate-800 rounded-t-3xl p-4 sm:p-5 shadow-2xl border-t border-gray-200 dark:border-slate-700 max-w-lg mx-auto transform transition-transform">
+            <!-- Drag Handle Bar -->
+            <div class="w-12 h-1 bg-gray-300 dark:bg-slate-600 rounded-full mx-auto mb-3.5"></div>
+
+            <!-- Header Info Pengguna -->
+            <div
+                class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-900/60 rounded-2xl border border-gray-100 dark:border-slate-700/60 mb-3.5">
+                <div
+                    class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 font-bold flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-700">
+                    <i data-feather="user" class="w-5 h-5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <h3 id="mobileMenuNamaUser" class="text-xs font-bold text-gray-900 dark:text-slate-100 truncate">
+                        Nama Pengguna</h3>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span id="mobileMenuRoleBadge"
+                            class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 uppercase">ROLE</span>
+                        <span class="text-[10px] text-gray-400 dark:text-slate-500">SBR System v7.4</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List Menu Opsi -->
+            <div class="space-y-1.5 text-xs font-semibold">
+                <!-- Menu Admin -->
+                <button id="btnMobileAdminMaster"
+                    onclick="closeFormModal('modalMobileMenu'); openFormModal('modalMasterAdmin')"
+                    class="hidden w-full flex items-center gap-3 p-3 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-950/30 text-purple-700 dark:text-purple-300 transition text-left border border-transparent hover:border-purple-200 active:scale-[0.98]">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center shrink-0">
+                        <i data-feather="settings" class="w-4 h-4 text-purple-600"></i>
+                    </span>
+                    <div>
+                        <div class="text-xs font-bold">Master Admin &amp; Operasional</div>
+                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Katalog barang, kunci
+                            tanggal &amp; struk</div>
+                    </div>
+                </button>
+
+                <button id="btnMobileAdminReset" onclick="closeFormModal('modalMobileMenu'); bukaModalResetAdmin()"
+                    class="hidden w-full flex items-center gap-3 p-3 rounded-xl hover:bg-orange-50 dark:hover:bg-orange-950/30 text-orange-700 dark:text-orange-300 transition text-left border border-transparent hover:border-orange-200 active:scale-[0.98]">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center shrink-0">
+                        <i data-feather="user-check" class="w-4 h-4 text-orange-600"></i>
+                    </span>
+                    <div>
+                        <div class="text-xs font-bold">Pengguna &amp; Reset PIN Pegawai</div>
+                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Atur ulang PIN akun
+                            karyawan/reseller</div>
+                    </div>
+                </button>
+
+                <!-- Menu Umum -->
+                <button onclick="closeFormModal('modalMobileMenu'); openFormModal('modalGantiPin')"
+                    class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950/30 text-gray-700 dark:text-slate-200 transition text-left border border-transparent hover:border-blue-200 active:scale-[0.98]">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
+                        <i data-feather="key" class="w-4 h-4 text-blue-600"></i>
+                    </span>
+                    <div>
+                        <div class="text-xs font-bold">Ganti PIN Saya</div>
+                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Perbarui 6 angka PIN
+                            login akun Anda</div>
+                    </div>
+                </button>
+
+                <button onclick="closeFormModal('modalMobileMenu'); cekPembaruanAplikasiOtomatis(true)"
+                    class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-gray-700 dark:text-slate-200 transition text-left border border-transparent hover:border-emerald-200 active:scale-[0.98]">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
+                        <i data-feather="refresh-cw" class="w-4 h-4 text-emerald-600"></i>
+                    </span>
+                    <div>
+                        <div class="text-xs font-bold">Periksa Pembaruan Sistem</div>
+                        <div class="text-[10px] text-gray-400 dark:text-slate-400 font-normal">Sinkronkan patch &amp;
+                            perbaikan terbaru</div>
+                    </div>
+                </button>
+
+                <div class="pt-2 border-t border-gray-100 dark:border-slate-700/60">
+                    <button onclick="closeFormModal('modalMobileMenu'); prosesLogout()"
+                        class="w-full flex items-center gap-3 p-3 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 transition text-left border border-red-200/60 dark:border-red-800/50 active:scale-[0.98]">
+                        <span
+                            class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/50 flex items-center justify-center shrink-0">
+                            <i data-feather="power" class="w-4 h-4 text-red-600"></i>
+                        </span>
+                        <div>
+                            <div class="text-xs font-bold">Keluar Akun</div>
+                            <div class="text-[10px] text-red-400 dark:text-red-300 font-normal">Logout dari perangkat
+                                ini</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- ==================== MODAL-MODAL LENGKAP ==================== -->
@@ -733,7 +928,17 @@
 
                     <!-- Filter & List Barang -->
                     <div
-                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 space-y-2">
+                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 space-y-2.5">
+                        <div
+                            class="p-2.5 bg-amber-50/80 dark:bg-amber-950/30 rounded-xl border border-amber-200/80 dark:border-amber-800/50 flex items-start gap-2 text-[10px] text-amber-900 dark:text-amber-300 leading-relaxed">
+                            <i data-feather="shield" class="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5"></i>
+                            <div>
+                                <b>Kontrol Akses Karyawan:</b> Klik ikon <b>Gembok</b> untuk mengunci barang (contoh:
+                                stok harga lama) agar <b>tidak bisa diinput karyawan</b>. Transaksi lama & pembukuan
+                                utama tetap aman.
+                            </div>
+                        </div>
+
                         <div class="flex p-0.5 bg-gray-100 dark:bg-slate-700 rounded-xl text-[10px] font-bold">
                             <button onclick="setFilterMasterBarang('semua')" id="btnFilterBarangSemua"
                                 class="flex-1 py-1.5 rounded-lg bg-white dark:bg-slate-600 shadow-sm text-blue-600 dark:text-blue-300 transition">Semua</button>
@@ -743,6 +948,9 @@
                             <button onclick="setFilterMasterBarang('bahan')" id="btnFilterBarangBahan"
                                 class="flex-1 py-1.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-300 transition">Bahan
                                 [BHN]</button>
+                            <button onclick="setFilterMasterBarang('terkunci')" id="btnFilterBarangTerkunci"
+                                class="flex-1 py-1.5 rounded-lg text-rose-500 hover:text-rose-700 dark:text-rose-400 transition flex items-center justify-center gap-1"><i
+                                    data-feather="lock" class="w-2.5 h-2.5"></i> Terkunci</button>
                         </div>
                         <input type="text" id="searchMasterBarang"
                             oninput="renderMasterBarangList(currentBarangFilter, this.value)"
@@ -759,27 +967,81 @@
                 <div id="masterSubOperasional" class="hidden space-y-3">
                     <!-- Kartu Kunci Tanggal -->
                     <div
-                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-amber-200/80 dark:border-slate-700 space-y-2.5">
+                        class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl shadow-sm border border-amber-200/80 dark:border-slate-700 space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold text-gray-800 dark:text-slate-100 flex items-center gap-1.5">
                                 <i data-feather="lock" class="w-3.5 h-3.5 text-amber-500"></i> Kunci Tanggal (Tutup
                                 Buku)
                             </span>
                             <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="checkLockDateActive" class="sr-only peer">
+                                <input type="checkbox" id="checkLockDateActive" onchange="toggleLockDateOptions()"
+                                    class="sr-only peer">
                                 <div
                                     class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500">
                                 </div>
                             </label>
                         </div>
-                        <p class="text-[10px] text-gray-500 dark:text-slate-400 leading-relaxed">Kunci semua tanggal
-                            catatan sebelum tanggal ini agar staf tidak bisa mengubah data lama yang sudah direkap.</p>
-                        <div>
-                            <label
-                                class="block text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase mb-1">Kunci
-                                Tanggal Sebelum:</label>
-                            <input type="date" id="inputLockDateBefore"
-                                class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 dark:text-white outline-none">
+                        <p class="text-[10px] text-gray-500 dark:text-slate-400 leading-relaxed">
+                            Kunci input dan perubahan tanggal catatan lama agar staf tidak dapat mengubah rekap. Khusus
+                            Admin tetap bebas memilih tanggal kapan saja.
+                        </p>
+
+                        <!-- Pilihan Detail Kunci Tanggal -->
+                        <div id="sectionLockDateOptions"
+                            class="space-y-2.5 pt-2 border-t border-gray-100 dark:border-slate-700/60 transition-all">
+                            <!-- Pilihan Mode -->
+                            <div>
+                                <label
+                                    class="block text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase mb-1.5">Metode
+                                    Kunci Tanggal:</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <label
+                                        class="flex items-center gap-2 p-2 rounded-xl border border-amber-200 dark:border-slate-600 bg-amber-50/50 dark:bg-slate-700/50 cursor-pointer text-xs font-semibold text-gray-700 dark:text-slate-200 hover:border-amber-400 transition-colors">
+                                        <input type="radio" name="radioLockMode" id="radioLockModeAuto" value="auto"
+                                            checked onchange="toggleLockModeFields()"
+                                            class="text-amber-500 focus:ring-amber-400">
+                                        <span>Otomatis Bergulir</span>
+                                    </label>
+                                    <label
+                                        class="flex items-center gap-2 p-2 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50/50 dark:bg-slate-700/50 cursor-pointer text-xs font-semibold text-gray-700 dark:text-slate-200 hover:border-amber-400 transition-colors">
+                                        <input type="radio" name="radioLockMode" id="radioLockModeManual" value="manual"
+                                            onchange="toggleLockModeFields()"
+                                            class="text-amber-500 focus:ring-amber-400">
+                                        <span>Manual (Tetap)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Opsi Mode Otomatis Bergulir -->
+                            <div id="fieldLockAuto" class="space-y-1.5">
+                                <label
+                                    class="block text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase">Toleransi
+                                    Mundur:</label>
+                                <select id="selectLockTolerance" onchange="updateLockPreviewInfo()"
+                                    class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white font-medium outline-none focus:border-amber-500">
+                                    <option value="0">Hanya Hari Ini (H)</option>
+                                    <option value="1" selected>Hari Ini & Kemarin (H-1) — Rekomendasi</option>
+                                    <option value="2">Maksimal 2 Hari Lalu (H-2)</option>
+                                    <option value="3">Maksimal 3 Hari Lalu (H-3)</option>
+                                    <option value="7">Maksimal 7 Hari Lalu (1 Minggu)</option>
+                                </select>
+                                <div id="textLockAutoPreview"
+                                    class="text-[10px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 p-2.5 rounded-xl flex items-start gap-1.5 leading-normal">
+                                    <i data-feather="info" class="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5"></i>
+                                    <span id="labelLockPreviewText">Memuat info batas tanggal...</span>
+                                </div>
+                            </div>
+
+                            <!-- Opsi Mode Manual Statis -->
+                            <div id="fieldLockManual" class="hidden space-y-1">
+                                <label
+                                    class="block text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase">Kunci
+                                    Tanggal Sebelum:</label>
+                                <input type="date" id="inputLockDateBefore" onchange="updateLockPreviewInfo()"
+                                    class="w-full text-xs p-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white outline-none focus:border-amber-500">
+                                <p class="text-[9px] text-gray-400 dark:text-slate-400">Catatan sebelum tanggal di atas
+                                    otomatis tidak bisa diinput atau diedit oleh staf.</p>
+                            </div>
                         </div>
                     </div>
 
@@ -945,6 +1207,7 @@
             </div>
             <p class="text-[10px] text-gray-500 dark:text-slate-400 mb-3">Masukkan PIN Admin untuk menghapus data.</p>
             <input type="password" id="inputPinHapus" placeholder="6 Angka PIN Admin" inputmode="numeric" maxlength="6"
+                autocomplete="off" onkeydown="if(event.key === 'Enter') prosesHapusDataValidasi()"
                 class="w-full text-center tracking-widest text-base font-bold p-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:border-blue-500 mb-3">
             <div class="flex gap-2">
                 <button onclick="closeFormModal('modalPin')"
@@ -1327,6 +1590,40 @@
         let isLastSavedKasbon = false; // Deteksi mode struk terakhir
         let itemToDelete = null; // Sistem hapus global
 
+        // --- SISTEM KONTROL HAK INPUT BARANG KARYAWAN (Ide 1) ---
+        const KARYAWAN_RESTRICTED_BARANG_KEY = 'karyawan_disabled_barang';
+        let globalKaryawanDisabledBarang = [];
+
+        async function fetchKaryawanDisabledBarang() {
+            // 1. Muat dari localStorage dulu untuk kecepatan render awal
+            try {
+                const local = JSON.parse(localStorage.getItem('sbr_karyawan_disabled_barang') || localStorage.getItem('sbr_hidden_barang') || '[]');
+                if (Array.isArray(local)) globalKaryawanDisabledBarang = local;
+            } catch (e) {
+                globalKaryawanDisabledBarang = [];
+            }
+
+            // 2. Sinkronkan dari Supabase Cloud (catatan_ringkasan)
+            try {
+                const { data, error } = await supabaseClient
+                    .from('catatan_ringkasan')
+                    .select('isi')
+                    .eq('kode', KARYAWAN_RESTRICTED_BARANG_KEY)
+                    .maybeSingle();
+
+                if (!error && data && data.isi) {
+                    const parsed = JSON.parse(data.isi);
+                    if (Array.isArray(parsed)) {
+                        globalKaryawanDisabledBarang = parsed;
+                        localStorage.setItem('sbr_karyawan_disabled_barang', JSON.stringify(globalKaryawanDisabledBarang));
+                        localStorage.setItem('sbr_hidden_barang', JSON.stringify(globalKaryawanDisabledBarang));
+                    }
+                }
+            } catch (err) {
+                console.warn("[karyawan_disabled_barang] fallback local:", err);
+            }
+        }
+
         // --- SISTEM TAB UI ---
         function switchTab(tab) {
             const areaB = document.getElementById('areaBarang');
@@ -1347,6 +1644,7 @@
                 tabK.classList.add(...activeClass, ...activeTextK); tabK.classList.remove(...inactiveClass);
                 tabB.classList.add(...inactiveClass); tabB.classList.remove(...activeClass, ...activeTextB);
             }
+            applyDateConstraintsToUI();
         }
 
         // --- HELPER & AUTH ---
@@ -1507,11 +1805,19 @@
             if (currentUserInfo.role === 'admin') {
                 document.getElementById('btnAdminResetMenu').classList.remove('hidden');
                 document.getElementById('btnAdminMasterMenu').classList.remove('hidden');
+                const mMaster = document.getElementById('btnMobileAdminMaster');
+                if (mMaster) mMaster.classList.remove('hidden');
+                const mReset = document.getElementById('btnMobileAdminReset');
+                if (mReset) mReset.classList.remove('hidden');
                 inputBy.disabled = false;
                 inputBy.classList.add('bg-white', 'text-blue-600', 'border-blue-300');
             } else {
                 document.getElementById('btnAdminResetMenu').classList.add('hidden');
                 document.getElementById('btnAdminMasterMenu').classList.add('hidden');
+                const mMaster = document.getElementById('btnMobileAdminMaster');
+                if (mMaster) mMaster.classList.add('hidden');
+                const mReset = document.getElementById('btnMobileAdminReset');
+                if (mReset) mReset.classList.add('hidden');
                 inputBy.disabled = true;
                 inputBy.classList.add('cursor-not-allowed', 'bg-gray-100', 'text-gray-500');
             }
@@ -1529,6 +1835,17 @@
                 tipeInput.value = 'semua'; tipeInput.disabled = false;
                 selReseller.disabled = false; selResellerK.disabled = false;
             }
+            applyDateConstraintsToUI();
+        }
+
+        function openMobileMenuSheet() {
+            if (currentUserInfo) {
+                const nameEl = document.getElementById('mobileMenuNamaUser');
+                const roleEl = document.getElementById('mobileMenuRoleBadge');
+                if (nameEl) nameEl.innerText = currentUserInfo.nama_lengkap || 'Pengguna';
+                if (roleEl) roleEl.innerText = (currentUserInfo.role || 'USER').toUpperCase();
+            }
+            openFormModal('modalMobileMenu');
         }
 
         // ==============================================================
@@ -1714,18 +2031,22 @@
             const btnSemua = document.getElementById('btnFilterBarangSemua');
             const btnJadi = document.getElementById('btnFilterBarangJadi');
             const btnBahan = document.getElementById('btnFilterBarangBahan');
+            const btnTerkunci = document.getElementById('btnFilterBarangTerkunci');
             const activeClasses = ['bg-white', 'dark:bg-slate-600', 'shadow-sm', 'text-blue-600', 'dark:text-blue-300'];
             const inactiveClasses = ['text-gray-500', 'dark:text-gray-300'];
 
-            if (btnSemua && btnJadi && btnBahan) {
-                [btnSemua, btnJadi, btnBahan].forEach(b => {
-                    b.classList.remove(...activeClasses);
-                    b.classList.add(...inactiveClasses);
-                });
+            const allBtns = [btnSemua, btnJadi, btnBahan, btnTerkunci].filter(Boolean);
+            allBtns.forEach(b => {
+                b.classList.remove(...activeClasses, 'text-rose-600', 'dark:text-rose-400');
+                b.classList.add(...inactiveClasses);
+            });
 
-                if (tipe === 'semua') btnSemua.classList.add(...activeClasses);
-                else if (tipe === 'jadi') btnJadi.classList.add(...activeClasses);
-                else btnBahan.classList.add(...activeClasses);
+            if (tipe === 'semua' && btnSemua) btnSemua.classList.add(...activeClasses);
+            else if (tipe === 'jadi' && btnJadi) btnJadi.classList.add(...activeClasses);
+            else if (tipe === 'bahan' && btnBahan) btnBahan.classList.add(...activeClasses);
+            else if (tipe === 'terkunci' && btnTerkunci) {
+                btnTerkunci.classList.remove(...inactiveClasses);
+                btnTerkunci.classList.add('bg-white', 'dark:bg-slate-600', 'shadow-sm', 'text-rose-600', 'dark:text-rose-400');
             }
 
             renderMasterBarangList(tipe, document.getElementById('searchMasterBarang')?.value || '');
@@ -1734,7 +2055,7 @@
         function renderMasterBarangList(tipeFilter = 'semua', search = '') {
             const container = document.getElementById('listMasterBarangContainer');
             const badgeCount = document.getElementById('badgeCountBarang');
-            const hiddenBarang = JSON.parse(localStorage.getItem('sbr_hidden_barang') || '[]');
+            const hiddenBarang = globalKaryawanDisabledBarang || [];
 
             let listJadi = (masterData.barangJadi || []).map(b => ({ ...b, tipe: 'jadi' }));
             let listBahan = (masterData.bahanBaku || []).map(b => ({ ...b, tipe: 'bahan' }));
@@ -1742,6 +2063,7 @@
 
             if (tipeFilter === 'jadi') all = listJadi;
             else if (tipeFilter === 'bahan') all = listBahan;
+            else if (tipeFilter === 'terkunci') all = all.filter(b => hiddenBarang.includes(b.id));
 
             if (search.trim()) {
                 const q = search.toLowerCase();
@@ -1756,30 +2078,31 @@
             }
 
             container.innerHTML = all.map(b => {
-                const isNonaktif = hiddenBarang.includes(b.id);
+                const isTerkunci = hiddenBarang.includes(b.id);
                 const isJadi = b.tipe === 'jadi';
                 return `
-                <div class="p-2.5 bg-gray-50 dark:bg-slate-700/60 rounded-xl border border-gray-200 dark:border-slate-600 flex items-center justify-between gap-2">
+                <div class="p-2.5 bg-gray-50 dark:bg-slate-700/60 rounded-xl border ${isTerkunci ? 'border-amber-300 dark:border-amber-700/60 bg-amber-50/40 dark:bg-amber-950/20' : 'border-gray-200 dark:border-slate-600'} flex items-center justify-between gap-2 transition-colors">
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-1.5 flex-wrap">
                             <span class="text-[9px] px-1.5 py-0.5 rounded font-black ${isJadi ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400'}">
                                 ${isJadi ? '[STR]' : '[BHN]'}
                             </span>
                             <span class="text-xs font-bold text-gray-800 dark:text-slate-100 truncate">${b.nama}</span>
-                            <span class="text-[8px] px-1 py-0.2 rounded font-bold ${isNonaktif ? 'bg-gray-200 dark:bg-slate-600 text-gray-500' : 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300'}">
-                                ${isNonaktif ? 'Disembunyikan' : 'Aktif'}
+                            <span class="text-[8.5px] px-1.5 py-0.5 rounded-full font-bold flex items-center gap-1 ${isTerkunci ? 'bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700' : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40'}">
+                                <i data-feather="${isTerkunci ? 'lock' : 'check'}" class="w-2.5 h-2.5"></i>
+                                ${isTerkunci ? 'Karyawan Terkunci' : 'Aktif Karyawan'}
                             </span>
                         </div>
                         <span class="text-[9px] text-gray-400">Kode: ${b.id}</span>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
-                        <button onclick="toggleStatusBarang('${b.id}')" title="${isNonaktif ? 'Tampilkan di Form' : 'Sembunyikan dari Form'}" class="p-1.5 rounded-lg text-xs font-bold ${isNonaktif ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300' : 'bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-slate-300'}">
-                            <i data-feather="${isNonaktif ? 'eye' : 'eye-off'}" class="w-3.5 h-3.5"></i>
+                        <button onclick="toggleStatusBarang('${b.id}')" title="${isTerkunci ? 'Buka Kunci (Karyawan bisa input)' : 'Kunci (Karyawan dilarang input)'}" class="p-1.5 rounded-lg text-xs font-bold ${isTerkunci ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-sm' : 'bg-gray-200 dark:bg-slate-600 text-gray-600 hover:text-amber-600 dark:text-slate-300'} transition active:scale-95">
+                            <i data-feather="${isTerkunci ? 'lock' : 'unlock'}" class="w-3.5 h-3.5"></i>
                         </button>
-                        <button onclick="editMasterBarang('${b.id}', '${b.nama.replace(/'/g, "\\'")}', '${b.tipe}')" class="p-1.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 rounded-lg hover:bg-blue-200">
+                        <button onclick="editMasterBarang('${b.id}', '${b.nama.replace(/'/g, "\\'")}', '${b.tipe}')" title="Edit Barang" class="p-1.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 rounded-lg hover:bg-blue-200 transition active:scale-95">
                             <i data-feather="edit-2" class="w-3.5 h-3.5"></i>
                         </button>
-                        <button onclick="hapusMasterBarang('${b.id}', '${b.nama.replace(/'/g, "\\'")}')" class="p-1.5 bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-300 rounded-lg hover:bg-red-200">
+                        <button onclick="hapusMasterBarang('${b.id}', '${b.nama.replace(/'/g, "\\'")}')" title="Hapus Barang" class="p-1.5 bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-300 rounded-lg hover:bg-red-200 transition active:scale-95">
                             <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
@@ -1862,24 +2185,195 @@
             }
         }
 
-        function toggleStatusBarang(id) {
-            let hidden = JSON.parse(localStorage.getItem('sbr_hidden_barang') || '[]');
-            if (hidden.includes(id)) {
-                hidden = hidden.filter(x => x !== id);
-                showNotification("Barang diaktifkan kembali!", "success");
-            } else {
-                hidden.push(id);
-                showNotification("Barang disembunyikan dari form harian!", "info");
+        async function toggleStatusBarang(id) {
+            if (!currentUserInfo || currentUserInfo.role !== 'admin') {
+                return showNotification("Hanya Admin yang berhak mengatur hak akses barang!", "error");
             }
-            localStorage.setItem('sbr_hidden_barang', JSON.stringify(hidden));
-            initDefaults();
+
+            const barang = [...(masterData.barangJadi || []), ...(masterData.bahanBaku || [])].find(b => b.id === id);
+            const namaBrg = barang ? barang.nama : id;
+
+            if (globalKaryawanDisabledBarang.includes(id)) {
+                globalKaryawanDisabledBarang = globalKaryawanDisabledBarang.filter(x => x !== id);
+                showNotification(`"${namaBrg}" DIBUKA! Karyawan sekarang bisa input barang ini.`, "success");
+            } else {
+                globalKaryawanDisabledBarang.push(id);
+                showNotification(`"${namaBrg}" DIKUNCI! Karyawan tidak bisa input barang ini.`, "info");
+            }
+
+            // Simpan ke localStorage agar langsung aktif instan
+            localStorage.setItem('sbr_karyawan_disabled_barang', JSON.stringify(globalKaryawanDisabledBarang));
+            localStorage.setItem('sbr_hidden_barang', JSON.stringify(globalKaryawanDisabledBarang));
+
             renderMasterBarangList(currentBarangFilter, document.getElementById('searchMasterBarang')?.value || '');
+            initDefaults();
+
+            // Simpan ke Supabase Cloud (catatan_ringkasan) agar seluruh device karyawan otomatis tersinkron
+            try {
+                await supabaseClient.from('catatan_ringkasan').upsert({
+                    kode: KARYAWAN_RESTRICTED_BARANG_KEY,
+                    isi: JSON.stringify(globalKaryawanDisabledBarang),
+                    diubah_oleh: currentUserInfo?.id || null,
+                    diperbarui_pada: new Date().toISOString()
+                });
+            } catch (err) {
+                console.warn("[karyawan_disabled_barang] sync cloud warning:", err);
+            }
         }
 
         // --- SUB 3: KONTROL OPERASIONAL & STRUK ---
+        function formatDateYYYYMMDD(d) {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getTodayDateStr() {
+            return formatDateYYYYMMDD(new Date());
+        }
+
+        function getMinAllowedDateStr() {
+            const cfg = getOperasionalSettings();
+            if (!cfg.isDateLockActive) return null;
+
+            if (cfg.lockMode === 'manual') {
+                return cfg.lockDateBefore || null;
+            } else {
+                // Mode otomatis bergulir: toleransi mundur N hari (default 1: Hari Ini & Kemarin)
+                const tolerance = (cfg.lockDaysTolerance !== undefined && cfg.lockDaysTolerance !== '') ? parseInt(cfg.lockDaysTolerance) : 1;
+                const d = new Date();
+                d.setDate(d.getDate() - tolerance);
+                return formatDateYYYYMMDD(d);
+            }
+        }
+
+        function isTanggalTerkunci(tglStr) {
+            if (!tglStr) return false;
+            // Admin bypass: Admin memiliki akses bebas memilih dan mengedit tanggal kapan saja
+            if (currentUserInfo && currentUserInfo.role === 'admin') return false;
+
+            const cfg = getOperasionalSettings();
+            if (!cfg.isDateLockActive) return false;
+
+            const minAllowed = getMinAllowedDateStr();
+            if (!minAllowed) return false;
+
+            return tglStr < minAllowed;
+        }
+
+        function applyDateConstraintsToUI() {
+            const isUserAdmin = currentUserInfo && currentUserInfo.role === 'admin';
+            const cfg = getOperasionalSettings();
+            const todayStr = getTodayDateStr();
+
+            let minDate = '';
+            let maxDate = '';
+
+            if (!isUserAdmin) {
+                maxDate = todayStr; // Karyawan & Reseller maksimal hari ini (cegah salah input masa depan)
+                if (cfg.isDateLockActive) {
+                    minDate = getMinAllowedDateStr() || '';
+                }
+            }
+
+            const targetIds = ['inputTglHarian', 'inputTglKasbon'];
+            targetIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+
+                if (minDate) {
+                    el.setAttribute('min', minDate);
+                } else {
+                    el.removeAttribute('min');
+                }
+
+                if (maxDate) {
+                    el.setAttribute('max', maxDate);
+                } else {
+                    el.removeAttribute('max');
+                }
+
+                // Jika nilai saat ini di luar batas yang diizinkan untuk non-admin, sesuaikan ke hari ini
+                if (!isUserAdmin && el.value) {
+                    if (minDate && el.value < minDate) {
+                        el.value = todayStr;
+                    }
+                    if (maxDate && el.value > maxDate) {
+                        el.value = todayStr;
+                    }
+                }
+            });
+        }
+
+        function toggleLockDateOptions() {
+            const isLock = document.getElementById('checkLockDateActive')?.checked;
+            const sec = document.getElementById('sectionLockDateOptions');
+            if (sec) {
+                if (isLock) {
+                    sec.classList.remove('opacity-40', 'pointer-events-none');
+                } else {
+                    sec.classList.add('opacity-40', 'pointer-events-none');
+                }
+            }
+            updateLockPreviewInfo();
+        }
+
+        function toggleLockModeFields() {
+            const mode = document.querySelector('input[name="radioLockMode"]:checked')?.value || 'auto';
+            const fAuto = document.getElementById('fieldLockAuto');
+            const fManual = document.getElementById('fieldLockManual');
+            if (mode === 'auto') {
+                if (fAuto) fAuto.classList.remove('hidden');
+                if (fManual) fManual.classList.add('hidden');
+            } else {
+                if (fAuto) fAuto.classList.add('hidden');
+                if (fManual) fManual.classList.remove('hidden');
+            }
+            updateLockPreviewInfo();
+            if (window.feather) feather.replace();
+        }
+
+        function updateLockPreviewInfo() {
+            const isLockActive = document.getElementById('checkLockDateActive')?.checked;
+            const mode = document.querySelector('input[name="radioLockMode"]:checked')?.value || 'auto';
+            const tolerance = parseInt(document.getElementById('selectLockTolerance')?.value) || 0;
+            const previewEl = document.getElementById('labelLockPreviewText');
+            if (!previewEl) return;
+
+            if (!isLockActive) {
+                previewEl.innerHTML = '<span class="text-gray-500 italic">Kunci tanggal tidak aktif (semua tanggal terbuka).</span>';
+                return;
+            }
+
+            const todayStr = getTodayDateStr();
+            const minAllowed = getMinAllowedDateStr();
+
+            if (mode === 'auto') {
+                let text = '';
+                if (tolerance === 0) {
+                    text = `Staf hanya bisa input tanggal <b>Hari Ini (${formatHariTanggalID(todayStr)})</b>. Tanggal kemarin & sebelumnya terkunci otomatis.`;
+                } else if (tolerance === 1) {
+                    text = `Staf hanya bisa input <b>Hari Ini & Kemarin</b> (${formatHariTanggalID(minAllowed)} s/d ${formatHariTanggalID(todayStr)}). Tanggal sebelumnya terkunci otomatis.`;
+                } else {
+                    text = `Staf bisa input s/d <b>${tolerance} hari lalu</b> (${formatHariTanggalID(minAllowed)} s/d ${formatHariTanggalID(todayStr)}). Tanggal sebelum itu terkunci otomatis.`;
+                }
+                previewEl.innerHTML = text;
+            } else {
+                const manualDate = document.getElementById('inputLockDateBefore')?.value;
+                if (!manualDate) {
+                    previewEl.innerHTML = '<span class="text-amber-600 font-semibold">Silakan tentukan batas tanggal manual di bawah.</span>';
+                } else {
+                    previewEl.innerHTML = `Catatan sebelum tanggal <b>${formatHariTanggalID(manualDate)}</b> otomatis terkunci untuk staf.`;
+                }
+            }
+        }
+
         function getOperasionalSettings() {
             const defaults = {
                 isDateLockActive: false,
+                lockMode: 'auto',
+                lockDaysTolerance: 1,
                 lockDateBefore: '',
                 maxKasbonLimit: 0,
                 strukHeader1: 'SBR PUTRA FOOD',
@@ -1894,18 +2388,68 @@
             }
         }
 
-        function muatPengaturanOperasional() {
-            const cfg = getOperasionalSettings();
-            document.getElementById('checkLockDateActive').checked = !!cfg.isDateLockActive;
-            document.getElementById('inputLockDateBefore').value = cfg.lockDateBefore || '';
-            document.getElementById('inputMaxKasbonLimit').value = cfg.maxKasbonLimit || '';
-            document.getElementById('inputStrukHeader1').value = cfg.strukHeader1 || 'SBR PUTRA FOOD';
-            document.getElementById('inputStrukHeader2').value = cfg.strukHeader2 || 'Gudang & Reseller System';
-            document.getElementById('inputStrukFooter').value = cfg.strukFooter || 'Harap periksa barang sebelum keluar';
+        async function fetchOperasionalSettingsCloud() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('catatan_ringkasan')
+                    .select('isi')
+                    .eq('kode', 'operasional_settings')
+                    .maybeSingle();
+
+                if (!error && data && data.isi) {
+                    const parsed = JSON.parse(data.isi);
+                    if (parsed && typeof parsed === 'object') {
+                        const local = getOperasionalSettings();
+                        const merged = { ...local, ...parsed };
+                        localStorage.setItem('sbr_operasional_settings', JSON.stringify(merged));
+                    }
+                }
+            } catch (e) {
+                console.warn("[operasional_settings] fallback local:", e);
+            }
+            applyDateConstraintsToUI();
         }
 
-        function simpanPengaturanOperasional() {
+        function muatPengaturanOperasional() {
+            const cfg = getOperasionalSettings();
+            const chkLock = document.getElementById('checkLockDateActive');
+            if (chkLock) chkLock.checked = !!cfg.isDateLockActive;
+
+            if (cfg.lockMode === 'manual') {
+                const rMan = document.getElementById('radioLockModeManual');
+                if (rMan) rMan.checked = true;
+            } else {
+                const rAuto = document.getElementById('radioLockModeAuto');
+                if (rAuto) rAuto.checked = true;
+            }
+
+            const selTol = document.getElementById('selectLockTolerance');
+            if (selTol) selTol.value = (cfg.lockDaysTolerance !== undefined && cfg.lockDaysTolerance !== '') ? String(cfg.lockDaysTolerance) : '1';
+
+            const inLock = document.getElementById('inputLockDateBefore');
+            if (inLock) inLock.value = cfg.lockDateBefore || '';
+
+            const inMaxKasbon = document.getElementById('inputMaxKasbonLimit');
+            if (inMaxKasbon) inMaxKasbon.value = cfg.maxKasbonLimit || '';
+
+            const inH1 = document.getElementById('inputStrukHeader1');
+            if (inH1) inH1.value = cfg.strukHeader1 || 'SBR PUTRA FOOD';
+
+            const inH2 = document.getElementById('inputStrukHeader2');
+            if (inH2) inH2.value = cfg.strukHeader2 || 'Gudang & Reseller System';
+
+            const inFoot = document.getElementById('inputStrukFooter');
+            if (inFoot) inFoot.value = cfg.strukFooter || 'Harap periksa barang sebelum keluar';
+
+            toggleLockDateOptions();
+            toggleLockModeFields();
+            updateLockPreviewInfo();
+        }
+
+        async function simpanPengaturanOperasional() {
             const isLock = document.getElementById('checkLockDateActive').checked;
+            const lockMode = document.querySelector('input[name="radioLockMode"]:checked')?.value || 'auto';
+            const lockTolerance = parseInt(document.getElementById('selectLockTolerance').value) || 0;
             const lockDate = document.getElementById('inputLockDateBefore').value;
             const maxKasbon = parseFloat(document.getElementById('inputMaxKasbonLimit').value) || 0;
             const h1 = document.getElementById('inputStrukHeader1').value.trim() || 'SBR PUTRA FOOD';
@@ -1914,6 +2458,8 @@
 
             const settings = {
                 isDateLockActive: isLock,
+                lockMode: lockMode,
+                lockDaysTolerance: lockTolerance,
                 lockDateBefore: lockDate,
                 maxKasbonLimit: maxKasbon,
                 strukHeader1: h1,
@@ -1923,15 +2469,20 @@
 
             localStorage.setItem('sbr_operasional_settings', JSON.stringify(settings));
             localStorage.setItem('sbr_struk_settings', JSON.stringify({ header1: h1, header2: h2, footer: foot }));
-            showNotification("Pengaturan operasional & struk berhasil disimpan!", "success");
-        }
 
-        function isTanggalTerkunci(tglStr) {
-            if (!tglStr) return false;
-            if (currentUserInfo && currentUserInfo.role === 'admin') return false; // Admin bypass
-            const cfg = getOperasionalSettings();
-            if (!cfg.isDateLockActive || !cfg.lockDateBefore) return false;
-            return tglStr < cfg.lockDateBefore;
+            applyDateConstraintsToUI();
+
+            try {
+                await supabaseClient.from('catatan_ringkasan').upsert({
+                    kode: 'operasional_settings',
+                    isi: JSON.stringify(settings),
+                    updated_at: new Date().toISOString()
+                });
+            } catch (err) {
+                console.warn("[operasional_settings] Cloud sync warning:", err);
+            }
+
+            showNotification("Pengaturan operasional & kunci tanggal berhasil disimpan!", "success");
         }
 
         function getStrukSettings() {
@@ -2135,6 +2686,9 @@
                 masterData.barangJadi.sort((a, b) => String(a.id).localeCompare(String(b.id)));
                 masterData.bahanBaku.sort((a, b) => String(a.id).localeCompare(String(b.id)));
 
+                await fetchKaryawanDisabledBarang();
+                await fetchOperasionalSettingsCloud();
+
                 const statusConn = document.getElementById('status-connection');
                 statusConn.classList.replace('bg-yellow-50', 'bg-green-50');
                 statusConn.classList.replace('border-yellow-100', 'border-green-100');
@@ -2175,10 +2729,10 @@
                 selResKasbon.value = currentUserInfo.reseller_id;
             }
 
-            const tzOffset = (new Date()).getTimezoneOffset() * 60000;
-            const today = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
+            const today = getTodayDateStr();
             document.getElementById('inputTglHarian').value = today;
             document.getElementById('inputTglKasbon').value = today;
+            applyDateConstraintsToUI();
 
             document.getElementById('containerHarianRows').innerHTML = '';
             for (let i = 0; i < 3; i++) { addRowHarian(); }
@@ -2198,25 +2752,35 @@
             }
         }
 
-        // --- BARANG LOGIC (Asli) ---
+        // --- BARANG LOGIC (Kontrol Akses Karyawan Terintegrasi) ---
         function getOptionsHarianHtmlWithSelected(selectedId = null, tipeFokus = 'semua') {
             let html = '<option value="">Pilih Barang / Bahan...</option>';
-            const hiddenBarang = JSON.parse(localStorage.getItem('sbr_hidden_barang') || '[]');
+            const hiddenBarang = globalKaryawanDisabledBarang || [];
+            const isKaryawan = currentUserInfo && currentUserInfo.role === 'karyawan';
+
             if (tipeFokus === 'semua' || tipeFokus === 'jadi') {
                 html += '<optgroup label="📦 BARANG JADI">';
                 masterData.barangJadi.forEach(b => {
-                    if (!hiddenBarang.includes(b.id) || b.id === selectedId) {
-                        html += `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.nama}</option>`;
+                    const isLocked = hiddenBarang.includes(b.id);
+                    // Karyawan tidak bisa melihat atau memilih barang yang dikunci (kecuali jika item sudah tersimpan di draft sebelumnya)
+                    if (isKaryawan && isLocked && b.id !== selectedId) {
+                        return;
                     }
+                    const tagLock = (!isKaryawan && isLocked) ? ' 🔒 (Terkunci Karyawan)' : '';
+                    html += `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.nama}${tagLock}</option>`;
                 });
                 html += '</optgroup>';
             }
             if (tipeFokus === 'semua' || tipeFokus === 'bahan') {
                 html += '<optgroup label="🛍️ BAHAN BAKU">';
                 masterData.bahanBaku.forEach(b => {
-                    if (!hiddenBarang.includes(b.id) || b.id === selectedId) {
-                        html += `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.nama}</option>`;
+                    const isLocked = hiddenBarang.includes(b.id);
+                    // Karyawan tidak bisa melihat atau memilih barang yang dikunci (kecuali jika item sudah tersimpan di draft sebelumnya)
+                    if (isKaryawan && isLocked && b.id !== selectedId) {
+                        return;
                     }
+                    const tagLock = (!isKaryawan && isLocked) ? ' 🔒 (Terkunci Karyawan)' : '';
+                    html += `<option value="${b.id}" ${b.id === selectedId ? 'selected' : ''}>${b.nama}${tagLock}</option>`;
                 });
                 html += '</optgroup>';
             }
@@ -2306,8 +2870,8 @@
                 lastSavedItems = savedData;
                 isLastSavedKasbon = false; // Flag bahwa ini barang
 
-                const tzOffset = (new Date()).getTimezoneOffset() * 60000;
-                document.getElementById('inputTglHarian').value = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
+                document.getElementById('inputTglHarian').value = getTodayDateStr();
+                applyDateConstraintsToUI();
                 document.getElementById('containerHarianRows').innerHTML = '';
                 for (let i = 0; i < 3; i++) { addRowHarian(); }
 
@@ -2852,6 +3416,7 @@
                                     Qty: ${item.qty}
                                 </span>
                                 ${isAdmin ? `<button onclick="toggleEditRow(this)" class="text-amber-500 hover:text-amber-600 dark:text-amber-400 p-1 rounded-lg bg-amber-50 dark:bg-slate-800 border border-amber-100 dark:border-slate-600 shadow-sm" title="Edit"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>` : ''}
+                                ${isAdmin ? `<button type="button" onclick="hapusCatatanDatabase('${item.id}', 'barang', '${rId}', '${tgl}')" class="text-white hover:bg-red-600 active:scale-95 bg-red-500 p-1 rounded-lg transition-all shadow-sm" title="Hapus"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
                             </div>
                         </div>
 
@@ -2870,7 +3435,7 @@
                             <div class="w-3/12"><input type="number" class="edit-qty w-full text-xs p-1.5 border border-gray-300 dark:border-slate-500 rounded text-center font-black bg-gray-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 focus:border-blue-500" value="${item.qty}"></div>
                             <div class="w-2/12 flex justify-end gap-1">
                                 <button type="button" onclick="toggleKeteranganEditAdmin(this)" class="text-blue-400 hover:text-blue-600 bg-blue-50 dark:bg-blue-900/30 p-1.5 rounded transition-colors"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>
-                                <button type="button" onclick="hapusCatatanDatabase('${item.id}', 'barang')" class="text-red-400 hover:text-red-600 bg-red-50 dark:bg-red-900/30 p-1.5 rounded transition-colors"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
+                                <button type="button" onclick="hapusCatatanDatabase('${item.id}', 'barang', '${rId}', '${tgl}')" class="text-white hover:bg-red-600 active:scale-95 bg-red-500 p-1.5 rounded-lg transition-colors shadow-sm" title="Hapus"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>
                             </div>
                         </div>
                         <div class="keterangan-edit-container hidden w-full flex gap-1.5 mt-0.5">
@@ -2967,6 +3532,8 @@
                 isLastSavedKasbon = true; // Flag bahwa ini adalah kasbon
 
                 document.getElementById('inputNominalKasbon').value = ''; document.getElementById('inputKetKasbon').value = '';
+                document.getElementById('inputTglKasbon').value = getTodayDateStr();
+                applyDateConstraintsToUI();
                 await fetchListKasbon();
 
                 document.getElementById('postSaveTitle').innerText = (statusInput === 'pending') ? "Menunggu Validasi" : "Tersimpan!";
@@ -3026,22 +3593,67 @@
         }
 
         // --- SISTEM HAPUS GLOBAL ---
-        function hapusCatatanDatabase(id, type) {
+        function hapusCatatanDatabase(id, type, rId = null, tgl = null) {
             if (currentUserInfo.role !== 'admin') return showNotification("Hanya Admin!", "error");
-            itemToDelete = { id, type }; document.getElementById('inputPinHapus').value = ''; openFormModal('modalPin');
+            itemToDelete = { id, type, rId, tgl };
+            document.getElementById('inputPinHapus').value = '';
+            const btn = document.querySelector('#modalPin button.bg-red-500');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = 'Hapus';
+            }
+            openFormModal('modalPin');
+            setTimeout(() => {
+                const el = document.getElementById('inputPinHapus');
+                if (el) el.focus();
+            }, 100);
         }
 
         async function prosesHapusDataValidasi() {
             const pin = document.getElementById('inputPinHapus').value;
-            if (pin !== "942715") return showNotification("PIN Admin Salah!", "error");
+            if (pin !== "749947" && pin !== "942715") return showNotification("PIN Admin Salah!", "error");
             if (!itemToDelete) return;
-            const { id, type } = itemToDelete; closeFormModal('modalPin');
+
+            const btn = document.querySelector('#modalPin button.bg-red-500');
+            const originalTxt = btn ? btn.innerText : 'Hapus';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'Menghapus...';
+            }
+
+            const { id, type, rId, tgl } = itemToDelete;
             try {
                 const { error } = await supabaseClient.from(type === 'kasbon' ? 'kasbon_harian' : 'buku_harian').delete().eq('id', id);
                 if (error) throw error;
-                showNotification("Data dihapus!", "success");
-                if (type === 'kasbon') fetchListKasbon(); else { closeFormModal('modalDetailDraft'); fetchListHarian(); fetchSummaryBahanSetor(true); }
-            } catch (err) { showNotification("Gagal menghapus", "error"); } finally { itemToDelete = null; }
+                showNotification("Data berhasil dihapus!", "success");
+                closeFormModal('modalPin');
+
+                if (type === 'kasbon') {
+                    fetchListKasbon();
+                } else {
+                    await fetchListHarian();
+                    fetchSummaryBahanSetor(true);
+
+                    const modalDraft = document.getElementById('modalDetailDraft');
+                    if (modalDraft && !modalDraft.classList.contains('hidden')) {
+                        const hasItems = rId && tgl && globalDraftData[rId]?.dates?.[tgl]?.length > 0;
+                        if (hasItems) {
+                            bukaDetailDraft(rId, tgl);
+                        } else {
+                            closeFormModal('modalDetailDraft');
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Gagal menghapus:", err);
+                showNotification("Gagal menghapus: " + err.message, "error");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalTxt;
+                }
+                itemToDelete = null;
+            }
         }
 
         // --- SISTEM CETAK BLUETOOTH ---
